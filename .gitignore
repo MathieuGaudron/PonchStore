@@ -6,7 +6,8 @@ CLAUDE.md
 .vscode/
 *.swp
 
-# Env files (chaque sous-projet aura le sien, on bloque par sécurité)
+# Env files (vrais secrets — gitignored)
+.env
 .env.local
 .env.*.local
 

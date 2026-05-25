@@ -1,1 +1,17 @@
 CLAUDE.md
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Env files (chaque sous-projet aura le sien, on bloque par sécurité)
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Docker
+docker-compose.override.yml

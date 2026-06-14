@@ -5,7 +5,7 @@ Application B2B Click & Collect de spiritueux pour bars et boîtes de nuit en Î
 ## Stack
 - **Front** : React 18 + Vite + TailwindCSS
 - **API** : Symfony 7 + PHP 8.2 + Doctrine
-- **BDD** : MySQL 8
+- **BDD** : MySQL 8 
 - **Orchestration** : Docker Compose
 
 ## Démarrage rapide
@@ -16,7 +16,8 @@ docker compose up -d
 
 - Front : http://localhost:3000
 - API : http://localhost:8080
-- DB : localhost:3306
+- DB : localhost:3306 -- docker exec -it ponchstore-db mysql -u ponchstore -pponchstore ponchstore
+
 
 ## Architecture
 

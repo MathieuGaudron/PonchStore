@@ -20,7 +20,22 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $categories = [];
-        foreach (['Vodka', 'Rhum', 'Whisky', 'Gin'] as $nom) {
+        $nomsCategories = [
+            'Vodka',
+            'Rhum',
+            'Whisky',
+            'Gin',
+            'Tequila',
+            'Cognac & Brandy',
+            'Liqueurs',
+            'Apéritifs & Vermouth',
+            'Pastis & Anisés',
+            'Champagne & Mousseux',
+            'Vin rouge',
+            'Vin blanc',
+            'Vin rosé',
+        ];
+        foreach ($nomsCategories as $nom) {
             $categorie = new Categorie();
             $categorie->setNom($nom);
             $categorie->setDescription('Sélection de ' . $nom . ' pour la revente CHR.');

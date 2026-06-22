@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 import { apiFetch } from '../services/api'
 
@@ -118,9 +118,10 @@ export default function Catalogue() {
 
           <div className="grid grid-cols-3 gap-[10px]">
             {produits.map((p) => (
-              <article
+              <Link
                 key={p.id}
-                className="bg-white rounded-md shadow-[0_1px_4px_#E8E8E8] overflow-hidden"
+                to={`/catalogue/${p.id}`}
+                className="bg-white rounded-md shadow-[0_1px_4px_#E8E8E8] overflow-hidden block hover:shadow-[0_2px_8px_#D0D0D0]"
               >
                 <div className="h-32 bg-[#1C1C1C] flex items-center justify-center">
                   {p.imageUrl ? (
@@ -148,7 +149,7 @@ export default function Catalogue() {
                   </p>
                   <p className="text-[#F5A623] font-bold">{p.prixCarton} € / carton</p>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </section>

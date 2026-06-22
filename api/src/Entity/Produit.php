@@ -189,6 +189,16 @@ class Produit
         return round((float) $this->prixAchatCarton * self::TAUX_MARGE_BASE, 2);
     }
 
+    #[Groups(['produit:detail'])]
+    public function getPrixPalette(): ?float
+    {
+        if ($this->cartonsParPalette === null) {
+            return null;
+        }
+
+        return round($this->getPrixCarton() * $this->cartonsParPalette, 2);
+    }
+
     public function getCartonsParPalette(): ?int
     {
         return $this->cartonsParPalette;

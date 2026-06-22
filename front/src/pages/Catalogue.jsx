@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/auth-context'
+import { Link } from 'react-router-dom'
 import { apiFetch } from '../services/api'
+import Navbar from '../components/Navbar'
 
 export default function Catalogue() {
-  const { utilisateur, seDeconnecter } = useAuth()
-  const navigate = useNavigate()
-
   const [categories, setCategories] = useState([])
   const [produits, setProduits] = useState([])
   const [recherche, setRecherche] = useState('')
@@ -14,11 +11,6 @@ export default function Catalogue() {
   const [disponible, setDisponible] = useState(false)
   const [chargement, setChargement] = useState(false)
   const [erreur, setErreur] = useState(null)
-
-  function handleDeconnexion() {
-    seDeconnecter()
-    navigate('/connexion')
-  }
 
   useEffect(() => {
     apiFetch('/api/categories')
@@ -55,20 +47,7 @@ export default function Catalogue() {
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
-      <nav className="h-12 bg-[#111111] flex items-center justify-between px-4">
-        <span className="text-[#F5A623] font-bold">PONCH'STORE</span>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-white">
-            {utilisateur?.prenom} {utilisateur?.nom} · {utilisateur?.role}
-          </span>
-          <button
-            onClick={handleDeconnexion}
-            className="bg-[#CC3333] text-white rounded px-3 py-1"
-          >
-            Déconnexion
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="flex gap-4 p-4">
         <aside className="w-[150px] shrink-0 bg-[#1C1C1C] rounded p-3 text-white">

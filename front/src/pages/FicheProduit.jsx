@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { apiFetch } from '../services/api'
+import { usePanier } from '../context/panier-context'
+import Navbar from '../components/Navbar'
+import { Button } from '@/components/ui/button'
 
 export default function FicheProduit() {
   const { id } = useParams()
+  const { ajouter } = usePanier()
 
   const [produit, setProduit] = useState(null)
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState(null)
+  const [quantite, setQuantite] = useState(1)
+  const [ajoute, setAjoute] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -33,22 +39,26 @@ export default function FicheProduit() {
     }
   }, [id])
 
+  function handleAjouter() {
+    ajouter(produit, quantite)
+    setAjoute(true)
+  }
+
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
-      <nav className="h-12 bg-[#111111] flex items-center justify-between px-4">
-        <span className="text-[#F5A623] font-bold">PONCH'STORE</span>
-        <Link to="/catalogue" className="text-white text-sm hover:text-[#F5A623]">
-          ← Retour au catalogue
-        </Link>
-      </nav>
+      <Navbar />
 
       <main className="p-8">
-        {chargement && <p className="text-[#888888]">Chargement…</p>}
-        {erreur && <p className="text-[#CC3333]">{erreur}</p>}
+        <Link to="/catalogue" className="text-sm text-[#888888] hover:text-[#F5A623]">
+          ← Retour au catalogue
+        </Link>
+
+        {chargement && <p className="mt-4 text-[#888888]">Chargement…</p>}
+        {erreur && <p className="mt-4 text-[#CC3333]">{erreur}</p>}
 
         {produit && (
-          <div className="flex gap-8 max-w-4xl">
-            <div className="w-80 h-80 shrink-0 bg-[#1C1C1C] rounded-md flex items-center justify-center">
+          <div className="mt-4 flex max-w-4xl gap-8">
+            <div className="flex h-80 w-80 shrink-0 items-center justify-center rounded-md bg-[#1C1C1C]">
               {produit.imageUrl ? (
                 <img src={produit.imageUrl} alt={produit.nom} className="h-full object-contain" />
               ) : (
@@ -60,40 +70,40 @@ export default function FicheProduit() {
               <div className="flex items-start justify-between gap-4">
                 <h1 className="text-3xl font-bold text-[#222222]">{produit.nom}</h1>
                 {produit.stockDisponible > 0 ? (
-                  <span className="bg-[#2ECC71] text-[#111111] text-sm rounded-full px-3 py-1 whitespace-nowrap">
+                  <span className="whitespace-nowrap rounded-full bg-[#2ECC71] px-3 py-1 text-sm text-[#111111]">
                     En stock
                   </span>
                 ) : (
-                  <span className="bg-[#E67E22] text-white text-sm rounded-full px-3 py-1 whitespace-nowrap">
+                  <span className="whitespace-nowrap rounded-full bg-[#E67E22] px-3 py-1 text-sm text-white">
                     Rupture
                   </span>
                 )}
               </div>
 
-              <p className="text-[#888888] mt-1">{produit.marque}</p>
-              <p className="text-[#888888] text-sm mt-1">{produit.categorie?.nom}</p>
+              <p className="mt-1 text-[#888888]">{produit.marque}</p>
+              <p className="mt-1 text-sm text-[#888888]">{produit.categorie?.nom}</p>
 
-              <p className="text-[#F5A623] text-2xl font-bold mt-4">
+              <p className="mt-4 text-2xl font-bold text-[#F5A623]">
                 {produit.prixCarton} € / carton
               </p>
 
-              <dl className="mt-6 text-sm text-[#222222] space-y-1">
+              <dl className="mt-6 space-y-1 text-sm text-[#222222]">
                 <div className="flex gap-2">
-                  <dt className="text-[#888888] w-40">Format carton</dt>
+                  <dt className="w-40 text-[#888888]">Format carton</dt>
                   <dd>{produit.formatCarton}</dd>
                 </div>
                 <div className="flex gap-2">
-                  <dt className="text-[#888888] w-40">Stock disponible</dt>
+                  <dt className="w-40 text-[#888888]">Stock disponible</dt>
                   <dd>{produit.stockDisponible} carton(s)</dd>
                 </div>
                 {produit.cartonsParPalette && (
                   <>
                     <div className="flex gap-2">
-                      <dt className="text-[#888888] w-40">Cartons par palette</dt>
+                      <dt className="w-40 text-[#888888]">Cartons par palette</dt>
                       <dd>{produit.cartonsParPalette}</dd>
                     </div>
                     <div className="flex gap-2">
-                      <dt className="text-[#888888] w-40">Prix palette</dt>
+                      <dt className="w-40 text-[#888888]">Prix palette</dt>
                       <dd>
                         {produit.prixPalette} €
                         <span className="text-[#888888]"> ({produit.cartonsParPalette} cartons)</span>
@@ -104,7 +114,29 @@ export default function FicheProduit() {
               </dl>
 
               {produit.description && (
-                <p className="mt-6 text-[#222222] leading-relaxed">{produit.description}</p>
+                <p className="mt-6 leading-relaxed text-[#222222]">{produit.description}</p>
+              )}
+
+              {produit.stockDisponible > 0 && (
+                <div className="mt-8 flex items-center gap-3">
+                  <input
+                    type="number"
+                    min="1"
+                    max={produit.stockDisponible}
+                    value={quantite}
+                    onChange={(e) => {
+                      setQuantite(Math.max(1, Number(e.target.value)))
+                      setAjoute(false)
+                    }}
+                    className="w-20 rounded border border-[#888888] px-2 py-2 text-sm"
+                  />
+                  <Button onClick={handleAjouter}>Ajouter au panier</Button>
+                  {ajoute && (
+                    <Link to="/panier" className="text-sm text-[#2ECC71] hover:underline">
+                      ✓ Ajouté — voir le panier
+                    </Link>
+                  )}
+                </div>
               )}
             </div>
           </div>

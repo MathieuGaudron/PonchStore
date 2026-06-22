@@ -12,4 +12,15 @@ class CreneauRetraitRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CreneauRetrait::class);
     }
+
+    public function aVenir(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.date >= :aujourdhui')
+            ->setParameter('aujourdhui', new \DateTimeImmutable('today'))
+            ->orderBy('c.date', 'ASC')
+            ->addOrderBy('c.heureDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

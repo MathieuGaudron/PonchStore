@@ -16,7 +16,7 @@ docker compose up -d
 
 - Front : http://localhost:3000
 - API : http://localhost:8080
-- DB : localhost:3306 -- docker exec -it ponchstore-db mysql -u ponchstore -pponchstore ponchstore
+- DB : localhost:3306
 
 
 ## Architecture

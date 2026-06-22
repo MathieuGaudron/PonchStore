@@ -11,6 +11,9 @@ CLAUDE.md
 .env.local
 .env.*.local
 
+# Notes perso (gitignored — non versionnées)
+*.local.md
+
 # Logs
 *.log
 

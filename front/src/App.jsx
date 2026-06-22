@@ -4,6 +4,7 @@ import RoutePrivee from './components/RoutePrivee'
 import Connexion from './pages/Connexion'
 import CreerUtilisateur from './pages/CreerUtilisateur'
 import Catalogue from './pages/Catalogue'
+import FicheProduit from './pages/FicheProduit'
 
 function App() {
   return (
@@ -16,6 +17,14 @@ function App() {
             element={
               <RoutePrivee>
                 <Catalogue />
+              </RoutePrivee>
+            }
+          />
+          <Route
+            path="/catalogue/:id"
+            element={
+              <RoutePrivee>
+                <FicheProduit />
               </RoutePrivee>
             }
           />

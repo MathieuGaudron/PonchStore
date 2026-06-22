@@ -6,6 +6,7 @@ use App\Repository\CreneauRetraitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CreneauRetraitRepository::class)]
@@ -16,22 +17,27 @@ class CreneauRetrait
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_creneau')]
+    #[Groups(['creneau:read', 'commande:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'date_immutable')]
     #[Assert\NotNull]
+    #[Groups(['creneau:read', 'commande:read'])]
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column(name: 'heure_debut', type: 'time_immutable')]
     #[Assert\NotNull]
+    #[Groups(['creneau:read', 'commande:read'])]
     private ?\DateTimeImmutable $heureDebut = null;
 
     #[ORM\Column(name: 'heure_fin', type: 'time_immutable')]
     #[Assert\NotNull]
+    #[Groups(['creneau:read', 'commande:read'])]
     private ?\DateTimeImmutable $heureFin = null;
 
     #[ORM\Column(name: 'capacite_max', options: ['default' => 5])]
     #[Assert\Positive]
+    #[Groups(['creneau:read'])]
     private int $capaciteMax = 5;
 
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'creneau')]

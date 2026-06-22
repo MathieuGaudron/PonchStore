@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\LigneCommandeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LigneCommandeRepository::class)]
@@ -18,11 +19,13 @@ class LigneCommande
 
     #[ORM\Column]
     #[Assert\Positive]
+    #[Groups(['commande:read'])]
     private ?int $quantite = null;
 
     #[ORM\Column(name: 'prix_unitaire', type: 'decimal', precision: 8, scale: 2)]
     #[Assert\NotBlank]
     #[Assert\PositiveOrZero]
+    #[Groups(['commande:read'])]
     private ?string $prixUnitaire = null;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'lignes')]
@@ -32,6 +35,7 @@ class LigneCommande
     #[ORM\ManyToOne(targetEntity: Produit::class)]
     #[ORM\JoinColumn(name: 'id_produit', referencedColumnName: 'id_produit', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
+    #[Groups(['commande:read'])]
     private ?Produit $produit = null;
 
     public function getId(): ?int

@@ -7,6 +7,7 @@ use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 #[ORM\Table(name: 'commande')]
@@ -16,21 +17,26 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_commande')]
+    #[Groups(['commande:read'])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'date_commande', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[Groups(['commande:read'])]
     private ?\DateTimeImmutable $dateCommande = null;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: StatutCommandeEnum::class, options: ['default' => 'EN_ATTENTE'])]
+    #[Groups(['commande:read'])]
     private StatutCommandeEnum $statut = StatutCommandeEnum::EN_ATTENTE;
 
     #[ORM\Column(name: 'montant_total', type: 'decimal', precision: 10, scale: 2, options: ['default' => '0.00'])]
+    #[Groups(['commande:read'])]
     private string $montantTotal = '0.00';
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['commande:read'])]
     private ?string $commentaire = null;
 
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'commandes')]
@@ -39,9 +45,11 @@ class Commande
 
     #[ORM\ManyToOne(targetEntity: CreneauRetrait::class, inversedBy: 'commandes')]
     #[ORM\JoinColumn(name: 'id_creneau', referencedColumnName: 'id_creneau', nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['commande:read'])]
     private ?CreneauRetrait $creneau = null;
 
     #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande', cascade: ['persist'], orphanRemoval: true)]
+    #[Groups(['commande:read'])]
     private Collection $lignes;
 
     public function __construct()

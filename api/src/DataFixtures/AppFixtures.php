@@ -94,25 +94,33 @@ class AppFixtures extends Fixture
             $manager->persist($produit);
         }
 
-        $heures = [
+        $plages = [
             ['09:00', '12:00'],
             ['14:00', '18:00'],
         ];
+        $dureeSlotMinutes = 20;
         $joursCrees = 0;
         $offset = 1;
-        while ($joursCrees < 3) {
+        while ($joursCrees < 10) {
             $date = new \DateTimeImmutable('+' . $offset . ' day');
             $offset++;
             if (in_array((int) $date->format('N'), [6, 7], true)) {
                 continue;
             }
-            foreach ($heures as [$debut, $fin]) {
-                $creneau = new CreneauRetrait();
-                $creneau->setDate(\DateTimeImmutable::createFromFormat('Y-m-d', $date->format('Y-m-d')));
-                $creneau->setHeureDebut(new \DateTimeImmutable($debut));
-                $creneau->setHeureFin(new \DateTimeImmutable($fin));
-                $creneau->setCapaciteMax(5);
-                $manager->persist($creneau);
+            $jour = \DateTimeImmutable::createFromFormat('Y-m-d', $date->format('Y-m-d'));
+            foreach ($plages as [$debut, $fin]) {
+                $heureCourante = new \DateTimeImmutable($debut);
+                $heureFinPlage = new \DateTimeImmutable($fin);
+                while ($heureCourante < $heureFinPlage) {
+                    $heureSuivante = $heureCourante->modify('+' . $dureeSlotMinutes . ' minutes');
+                    $creneau = new CreneauRetrait();
+                    $creneau->setDate($jour);
+                    $creneau->setHeureDebut($heureCourante);
+                    $creneau->setHeureFin($heureSuivante);
+                    $creneau->setCapaciteMax(1);
+                    $manager->persist($creneau);
+                    $heureCourante = $heureSuivante;
+                }
             }
             $joursCrees++;
         }

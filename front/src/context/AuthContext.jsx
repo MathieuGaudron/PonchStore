@@ -3,11 +3,17 @@ import { apiFetch, setAuthToken, setOnUnauthorized } from '../services/api'
 import { AuthContext } from './auth-context'
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(() => sessionStorage.getItem('token'))
   const [utilisateur, setUtilisateur] = useState(null)
+  const [pret, setPret] = useState(() => sessionStorage.getItem('token') === null)
 
   useEffect(() => {
     setAuthToken(token)
+    if (token) {
+      sessionStorage.setItem('token', token)
+    } else {
+      sessionStorage.removeItem('token')
+    }
   }, [token])
 
   useEffect(() => {
@@ -15,6 +21,25 @@ export function AuthProvider({ children }) {
       setToken(null)
       setUtilisateur(null)
     })
+  }, [])
+
+  useEffect(() => {
+    let ignore = false
+
+    async function restaurerSession() {
+      if (sessionStorage.getItem('token') === null) {
+        return
+      }
+      const moi = await apiFetch('/api/auth/me').catch(() => null)
+      if (ignore) return
+      if (moi) setUtilisateur(moi)
+      setPret(true)
+    }
+
+    restaurerSession()
+    return () => {
+      ignore = true
+    }
   }, [])
 
   async function seConnecter(email, password) {
@@ -46,5 +71,9 @@ export function AuthProvider({ children }) {
 
   const value = { token, utilisateur, seConnecter, creerUtilisateur, seDeconnecter }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {pret ? children : null}
+    </AuthContext.Provider>
+  )
 }

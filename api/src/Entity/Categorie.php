@@ -6,6 +6,7 @@ use App\Repository\CategorieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategorieRepository::class)]
@@ -16,14 +17,17 @@ class Categorie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_categorie')]
+    #[Groups(['categorie:read', 'produit:list', 'produit:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 80, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 80)]
+    #[Groups(['categorie:read', 'produit:list', 'produit:detail'])]
     private ?string $nom = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['categorie:read'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: 'categorie')]

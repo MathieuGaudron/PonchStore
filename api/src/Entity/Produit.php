@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
@@ -12,43 +13,59 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class Produit
 {
+    public const TAUX_MARGE_BASE = 1.28;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_produit')]
+    #[Groups(['produit:list', 'produit:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 150)]
+    #[Groups(['produit:list', 'produit:detail'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\Length(max: 100)]
+    #[Groups(['produit:list', 'produit:detail'])]
     private ?string $marque = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['produit:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(name: 'image_url', length: 255, nullable: true)]
     #[Assert\Length(max: 255)]
+    #[Groups(['produit:list', 'produit:detail'])]
     private ?string $imageUrl = null;
 
     #[ORM\Column(length: 13, nullable: true, unique: true)]
     #[Assert\Length(max: 13)]
+    #[Groups(['produit:detail'])]
     private ?string $ean = null;
 
     #[ORM\Column(name: 'format_carton', length: 50)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 50)]
+    #[Groups(['produit:list', 'produit:detail'])]
     private ?string $formatCarton = null;
 
-    #[ORM\Column(name: 'prix_carton', type: 'decimal', precision: 8, scale: 2)]
+    #[ORM\Column(name: 'prix_achat_carton', type: 'decimal', precision: 8, scale: 2)]
     #[Assert\NotBlank]
     #[Assert\Positive]
-    private ?string $prixCarton = null;
+    #[Groups(['produit:admin'])]
+    private ?string $prixAchatCarton = null;
+
+    #[ORM\Column(name: 'cartons_par_palette', nullable: true)]
+    #[Assert\Positive]
+    #[Groups(['produit:list', 'produit:detail'])]
+    private ?int $cartonsParPalette = null;
 
     #[ORM\Column(name: 'stock_disponible', options: ['default' => 0])]
     #[Assert\PositiveOrZero]
+    #[Groups(['produit:list', 'produit:detail'])]
     private int $stockDisponible = 0;
 
     #[ORM\Column(options: ['default' => 1])]
@@ -63,6 +80,7 @@ class Produit
     #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(name: 'id_categorie', referencedColumnName: 'id_categorie', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
+    #[Groups(['produit:list', 'produit:detail'])]
     private ?Categorie $categorie = null;
 
     public function __construct()
@@ -153,14 +171,32 @@ class Produit
         return $this;
     }
 
-    public function getPrixCarton(): ?string
+    public function getPrixAchatCarton(): ?string
     {
-        return $this->prixCarton;
+        return $this->prixAchatCarton;
     }
 
-    public function setPrixCarton(string $prixCarton): static
+    public function setPrixAchatCarton(string $prixAchatCarton): static
     {
-        $this->prixCarton = $prixCarton;
+        $this->prixAchatCarton = $prixAchatCarton;
+
+        return $this;
+    }
+
+    #[Groups(['produit:list', 'produit:detail'])]
+    public function getPrixCarton(): float
+    {
+        return round((float) $this->prixAchatCarton * self::TAUX_MARGE_BASE, 2);
+    }
+
+    public function getCartonsParPalette(): ?int
+    {
+        return $this->cartonsParPalette;
+    }
+
+    public function setCartonsParPalette(?int $cartonsParPalette): static
+    {
+        $this->cartonsParPalette = $cartonsParPalette;
 
         return $this;
     }

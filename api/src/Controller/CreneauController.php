@@ -13,7 +13,7 @@ class CreneauController extends AbstractController
     #[Route('', name: 'api_creneaux_liste', methods: ['GET'])]
     public function liste(CreneauRetraitRepository $creneauRepository): JsonResponse
     {
-        $creneaux = $creneauRepository->aVenir();
+        $creneaux = $creneauRepository->futurs();
 
         return $this->json($creneaux, JsonResponse::HTTP_OK, [], ['groups' => 'creneau:read']);
     }

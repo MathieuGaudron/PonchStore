@@ -1,77 +1,75 @@
 import { useEffect, useState } from 'react'
+import { apiFetch } from '../services/api'
+import { useAuth } from './auth-context'
 import { PanierContext } from './panier-context'
 
-const CLE_STOCKAGE = 'panier'
-
-function lirePanierInitial() {
-  const brut = sessionStorage.getItem(CLE_STOCKAGE)
-  if (!brut) {
-    return []
-  }
-  try {
-    const valeur = JSON.parse(brut)
-    return Array.isArray(valeur) ? valeur : []
-  } catch {
-    return []
-  }
-}
+const PANIER_VIDE = { lignes: [], montantTotal: '0.00', nombreArticles: 0 }
 
 export function PanierProvider({ children }) {
-  const [articles, setArticles] = useState(lirePanierInitial)
+  const { utilisateur } = useAuth()
+  const [panier, setPanier] = useState(PANIER_VIDE)
 
   useEffect(() => {
-    sessionStorage.setItem(CLE_STOCKAGE, JSON.stringify(articles))
-  }, [articles])
+    let ignore = false
 
-  function ajouter(produit, quantite) {
-    setArticles((actuels) => {
-      const existant = actuels.find((a) => a.produitId === produit.id)
-      if (existant) {
-        return actuels.map((a) =>
-          a.produitId === produit.id ? { ...a, quantite: a.quantite + quantite } : a,
-        )
+    async function charger() {
+      if (!utilisateur) {
+        if (!ignore) setPanier(PANIER_VIDE)
+        return
       }
-      return [
-        ...actuels,
-        {
-          produitId: produit.id,
-          nom: produit.nom,
-          marque: produit.marque,
-          prixCarton: produit.prixCarton,
-          formatCarton: produit.formatCarton,
-          imageUrl: produit.imageUrl,
-          quantite,
-        },
-      ]
-    })
+      const data = await apiFetch('/api/panier').catch(() => PANIER_VIDE)
+      if (!ignore) setPanier(data)
+    }
+
+    charger()
+    return () => {
+      ignore = true
+    }
+  }, [utilisateur])
+
+  async function rafraichir() {
+    const data = await apiFetch('/api/panier').catch(() => PANIER_VIDE)
+    setPanier(data)
   }
 
-  function modifierQuantite(produitId, quantite) {
+  async function ajouter(produitId, quantite) {
+    const data = await apiFetch('/api/panier', {
+      method: 'POST',
+      body: JSON.stringify({ produitId, quantite }),
+    })
+    setPanier(data)
+  }
+
+  async function modifierQuantite(produitId, quantite) {
     if (quantite < 1) {
       return
     }
-    setArticles((actuels) =>
-      actuels.map((a) => (a.produitId === produitId ? { ...a, quantite } : a)),
-    )
+    const data = await apiFetch(`/api/panier/${produitId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ quantite }),
+    })
+    setPanier(data)
   }
 
-  function retirer(produitId) {
-    setArticles((actuels) => actuels.filter((a) => a.produitId !== produitId))
+  async function retirer(produitId) {
+    const data = await apiFetch(`/api/panier/${produitId}`, { method: 'DELETE' })
+    setPanier(data)
   }
 
-  function vider() {
-    setArticles([])
+  async function vider() {
+    const data = await apiFetch('/api/panier', { method: 'DELETE' })
+    setPanier(data)
   }
-
-  const nombreArticles = articles.reduce((total, a) => total + a.quantite, 0)
 
   const value = {
-    articles,
-    nombreArticles,
+    lignes: panier.lignes,
+    montantTotal: panier.montantTotal,
+    nombreArticles: panier.nombreArticles,
     ajouter,
     modifierQuantite,
     retirer,
     vider,
+    rafraichir,
   }
 
   return <PanierContext.Provider value={value}>{children}</PanierContext.Provider>

@@ -39,8 +39,8 @@ export default function FicheProduit() {
     }
   }, [id])
 
-  function handleAjouter() {
-    ajouter(produit, quantite)
+  async function handleAjouter() {
+    await ajouter(produit.id, quantite)
     setAjoute(true)
   }
 

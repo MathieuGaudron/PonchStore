@@ -36,4 +36,39 @@ class PanierService
 
         return round($produit->getPrixCarton() * $quantite * (1 - $taux), 2);
     }
+
+    public function calculer(array $articles): array
+    {
+        $lignes = [];
+        $montantTotal = 0.0;
+        $nombreArticles = 0;
+
+        foreach ($articles as $article) {
+            $produit = $article->getProduit();
+            $quantite = $article->getQuantite();
+            $montant = $this->montantLigne($produit, $quantite);
+
+            $montantTotal += $montant;
+            $nombreArticles += $quantite;
+
+            $lignes[] = [
+                'produitId' => $produit->getId(),
+                'nom' => $produit->getNom(),
+                'marque' => $produit->getMarque(),
+                'prixCarton' => $produit->getPrixCarton(),
+                'formatCarton' => $produit->getFormatCarton(),
+                'imageUrl' => $produit->getImageUrl(),
+                'quantite' => $quantite,
+                'montant' => $montant,
+                'remiseAppliquee' => $this->tauxRemise($quantite, $produit->getCartonsParPalette()) > 0,
+                'disponible' => $produit->getStockDisponible() >= $quantite,
+            ];
+        }
+
+        return [
+            'lignes' => $lignes,
+            'montantTotal' => number_format($montantTotal, 2, '.', ''),
+            'nombreArticles' => $nombreArticles,
+        ];
+    }
 }

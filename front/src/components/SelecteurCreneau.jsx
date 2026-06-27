@@ -25,7 +25,7 @@ export default function SelecteurCreneau({ creneauChoisi, onChoisir }) {
   }, [])
 
   const joursDisponibles = useMemo(
-    () => new Set(creneaux.map((c) => c.date.slice(0, 10))),
+    () => new Set(creneaux.filter((c) => c.disponible).map((c) => c.date.slice(0, 10))),
     [creneaux],
   )
 
@@ -46,16 +46,27 @@ export default function SelecteurCreneau({ creneauChoisi, onChoisir }) {
   function grilleSlots(liste) {
     return (
       <div className="grid grid-cols-3 gap-2">
-        {liste.map((c) => (
-          <Button
-            key={c.id}
-            size="sm"
-            variant={creneauChoisi?.id === c.id ? 'primary' : 'outline'}
-            onClick={() => onChoisir(c)}
-          >
-            {heure(c.heureDebut)}
-          </Button>
-        ))}
+        {liste.map((c) =>
+          c.disponible ? (
+            <Button
+              key={c.id}
+              size="sm"
+              variant={creneauChoisi?.id === c.id ? 'primary' : 'outline'}
+              onClick={() => onChoisir(c)}
+            >
+              {heure(c.heureDebut)}
+            </Button>
+          ) : (
+            <button
+              key={c.id}
+              disabled
+              title="Complet"
+              className="flex h-8 cursor-not-allowed items-center justify-center rounded border border-[#E8E8E8] text-xs text-[#BBBBBB] line-through"
+            >
+              {heure(c.heureDebut)}
+            </button>
+          ),
+        )}
       </div>
     )
   }

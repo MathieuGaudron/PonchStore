@@ -22,25 +22,13 @@ class CommandeController extends AbstractController
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        if (!is_array($data) || !isset($data['articles']) || !is_array($data['articles']) || !isset($data['creneauId'])) {
-            return $this->json(['message' => 'Requête invalide : articles et creneauId requis.'], JsonResponse::HTTP_BAD_REQUEST);
-        }
-
-        $articles = [];
-        foreach ($data['articles'] as $article) {
-            if (!isset($article['produitId'], $article['quantite'])) {
-                return $this->json(['message' => 'Chaque article doit avoir produitId et quantite.'], JsonResponse::HTTP_BAD_REQUEST);
-            }
-            $articles[] = [
-                'produitId' => (int) $article['produitId'],
-                'quantite' => (int) $article['quantite'],
-            ];
+        if (!is_array($data) || !isset($data['creneauId'])) {
+            return $this->json(['message' => 'Requête invalide : creneauId requis.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         try {
             $commande = $commandeService->creerReservation(
                 $utilisateur,
-                $articles,
                 (int) $data['creneauId'],
                 $data['commentaire'] ?? null,
             );

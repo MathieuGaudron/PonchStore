@@ -40,6 +40,9 @@ class CreneauRetrait
     #[Groups(['creneau:read'])]
     private int $capaciteMax = 5;
 
+    #[Groups(['creneau:read'])]
+    private bool $disponible = true;
+
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'creneau')]
     private Collection $commandes;
 
@@ -97,6 +100,18 @@ class CreneauRetrait
     public function setCapaciteMax(int $capaciteMax): static
     {
         $this->capaciteMax = $capaciteMax;
+
+        return $this;
+    }
+
+    public function isDisponible(): bool
+    {
+        return $this->disponible;
+    }
+
+    public function setDisponible(bool $disponible): static
+    {
+        $this->disponible = $disponible;
 
         return $this;
     }

@@ -19,6 +19,14 @@ docker compose up -d
 - DB : localhost:3306
 
 
+## Tests
+
+Tests unitaires PHPUnit sur la logique métier critique (remise palette, marge).
+
+```bash
+docker exec ponchstore-api php bin/phpunit
+```
+
 ## Architecture
 
 Projet monorepo organisé en deux applications indépendantes :

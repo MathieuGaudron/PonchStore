@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { apiFetch } from '../services/api'
 import { usePanier } from '../context/panier-context'
 import Navbar from '../components/Navbar'
+import ChampQuantite from '../components/ChampQuantite'
 import { Button } from '@/components/ui/button'
 
 export default function FicheProduit() {
@@ -119,16 +120,12 @@ export default function FicheProduit() {
 
               {produit.stockDisponible > 0 && (
                 <div className="mt-8 flex items-center gap-3">
-                  <input
-                    type="number"
-                    min="1"
-                    max={produit.stockDisponible}
-                    value={quantite}
-                    onChange={(e) => {
-                      setQuantite(Math.max(1, Number(e.target.value)))
+                  <ChampQuantite
+                    valeur={quantite}
+                    onChanger={(n) => {
+                      setQuantite(n)
                       setAjoute(false)
                     }}
-                    className="w-20 rounded border border-[#888888] px-2 py-2 text-sm"
                   />
                   <Button onClick={handleAjouter}>Ajouter au panier</Button>
                   {ajoute && (

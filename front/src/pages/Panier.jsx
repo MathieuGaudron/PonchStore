@@ -4,6 +4,7 @@ import { apiFetch } from '../services/api'
 import { usePanier } from '../context/panier-context'
 import Navbar from '../components/Navbar'
 import SelecteurCreneau from '../components/SelecteurCreneau'
+import ChampQuantite from '../components/ChampQuantite'
 import { Button } from '@/components/ui/button'
 
 export default function Panier() {
@@ -16,14 +17,6 @@ export default function Panier() {
   const [envoi, setEnvoi] = useState(false)
 
   const stockOk = lignes.every((l) => l.disponible)
-
-  function diminuer(ligne) {
-    if (ligne.quantite > 1) {
-      modifierQuantite(ligne.produitId, ligne.quantite - 1)
-    } else {
-      retirer(ligne.produitId)
-    }
-  }
 
   async function confirmer() {
     setErreur(null)
@@ -93,21 +86,11 @@ export default function Panier() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => diminuer(l)}
-                      className="flex h-7 w-7 items-center justify-center rounded border border-[#888888] bg-white text-[#222222] hover:bg-[#F2F2F2]"
-                    >
-                      −
-                    </button>
-                    <span className="w-8 text-center text-sm font-bold">{l.quantite}</span>
-                    <button
-                      onClick={() => modifierQuantite(l.produitId, l.quantite + 1)}
-                      className="flex h-7 w-7 items-center justify-center rounded border border-[#888888] bg-white text-[#222222] hover:bg-[#F2F2F2]"
-                    >
-                      +
-                    </button>
-                  </div>
+                  <ChampQuantite
+                    valeur={l.quantite}
+                    onChanger={(n) => modifierQuantite(l.produitId, n)}
+                    onMin={() => retirer(l.produitId)}
+                  />
 
                   <div className="w-28 text-right">
                     <p className="font-bold text-[#222222]">{l.montant} €</p>

@@ -20,26 +20,26 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_utilisateur')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profil:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 100)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profil:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 100)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profil:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email]
     #[Assert\Length(max: 180)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profil:read'])]
     private ?string $email = null;
 
     #[ORM\Column(name: 'mot_de_passe')]
@@ -47,21 +47,25 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Assert\Length(max: 20)]
+    #[Groups(['profil:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(name: 'nom_etablissement', length: 150, nullable: true)]
     #[Assert\Length(max: 150)]
+    #[Groups(['profil:read'])]
     private ?string $nomEtablissement = null;
 
     #[ORM\Column(name: 'adresse_etablissement', type: 'text', nullable: true)]
+    #[Groups(['profil:read'])]
     private ?string $adresseEtablissement = null;
 
     #[ORM\Column(length: 14, nullable: true)]
     #[Assert\Length(exactly: 14)]
+    #[Groups(['profil:read'])]
     private ?string $siret = null;
 
     #[ORM\Column(enumType: RoleEnum::class, options: ['default' => 'CLIENT_PRO'])]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profil:read'])]
     private RoleEnum $role = RoleEnum::CLIENT_PRO;
 
     #[ORM\Column(name: 'date_inscription', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]

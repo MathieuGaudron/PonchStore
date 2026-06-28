@@ -6,6 +6,7 @@ use App\Entity\Commande;
 use App\Entity\LigneCommande;
 use App\Entity\MouvementStock;
 use App\Entity\Utilisateur;
+use App\Enum\StatutCommandeEnum;
 use App\Enum\TypeMouvementEnum;
 use App\Repository\CommandeRepository;
 use App\Repository\CreneauRetraitRepository;
@@ -86,6 +87,41 @@ class CommandeService
             }
 
             $commande->setMontantTotal(number_format($montantTotal, 2, '.', ''));
+
+            $this->em->flush();
+            $this->em->commit();
+
+            return $commande;
+        } catch (\Throwable $e) {
+            $this->em->rollback();
+            throw $e;
+        }
+    }
+
+    public function annuler(Commande $commande): Commande
+    {
+        $statutsAnnulables = [StatutCommandeEnum::EN_ATTENTE, StatutCommandeEnum::EN_PREPARATION];
+        if (!in_array($commande->getStatut(), $statutsAnnulables, true)) {
+            throw new \DomainException('Cette commande ne peut plus être annulée.');
+        }
+
+        $this->em->beginTransaction();
+        try {
+            foreach ($commande->getLignes() as $ligne) {
+                $produit = $ligne->getProduit();
+                $produit->setStockDisponible($produit->getStockDisponible() + $ligne->getQuantite());
+
+                $mouvement = new MouvementStock();
+                $mouvement->setTypeMouvement(TypeMouvementEnum::ENTREE);
+                $mouvement->setQuantite($ligne->getQuantite());
+                $mouvement->setProduit($produit);
+                $mouvement->setUtilisateur($commande->getUtilisateur());
+                $mouvement->setCommande($commande);
+                $mouvement->setCommentaire('Réapprovisionnement suite annulation commande #' . $commande->getId());
+                $this->em->persist($mouvement);
+            }
+
+            $commande->setStatut(StatutCommandeEnum::ANNULEE);
 
             $this->em->flush();
             $this->em->commit();

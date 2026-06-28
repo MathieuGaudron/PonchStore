@@ -26,9 +26,9 @@ export default function Navbar() {
             </span>
           )}
         </Link>
-        <span className="text-white">
+        <Link to="/compte" className="text-white hover:text-[#F5A623]">
           {utilisateur?.prenom} {utilisateur?.nom} · {utilisateur?.role}
-        </span>
+        </Link>
         <button
           onClick={handleDeconnexion}
           className="rounded bg-[#CC3333] px-3 py-1 text-white"

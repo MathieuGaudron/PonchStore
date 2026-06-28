@@ -41,10 +41,11 @@ class CommandeController extends AbstractController
 
     #[Route('', name: 'api_commandes_liste', methods: ['GET'])]
     public function liste(
+        Request $request,
         #[CurrentUser] Utilisateur $utilisateur,
         CommandeRepository $commandeRepository,
     ): JsonResponse {
-        $commandes = $commandeRepository->findBy(['utilisateur' => $utilisateur], ['dateCommande' => 'DESC']);
+        $commandes = $commandeRepository->mesCommandes($utilisateur, $request->query->get('filtre'));
 
         return $this->json($commandes, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list']]);
     }

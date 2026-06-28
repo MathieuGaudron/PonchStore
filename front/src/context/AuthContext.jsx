@@ -69,7 +69,21 @@ export function AuthProvider({ children }) {
     setUtilisateur(null)
   }
 
-  const value = { token, utilisateur, seConnecter, creerUtilisateur, seDeconnecter }
+  async function rafraichirUtilisateur() {
+    const moi = await apiFetch('/api/auth/me').catch(() => null)
+    if (moi) {
+      setUtilisateur(moi)
+    }
+  }
+
+  const value = {
+    token,
+    utilisateur,
+    seConnecter,
+    creerUtilisateur,
+    seDeconnecter,
+    rafraichirUtilisateur,
+  }
 
   return (
     <AuthContext.Provider value={value}>

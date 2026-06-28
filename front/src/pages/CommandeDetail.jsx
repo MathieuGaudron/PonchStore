@@ -107,12 +107,14 @@ export default function CommandeDetail() {
               <span className="text-xl font-bold text-[#F5A623]">{commande.montantTotal} €</span>
             </p>
 
-            <Link
-              to="/catalogue"
-              className="mt-6 inline-block text-sm text-[#F5A623] hover:underline"
-            >
-              ← Retour au catalogue
-            </Link>
+            <div className="mt-6 flex flex-col gap-2">
+              <Link to="/compte" className="text-sm text-[#F5A623] hover:underline">
+                ← Retour à mes commandes
+              </Link>
+              <Link to="/catalogue" className="text-sm text-[#F5A623] hover:underline">
+                ← Retour au catalogue
+              </Link>
+            </div>
           </div>
         )}
       </main>

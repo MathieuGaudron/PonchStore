@@ -8,6 +8,7 @@ import Catalogue from './pages/Catalogue'
 import FicheProduit from './pages/FicheProduit'
 import Panier from './pages/Panier'
 import CommandeDetail from './pages/CommandeDetail'
+import MonCompte from './pages/MonCompte'
 
 function App() {
   return (
@@ -45,6 +46,14 @@ function App() {
               element={
                 <RoutePrivee>
                   <CommandeDetail />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/compte"
+              element={
+                <RoutePrivee>
+                  <MonCompte />
                 </RoutePrivee>
               }
             />

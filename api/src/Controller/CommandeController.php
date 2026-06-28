@@ -64,4 +64,26 @@ class CommandeController extends AbstractController
 
         return $this->json($commande, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list']]);
     }
+
+    #[Route('/{id}/annuler', name: 'api_commandes_annuler', methods: ['PATCH'], requirements: ['id' => '\d+'])]
+    public function annuler(
+        int $id,
+        #[CurrentUser] Utilisateur $utilisateur,
+        CommandeRepository $commandeRepository,
+        CommandeService $commandeService,
+    ): JsonResponse {
+        $commande = $commandeRepository->find($id);
+
+        if ($commande === null || $commande->getUtilisateur() !== $utilisateur) {
+            return $this->json(['message' => 'Commande introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        try {
+            $commandeService->annuler($commande);
+        } catch (\DomainException $e) {
+            return $this->json(['message' => $e->getMessage()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return $this->json($commande, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list']]);
+    }
 }

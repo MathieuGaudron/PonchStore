@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { apiFetch } from '../services/api'
 import Navbar from '../components/Navbar'
+import BoutonRetour from '../components/BoutonRetour'
 import { Button } from '@/components/ui/button'
+
+const FILTRES_STOCK = [
+  { cle: 'tous', libelle: 'Tous' },
+  { cle: 'rupture', libelle: 'Rupture' },
+  { cle: 'faible', libelle: 'Stock faible' },
+]
+
+const SEUIL_STOCK_FAIBLE = 10
 
 const FORM_VIDE = {
   nom: '',
@@ -17,12 +27,20 @@ const FORM_VIDE = {
 }
 
 export default function GestionProduits() {
+  const [params] = useSearchParams()
   const [produits, setProduits] = useState([])
   const [categories, setCategories] = useState([])
   const [form, setForm] = useState(FORM_VIDE)
   const [editionId, setEditionId] = useState(null)
   const [erreur, setErreur] = useState(null)
   const [version, setVersion] = useState(0)
+  const [filtreStock, setFiltreStock] = useState(params.get('stock') || 'tous')
+
+  const produitsAffiches = produits.filter((p) => {
+    if (filtreStock === 'rupture') return p.stockDisponible === 0
+    if (filtreStock === 'faible') return p.stockDisponible > 0 && p.stockDisponible <= SEUIL_STOCK_FAIBLE
+    return true
+  })
 
   useEffect(() => {
     apiFetch('/api/categories')
@@ -116,6 +134,7 @@ export default function GestionProduits() {
       <Navbar />
 
       <main className="p-8">
+        <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Gestion des produits</h1>
 
         <form onSubmit={soumettre} className="mb-8 max-w-3xl rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
@@ -171,6 +190,19 @@ export default function GestionProduits() {
           </div>
         </form>
 
+        <div className="mb-4 flex flex-wrap gap-2">
+          {FILTRES_STOCK.map((f) => (
+            <Button
+              key={f.cle}
+              size="sm"
+              variant={filtreStock === f.cle ? 'primary' : 'outline'}
+              onClick={() => setFiltreStock(f.cle)}
+            >
+              {f.libelle}
+            </Button>
+          ))}
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -184,14 +216,22 @@ export default function GestionProduits() {
               </tr>
             </thead>
             <tbody>
-              {produits.map((p) => (
+              {produitsAffiches.map((p) => (
                 <tr key={p.id} className="border-b border-[#E8E8E8]">
                   <td className="py-2 text-[#222222]">
                     {p.nom} <span className="text-[#888888]">· {p.marque}</span>
                   </td>
                   <td className="py-2 text-[#888888]">{p.categorie?.nom}</td>
                   <td className="py-2 text-right">{p.prixCarton} €</td>
-                  <td className="py-2 text-right">{p.stockDisponible}</td>
+                  <td className="py-2 text-right">
+                    {p.stockDisponible === 0 ? (
+                      <span className="font-bold text-[#CC3333]">0 · rupture</span>
+                    ) : p.stockDisponible <= SEUIL_STOCK_FAIBLE ? (
+                      <span className="font-bold text-[#E67E22]">{p.stockDisponible} · faible</span>
+                    ) : (
+                      <span>{p.stockDisponible}</span>
+                    )}
+                  </td>
                   <td className="py-2 text-center">
                     {p.actif ? (
                       <span className="text-[#2ECC71]">oui</span>

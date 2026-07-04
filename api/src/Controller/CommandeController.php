@@ -98,6 +98,27 @@ class CommandeController extends AbstractController
         return $this->json($commandes, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list', 'commande:staff', 'user:read']]);
     }
 
+    #[Route('/{id}/annuler-staff', name: 'api_commandes_annuler_staff', methods: ['PATCH'], requirements: ['id' => '\d+'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function annulerStaff(
+        int $id,
+        CommandeRepository $commandeRepository,
+        CommandeService $commandeService,
+    ): JsonResponse {
+        $commande = $commandeRepository->find($id);
+        if ($commande === null) {
+            return $this->json(['message' => 'Commande introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        try {
+            $commandeService->annuler($commande);
+        } catch (\DomainException $e) {
+            return $this->json(['message' => $e->getMessage()], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return $this->json($commande, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list', 'commande:staff', 'user:read']]);
+    }
+
     #[Route('/{id}/statut', name: 'api_commandes_statut', methods: ['PATCH'], requirements: ['id' => '\d+'])]
     #[IsGranted('ROLE_STAFF')]
     public function changerStatut(

@@ -13,6 +13,28 @@ class ProduitRepository extends ServiceEntityRepository
         parent::__construct($registry, Produit::class);
     }
 
+    public function compterEnRupture(): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->andWhere('p.actif = true')
+            ->andWhere('p.stockDisponible = 0')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function compterStockFaible(int $seuil): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->andWhere('p.actif = true')
+            ->andWhere('p.stockDisponible > 0')
+            ->andWhere('p.stockDisponible <= :seuil')
+            ->setParameter('seuil', $seuil)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function rechercher(?string $recherche, ?int $idCategorie, ?bool $disponible): array
     {
         $qb = $this->createQueryBuilder('p')

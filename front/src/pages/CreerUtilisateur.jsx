@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
+import Navbar from '../components/Navbar'
+import BoutonRetour from '../components/BoutonRetour'
+import { Button } from '@/components/ui/button'
 
 const INITIAL = {
   nom: '',
@@ -22,7 +24,6 @@ const ROLES = [
 
 export default function CreerUtilisateur() {
   const { creerUtilisateur } = useAuth()
-  const navigate = useNavigate()
 
   const [form, setForm] = useState(INITIAL)
   const [errors, setErrors] = useState(null)
@@ -59,79 +60,79 @@ export default function CreerUtilisateur() {
     }
   }
 
-  const field = (name, label, type = 'text', required = false) => (
-    <label className="flex flex-col gap-1 text-sm text-[#888888]">
-      {label}
-      <input
-        type={type}
-        name={name}
-        value={form[name]}
-        onChange={handleChange}
-        required={required}
-        className="bg-[#111111] border border-[#888888]/50 rounded px-3 py-2 text-white"
-      />
-      {errors?.[name] && <span className="text-[#CC3333] text-xs">{errors[name]}</span>}
-    </label>
-  )
+  function champ(name, label, type = 'text', required = false) {
+    return (
+      <div>
+        <label className="mb-1 block text-xs text-[#888888]">
+          {label}
+          {required && ' *'}
+        </label>
+        <input
+          type={type}
+          name={name}
+          value={form[name]}
+          onChange={handleChange}
+          required={required}
+          className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+        />
+        {errors?.[name] && <span className="text-xs text-[#CC3333]">{errors[name]}</span>}
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
-      <nav className="h-12 bg-[#111111] flex items-center justify-between px-4">
-        <span className="text-[#F5A623] font-bold">PONCH'STORE</span>
-        <button
-          onClick={() => navigate('/catalogue')}
-          className="text-white text-sm"
-        >
-          Retour
-        </button>
-      </nav>
+      <Navbar />
 
-      <main className="p-8 flex justify-center">
+      <main className="p-8">
+        <BoutonRetour />
+        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Créer un utilisateur</h1>
+
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md bg-[#FFFFFF] rounded-md p-8 flex flex-col gap-4 shadow"
+          className="max-w-3xl rounded bg-white p-6 shadow-[0_1px_4px_#E8E8E8]"
         >
-          <h1 className="text-2xl font-bold text-[#222222]">Créer un utilisateur</h1>
+          {error && <p className="mb-3 text-sm text-[#CC3333]">{error}</p>}
+          {success && <p className="mb-3 text-sm text-[#2ECC71]">{success}</p>}
 
-          {error && <p className="text-[#CC3333] text-sm">{error}</p>}
-          {success && <p className="text-[#2ECC71] text-sm">{success}</p>}
-
-          <div className="grid grid-cols-2 gap-4">
-            {field('prenom', 'Prénom', 'text', true)}
-            {field('nom', 'Nom', 'text', true)}
+          <h2 className="mb-3 font-bold text-[#222222]">Identifiants</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {champ('prenom', 'Prénom', 'text', true)}
+            {champ('nom', 'Nom', 'text', true)}
+            {champ('email', 'Email', 'email', true)}
+            {champ('password', 'Mot de passe (8 car. min.)', 'password', true)}
+            <div>
+              <label className="mb-1 block text-xs text-[#888888]">Rôle *</label>
+              <select
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+              >
+                {ROLES.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {field('email', 'Email', 'email', true)}
-          {field('password', 'Mot de passe (8 caractères min.)', 'password', true)}
+          <h2 className="mb-3 mt-6 font-bold text-[#222222]">
+            Établissement <span className="text-xs font-normal text-[#888888]">(optionnel)</span>
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {champ('telephone', 'Téléphone')}
+            {champ('nomEtablissement', 'Nom de l\'établissement')}
+            {champ('siret', 'SIRET')}
+            <div className="sm:col-span-2">{champ('adresseEtablissement', 'Adresse')}</div>
+          </div>
 
-          <label className="flex flex-col gap-1 text-sm text-[#888888]">
-            Rôle
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="bg-[#111111] border border-[#888888]/50 rounded px-3 py-2 text-white"
-            >
-              {ROLES.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          {field('telephone', 'Téléphone')}
-          {field('nomEtablissement', 'Établissement')}
-          {field('adresseEtablissement', 'Adresse')}
-          {field('siret', 'SIRET')}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-[#F5A623] text-[#111111] font-bold rounded py-2 disabled:opacity-60"
-          >
-            {loading ? 'Création…' : "Créer l'utilisateur"}
-          </button>
+          <div className="mt-6">
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Création…' : "Créer l'utilisateur"}
+            </Button>
+          </div>
         </form>
       </main>
     </div>

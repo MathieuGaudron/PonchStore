@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../services/api'
 import Navbar from '../components/Navbar'
+import BoutonRetour from '../components/BoutonRetour'
 import { Button } from '@/components/ui/button'
 
 const STATUT = {
@@ -54,11 +55,20 @@ export default function PreparationCommandes() {
     setVersion((v) => v + 1)
   }
 
+  async function refuser(id) {
+    if (!window.confirm('Refuser / annuler cette commande ? Le stock sera remis à disposition.')) {
+      return
+    }
+    await apiFetch(`/api/commandes/${id}/annuler-staff`, { method: 'PATCH' }).catch(() => null)
+    setVersion((v) => v + 1)
+  }
+
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
       <main className="p-8">
+        <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Commandes à préparer</h1>
 
         {chargement && <p className="text-[#888888]">Chargement…</p>}
@@ -103,11 +113,19 @@ export default function PreparationCommandes() {
 
                 <div className="mt-3 flex items-center justify-between">
                   <span className="font-bold text-[#F5A623]">{c.montantTotal} €</span>
-                  {etape && (
-                    <Button size="sm" onClick={() => avancer(c.id, etape.statut)}>
-                      {etape.libelle}
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => refuser(c.id)}
+                      className="text-sm text-[#CC3333] hover:underline"
+                    >
+                      Refuser
+                    </button>
+                    {etape && (
+                      <Button size="sm" onClick={() => avancer(c.id, etape.statut)}>
+                        {etape.libelle}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             )

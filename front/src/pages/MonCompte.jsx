@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
+import BoutonRetour from '../components/BoutonRetour'
 import MesCommandes from '../components/MesCommandes'
 import ProfilForm from '../components/ProfilForm'
 import ChangerMotDePasse from '../components/ChangerMotDePasse'
@@ -18,6 +19,7 @@ export default function MonCompte() {
       <Navbar />
 
       <main className="p-8">
+        <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Mon compte</h1>
 
         <div className="mb-6 flex gap-6 border-b border-[#E8E8E8]">

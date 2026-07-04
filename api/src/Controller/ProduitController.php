@@ -1,0 +1,157 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Categorie;
+use App\Entity\Produit;
+use App\Repository\CategorieRepository;
+use App\Repository\ProduitRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+#[Route('/api/produits')]
+#[IsGranted('ROLE_ADMIN')]
+class ProduitController extends AbstractController
+{
+    private const GROUPES = ['produit:detail', 'produit:admin'];
+
+    public function __construct(
+        private readonly ProduitRepository $produitRepository,
+        private readonly CategorieRepository $categorieRepository,
+        private readonly ValidatorInterface $validator,
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
+
+    #[Route('', name: 'api_produits_liste', methods: ['GET'])]
+    public function liste(): JsonResponse
+    {
+        $produits = $this->produitRepository->findBy([], ['nom' => 'ASC']);
+
+        return $this->json($produits, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
+    #[Route('', name: 'api_produits_creer', methods: ['POST'])]
+    public function creer(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            return $this->json(['message' => 'Corps de requête JSON invalide.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $categorie = $this->trouverCategorie($data);
+        if ($categorie === null) {
+            return $this->json(['message' => 'Catégorie introuvable.'], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $produit = new Produit();
+        $this->appliquer($produit, $data, $categorie);
+
+        $erreurs = $this->valider($produit, $data['ean'] ?? null, null);
+        if ($erreurs !== null) {
+            return $erreurs;
+        }
+
+        $this->em->persist($produit);
+        $this->em->flush();
+
+        return $this->json($produit, JsonResponse::HTTP_CREATED, [], ['groups' => self::GROUPES]);
+    }
+
+    #[Route('/{id}', name: 'api_produits_modifier', methods: ['PUT'], requirements: ['id' => '\d+'])]
+    public function modifier(int $id, Request $request): JsonResponse
+    {
+        $produit = $this->produitRepository->find($id);
+        if ($produit === null) {
+            return $this->json(['message' => 'Produit introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            return $this->json(['message' => 'Corps de requête JSON invalide.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $categorie = $this->trouverCategorie($data);
+        if ($categorie === null) {
+            return $this->json(['message' => 'Catégorie introuvable.'], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $this->appliquer($produit, $data, $categorie);
+
+        $erreurs = $this->valider($produit, $data['ean'] ?? null, $produit->getId());
+        if ($erreurs !== null) {
+            return $erreurs;
+        }
+
+        $this->em->flush();
+
+        return $this->json($produit, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
+    #[Route('/{id}', name: 'api_produits_desactiver', methods: ['DELETE'], requirements: ['id' => '\d+'])]
+    public function desactiver(int $id): JsonResponse
+    {
+        $produit = $this->produitRepository->find($id);
+        if ($produit === null) {
+            return $this->json(['message' => 'Produit introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $produit->setActif(false);
+        $this->em->flush();
+
+        return $this->json($produit, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
+    private function trouverCategorie(array $data): ?Categorie
+    {
+        if (!isset($data['categorieId'])) {
+            return null;
+        }
+
+        return $this->categorieRepository->find((int) $data['categorieId']);
+    }
+
+    private function appliquer(Produit $produit, array $data, Categorie $categorie): void
+    {
+        $produit->setNom((string) ($data['nom'] ?? ''));
+        $produit->setMarque($data['marque'] ?? null);
+        $produit->setDescription($data['description'] ?? null);
+        $produit->setImageUrl($data['imageUrl'] ?? null);
+        $produit->setEan(isset($data['ean']) && $data['ean'] !== '' ? (string) $data['ean'] : null);
+        $produit->setFormatCarton((string) ($data['formatCarton'] ?? ''));
+        $produit->setPrixAchatCarton((string) ($data['prixAchatCarton'] ?? ''));
+        $produit->setCartonsParPalette(isset($data['cartonsParPalette']) && $data['cartonsParPalette'] !== '' ? (int) $data['cartonsParPalette'] : null);
+        $produit->setStockDisponible((int) ($data['stockDisponible'] ?? 0));
+        $produit->setCategorie($categorie);
+        if (isset($data['actif'])) {
+            $produit->setActif((bool) $data['actif']);
+        }
+    }
+
+    private function valider(Produit $produit, ?string $ean, ?int $idActuel): ?JsonResponse
+    {
+        $errors = $this->validator->validate($produit);
+        if (count($errors) > 0) {
+            $messages = [];
+            foreach ($errors as $error) {
+                $messages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $messages], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if ($ean !== null && $ean !== '') {
+            $existant = $this->produitRepository->findOneBy(['ean' => $ean]);
+            if ($existant !== null && $existant->getId() !== $idActuel) {
+                return $this->json(['message' => 'Cet EAN est déjà utilisé.'], JsonResponse::HTTP_CONFLICT);
+            }
+        }
+
+        return null;
+    }
+}

@@ -41,6 +41,7 @@ class Commande
 
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'commandes')]
     #[ORM\JoinColumn(name: 'id_utilisateur', referencedColumnName: 'id_utilisateur', nullable: false, onDelete: 'RESTRICT')]
+    #[Groups(['commande:staff'])]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne(targetEntity: CreneauRetrait::class, inversedBy: 'commandes')]

@@ -98,6 +98,25 @@ class CommandeService
         }
     }
 
+    public function changerStatut(Commande $commande, StatutCommandeEnum $nouveauStatut): Commande
+    {
+        $transitions = match ($commande->getStatut()) {
+            StatutCommandeEnum::EN_ATTENTE => [StatutCommandeEnum::EN_PREPARATION],
+            StatutCommandeEnum::EN_PREPARATION => [StatutCommandeEnum::PRETE],
+            StatutCommandeEnum::PRETE => [StatutCommandeEnum::RECUPEREE],
+            default => [],
+        };
+
+        if (!in_array($nouveauStatut, $transitions, true)) {
+            throw new \DomainException('Transition de statut non autorisée.');
+        }
+
+        $commande->setStatut($nouveauStatut);
+        $this->em->flush();
+
+        return $commande;
+    }
+
     public function annuler(Commande $commande): Commande
     {
         $statutsAnnulables = [StatutCommandeEnum::EN_ATTENTE, StatutCommandeEnum::EN_PREPARATION];

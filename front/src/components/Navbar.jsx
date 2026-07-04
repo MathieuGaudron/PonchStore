@@ -18,6 +18,16 @@ export default function Navbar() {
         PONCH'STORE
       </Link>
       <div className="flex items-center gap-4 text-sm">
+        {['STAFF', 'ADMIN'].includes(utilisateur?.role) && (
+          <Link to="/preparation" className="text-white hover:text-[#F5A623]">
+            Préparation
+          </Link>
+        )}
+        {utilisateur?.role === 'ADMIN' && (
+          <Link to="/admin/produits" className="text-white hover:text-[#F5A623]">
+            Produits
+          </Link>
+        )}
         <Link to="/panier" className="text-white hover:text-[#F5A623]">
           Panier
           {nombreArticles > 0 && (

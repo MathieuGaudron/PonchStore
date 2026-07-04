@@ -52,7 +52,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(name: 'nom_etablissement', length: 150, nullable: true)]
     #[Assert\Length(max: 150)]
-    #[Groups(['profil:read'])]
+    #[Groups(['profil:read', 'user:read'])]
     private ?string $nomEtablissement = null;
 
     #[ORM\Column(name: 'adresse_etablissement', type: 'text', nullable: true)]

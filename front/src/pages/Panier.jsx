@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { apiFetch } from '../services/api'
 import { usePanier } from '../context/panier-context'
 import Navbar from '../components/Navbar'
+import BoutonRetour from '../components/BoutonRetour'
 import SelecteurCreneau from '../components/SelecteurCreneau'
 import ChampQuantite from '../components/ChampQuantite'
 import { Button } from '@/components/ui/button'
@@ -54,6 +55,7 @@ export default function Panier() {
       <Navbar />
 
       <main className="p-8">
+        <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Mon panier</h1>
 
         {lignes.length === 0 ? (

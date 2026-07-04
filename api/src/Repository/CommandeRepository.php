@@ -41,6 +41,34 @@ class CommandeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function aPreparer(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.statut IN (:statuts)')
+            ->setParameter('statuts', [
+                StatutCommandeEnum::EN_ATTENTE,
+                StatutCommandeEnum::EN_PREPARATION,
+                StatutCommandeEnum::PRETE,
+            ])
+            ->orderBy('c.dateCommande', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function compterAPreparer(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.statut IN (:statuts)')
+            ->setParameter('statuts', [
+                StatutCommandeEnum::EN_ATTENTE,
+                StatutCommandeEnum::EN_PREPARATION,
+                StatutCommandeEnum::PRETE,
+            ])
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function compterCommandesActives(CreneauRetrait $creneau): int
     {
         return (int) $this->createQueryBuilder('c')

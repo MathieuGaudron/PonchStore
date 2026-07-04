@@ -9,6 +9,9 @@ import FicheProduit from './pages/FicheProduit'
 import Panier from './pages/Panier'
 import CommandeDetail from './pages/CommandeDetail'
 import MonCompte from './pages/MonCompte'
+import PreparationCommandes from './pages/PreparationCommandes'
+import GestionProduits from './pages/GestionProduits'
+import TableauBord from './pages/TableauBord'
 
 function App() {
   return (
@@ -54,6 +57,30 @@ function App() {
               element={
                 <RoutePrivee>
                   <MonCompte />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/tableau-bord"
+              element={
+                <RoutePrivee roles={['STAFF']}>
+                  <TableauBord />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/preparation"
+              element={
+                <RoutePrivee roles={['STAFF']}>
+                  <PreparationCommandes />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/admin/produits"
+              element={
+                <RoutePrivee roles={['ADMIN']}>
+                  <GestionProduits />
                 </RoutePrivee>
               }
             />

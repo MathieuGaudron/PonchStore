@@ -102,11 +102,11 @@ export default function Catalogue() {
                 to={`/catalogue/${p.id}`}
                 className="bg-white rounded-md shadow-[0_1px_4px_#E8E8E8] overflow-hidden block hover:shadow-[0_2px_8px_#D0D0D0]"
               >
-                <div className="h-32 bg-[#1C1C1C] flex items-center justify-center">
+                <div className="flex h-40 items-center justify-center bg-[#F2F2F2] p-3">
                   {p.imageUrl ? (
-                    <img src={p.imageUrl} alt={p.nom} className="h-full object-contain" />
+                    <img src={p.imageUrl} alt={p.nom} className="h-full w-full object-contain" />
                   ) : (
-                    <span className="text-[#888888] text-sm">Pas d'image</span>
+                    <span className="text-sm text-[#888888]">Pas d'image</span>
                   )}
                 </div>
                 <div className="p-2">

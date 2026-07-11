@@ -33,6 +33,7 @@ export default function GestionProduits() {
   const [form, setForm] = useState(FORM_VIDE)
   const [editionId, setEditionId] = useState(null)
   const [erreur, setErreur] = useState(null)
+  const [succes, setSucces] = useState(null)
   const [version, setVersion] = useState(0)
   const [filtreStock, setFiltreStock] = useState(params.get('stock') || 'tous')
   const [importMsg, setImportMsg] = useState(null)
@@ -163,37 +164,50 @@ export default function GestionProduits() {
     const methode = editionId ? 'PUT' : 'POST'
     try {
       await apiFetch(chemin, { method: methode, body: JSON.stringify(form) })
+      const message = editionId ? 'Produit modifié ✓' : 'Produit ajouté au catalogue ✓'
       reinitialiser()
       setVersion((v) => v + 1)
+      setSucces(message)
+      setTimeout(() => setSucces(null), 3000)
     } catch (err) {
       setErreur(err.data?.message || 'Enregistrement impossible (vérifie les champs).')
     }
   }
 
-  async function changerActif(p, actif) {
-    if (!actif && !window.confirm('Désactiver ce produit ?')) {
+  async function supprimer(p) {
+    if (!window.confirm(`Supprimer définitivement « ${p.nom} » ?`)) {
       return
     }
-    if (actif) {
-      await apiFetch(`/api/produits/${p.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          nom: p.nom,
-          marque: p.marque,
-          description: p.description,
-          imageUrl: p.imageUrl,
-          ean: p.ean,
-          formatCarton: p.formatCarton,
-          prixAchatCarton: p.prixAchatCarton,
-          cartonsParPalette: p.cartonsParPalette,
-          stockDisponible: p.stockDisponible,
-          categorieId: p.categorie.id,
-          actif: true,
-        }),
-      }).catch(() => null)
-    } else {
-      await apiFetch(`/api/produits/${p.id}`, { method: 'DELETE' }).catch(() => null)
+    try {
+      await apiFetch(`/api/produits/${p.id}`, { method: 'DELETE' })
+      setVersion((v) => v + 1)
+      setSucces('Produit supprimé ✓')
+      setTimeout(() => setSucces(null), 3000)
+    } catch (err) {
+      window.alert(err.data?.message || 'Suppression impossible.')
     }
+  }
+
+  async function changerActif(p, actif) {
+    if (!actif && !window.confirm('Désactiver ce produit ? (il sera masqué du catalogue)')) {
+      return
+    }
+    await apiFetch(`/api/produits/${p.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        nom: p.nom,
+        marque: p.marque,
+        description: p.description,
+        imageUrl: p.imageUrl,
+        ean: p.ean,
+        formatCarton: p.formatCarton,
+        prixAchatCarton: p.prixAchatCarton,
+        cartonsParPalette: p.cartonsParPalette,
+        stockDisponible: p.stockDisponible,
+        categorieId: p.categorie.id,
+        actif,
+      }),
+    }).catch(() => null)
     setVersion((v) => v + 1)
   }
 
@@ -204,6 +218,12 @@ export default function GestionProduits() {
       <main className="p-8">
         <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Gestion des produits</h1>
+
+        {succes && (
+          <div className="fixed right-6 top-6 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg">
+            {succes}
+          </div>
+        )}
 
         <form onSubmit={soumettre} className="mb-8 max-w-3xl rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
           <h2 className="mb-3 font-bold text-[#222222]">
@@ -218,7 +238,7 @@ export default function GestionProduits() {
               type="text"
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              placeholder="ex : Grey Goose, Nutella…"
+              placeholder="ex : Grey Goose, Hennessy…"
               className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
             />
             {rechercheMsg && <p className="mt-1 text-xs text-[#888888]">{rechercheMsg}</p>}
@@ -389,6 +409,12 @@ export default function GestionProduits() {
                         Réactiver
                       </button>
                     )}
+                    <button
+                      onClick={() => supprimer(p)}
+                      className="ml-3 text-[#CC3333] hover:underline"
+                    >
+                      Supprimer
+                    </button>
                   </td>
                 </tr>
               ))}

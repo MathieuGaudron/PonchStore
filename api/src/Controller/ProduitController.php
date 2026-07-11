@@ -122,18 +122,25 @@ class ProduitController extends AbstractController
         return $this->json($produit, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
     }
 
-    #[Route('/{id}', name: 'api_produits_desactiver', methods: ['DELETE'], requirements: ['id' => '\d+'])]
-    public function desactiver(int $id): JsonResponse
+    #[Route('/{id}', name: 'api_produits_supprimer', methods: ['DELETE'], requirements: ['id' => '\d+'])]
+    public function supprimer(int $id): JsonResponse
     {
         $produit = $this->produitRepository->find($id);
         if ($produit === null) {
             return $this->json(['message' => 'Produit introuvable.'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $produit->setActif(false);
-        $this->em->flush();
+        try {
+            $this->em->remove($produit);
+            $this->em->flush();
+        } catch (\Throwable) {
+            return $this->json(
+                ['message' => 'Ce produit est lié à des commandes : désactivez-le plutôt que de le supprimer.'],
+                JsonResponse::HTTP_CONFLICT,
+            );
+        }
 
-        return $this->json($produit, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+        return $this->json(['message' => 'Produit supprimé.']);
     }
 
     private function trouverCategorie(array $data): ?Categorie
@@ -153,7 +160,7 @@ class ProduitController extends AbstractController
         $produit->setImageUrl($data['imageUrl'] ?? null);
         $produit->setEan(isset($data['ean']) && $data['ean'] !== '' ? (string) $data['ean'] : null);
         $produit->setFormatCarton((string) ($data['formatCarton'] ?? ''));
-        $produit->setPrixAchatCarton((string) ($data['prixAchatCarton'] ?? ''));
+        $produit->setPrixAchatCarton(str_replace(',', '.', (string) ($data['prixAchatCarton'] ?? '')));
         $produit->setCartonsParPalette(isset($data['cartonsParPalette']) && $data['cartonsParPalette'] !== '' ? (int) $data['cartonsParPalette'] : null);
         $produit->setStockDisponible((int) ($data['stockDisponible'] ?? 0));
         $produit->setCategorie($categorie);

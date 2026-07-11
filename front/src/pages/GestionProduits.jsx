@@ -35,6 +35,34 @@ export default function GestionProduits() {
   const [erreur, setErreur] = useState(null)
   const [version, setVersion] = useState(0)
   const [filtreStock, setFiltreStock] = useState(params.get('stock') || 'tous')
+  const [importMsg, setImportMsg] = useState(null)
+  const [recherche, setRecherche] = useState('')
+  const [resultats, setResultats] = useState([])
+  const [rechercheMsg, setRechercheMsg] = useState(null)
+
+  useEffect(() => {
+    const terme = recherche.trim()
+    const minuteur = setTimeout(async () => {
+      if (terme.length < 2) {
+        setResultats([])
+        setRechercheMsg(null)
+        return
+      }
+      setRechercheMsg('Recherche…')
+      const data = await apiFetch(
+        `/api/produits/recherche-ean?q=${encodeURIComponent(terme)}`,
+      ).catch(() => null)
+      if (Array.isArray(data)) {
+        setResultats(data)
+        setRechercheMsg(data.length === 0 ? 'Aucun résultat (ou service Open Food Facts indisponible).' : null)
+      } else {
+        setResultats([])
+        setRechercheMsg('Recherche indisponible pour le moment.')
+      }
+    }, 350)
+
+    return () => clearTimeout(minuteur)
+  }, [recherche])
 
   const produitsAffiches = produits.filter((p) => {
     if (filtreStock === 'rupture') return p.stockDisponible === 0
@@ -62,6 +90,46 @@ export default function GestionProduits() {
 
   function maj(champ, valeur) {
     setForm((actuel) => ({ ...actuel, [champ]: valeur }))
+  }
+
+  function choisirResultat(r) {
+    setForm((f) => ({
+      ...f,
+      nom: r.nom || f.nom,
+      marque: r.marque || f.marque,
+      imageUrl: r.imageUrl || f.imageUrl,
+      ean: r.ean || f.ean,
+    }))
+    setRecherche('')
+    setResultats([])
+    setRechercheMsg(null)
+  }
+
+  async function importerEan() {
+    if (!form.ean) {
+      setImportMsg('Saisis d\'abord un EAN.')
+      return
+    }
+    setImportMsg('Recherche…')
+    try {
+      const infos = await apiFetch('/api/produits/import-ean', {
+        method: 'POST',
+        body: JSON.stringify({ ean: form.ean }),
+      })
+      setForm((f) => ({
+        ...f,
+        nom: infos.nom || f.nom,
+        marque: infos.marque || f.marque,
+        imageUrl: infos.imageUrl || f.imageUrl,
+      }))
+      setImportMsg('Infos récupérées depuis Open Food Facts ✓')
+    } catch (err) {
+      setImportMsg(
+        err.status === 404
+          ? 'Produit introuvable pour cet EAN — saisis à la main.'
+          : 'Import impossible pour le moment.',
+      )
+    }
   }
 
   function reinitialiser() {
@@ -142,11 +210,74 @@ export default function GestionProduits() {
             {editionId ? 'Modifier le produit' : 'Nouveau produit'}
           </h2>
 
+          <div className="relative mb-4 rounded bg-[#F9F9F9] p-3">
+            <label className="mb-1 block text-xs text-[#888888]">
+              Rechercher un produit (Open Food Facts) — remplit nom, marque, image, EAN
+            </label>
+            <input
+              type="text"
+              value={recherche}
+              onChange={(e) => setRecherche(e.target.value)}
+              placeholder="ex : Grey Goose, Nutella…"
+              className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+            />
+            {rechercheMsg && <p className="mt-1 text-xs text-[#888888]">{rechercheMsg}</p>}
+
+            {resultats.length > 0 && (
+              <ul className="absolute z-10 mt-1 max-h-72 w-[calc(100%-1.5rem)] divide-y divide-[#E8E8E8] overflow-y-auto rounded border border-[#888888] bg-white shadow-lg">
+                {resultats.map((r) => (
+                  <li key={r.ean}>
+                    <button
+                      type="button"
+                      onClick={() => choisirResultat(r)}
+                      className="flex w-full items-center gap-3 p-2 text-left hover:bg-[#F2F2F2]"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded bg-[#1C1C1C]">
+                        {r.imageUrl ? (
+                          <img src={r.imageUrl} alt={r.nom} className="h-full object-contain" />
+                        ) : (
+                          <span className="text-[8px] text-[#888888]">—</span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-[#222222]">
+                          {r.nom}
+                          {r.contenance && (
+                            <span className="ml-2 rounded bg-[#F5A623] px-1.5 py-0.5 text-xs text-[#111111]">
+                              {r.contenance}
+                            </span>
+                          )}
+                        </p>
+                        <p className="truncate text-xs text-[#888888]">
+                          {r.marque || 'Marque inconnue'} · EAN {r.ean || '—'}
+                        </p>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <Champ label="Nom" valeur={form.nom} onChange={(v) => maj('nom', v)} />
             <Champ label="Marque" valeur={form.marque} onChange={(v) => maj('marque', v)} />
             <Champ label="Format carton (ex: 6x70cl)" valeur={form.formatCarton} onChange={(v) => maj('formatCarton', v)} />
-            <Champ label="EAN (code-barres)" valeur={form.ean} onChange={(v) => maj('ean', v)} />
+            <div>
+              <label className="mb-1 block text-xs text-[#888888]">EAN (code-barres)</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={form.ean}
+                  onChange={(e) => maj('ean', e.target.value)}
+                  className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                />
+                <Button type="button" variant="outline" size="sm" onClick={importerEan}>
+                  Récupérer
+                </Button>
+              </div>
+              {importMsg && <p className="mt-1 text-xs text-[#888888]">{importMsg}</p>}
+            </div>
             <Champ label="Prix d'achat carton (€)" valeur={form.prixAchatCarton} onChange={(v) => maj('prixAchatCarton', v)} />
             <Champ label="Stock (cartons)" valeur={form.stockDisponible} onChange={(v) => maj('stockDisponible', v)} />
             <Champ label="Cartons par palette" valeur={form.cartonsParPalette} onChange={(v) => maj('cartonsParPalette', v)} />

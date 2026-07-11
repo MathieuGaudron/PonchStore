@@ -6,6 +6,7 @@ use App\Entity\Categorie;
 use App\Entity\Produit;
 use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
+use App\Service\EanImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +35,34 @@ class ProduitController extends AbstractController
         $produits = $this->produitRepository->findBy([], ['nom' => 'ASC']);
 
         return $this->json($produits, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
+    #[Route('/recherche-ean', name: 'api_produits_recherche_ean', methods: ['GET'])]
+    public function rechercheEan(Request $request, EanImportService $eanImportService): JsonResponse
+    {
+        $terme = trim((string) $request->query->get('q', ''));
+        if (mb_strlen($terme) < 2) {
+            return $this->json(['message' => 'Recherche trop courte.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($eanImportService->rechercher($terme));
+    }
+
+    #[Route('/import-ean', name: 'api_produits_import_ean', methods: ['POST'])]
+    public function importEan(Request $request, EanImportService $eanImportService): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $ean = is_array($data) ? trim((string) ($data['ean'] ?? '')) : '';
+        if ($ean === '') {
+            return $this->json(['message' => 'EAN requis.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $infos = $eanImportService->importer($ean);
+        if ($infos === null) {
+            return $this->json(['message' => 'Produit introuvable pour cet EAN — saisie manuelle.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($infos);
     }
 
     #[Route('', name: 'api_produits_creer', methods: ['POST'])]

@@ -6,6 +6,7 @@ use App\Entity\Categorie;
 use App\Entity\Produit;
 use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
+use App\Service\EanImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +35,34 @@ class ProduitController extends AbstractController
         $produits = $this->produitRepository->findBy([], ['nom' => 'ASC']);
 
         return $this->json($produits, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
+    #[Route('/recherche-ean', name: 'api_produits_recherche_ean', methods: ['GET'])]
+    public function rechercheEan(Request $request, EanImportService $eanImportService): JsonResponse
+    {
+        $terme = trim((string) $request->query->get('q', ''));
+        if (mb_strlen($terme) < 2) {
+            return $this->json(['message' => 'Recherche trop courte.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($eanImportService->rechercher($terme));
+    }
+
+    #[Route('/import-ean', name: 'api_produits_import_ean', methods: ['POST'])]
+    public function importEan(Request $request, EanImportService $eanImportService): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $ean = is_array($data) ? trim((string) ($data['ean'] ?? '')) : '';
+        if ($ean === '') {
+            return $this->json(['message' => 'EAN requis.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $infos = $eanImportService->importer($ean);
+        if ($infos === null) {
+            return $this->json(['message' => 'Produit introuvable pour cet EAN — saisie manuelle.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($infos);
     }
 
     #[Route('', name: 'api_produits_creer', methods: ['POST'])]
@@ -93,18 +122,25 @@ class ProduitController extends AbstractController
         return $this->json($produit, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
     }
 
-    #[Route('/{id}', name: 'api_produits_desactiver', methods: ['DELETE'], requirements: ['id' => '\d+'])]
-    public function desactiver(int $id): JsonResponse
+    #[Route('/{id}', name: 'api_produits_supprimer', methods: ['DELETE'], requirements: ['id' => '\d+'])]
+    public function supprimer(int $id): JsonResponse
     {
         $produit = $this->produitRepository->find($id);
         if ($produit === null) {
             return $this->json(['message' => 'Produit introuvable.'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $produit->setActif(false);
-        $this->em->flush();
+        try {
+            $this->em->remove($produit);
+            $this->em->flush();
+        } catch (\Throwable) {
+            return $this->json(
+                ['message' => 'Ce produit est lié à des commandes : désactivez-le plutôt que de le supprimer.'],
+                JsonResponse::HTTP_CONFLICT,
+            );
+        }
 
-        return $this->json($produit, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+        return $this->json(['message' => 'Produit supprimé.']);
     }
 
     private function trouverCategorie(array $data): ?Categorie
@@ -124,7 +160,7 @@ class ProduitController extends AbstractController
         $produit->setImageUrl($data['imageUrl'] ?? null);
         $produit->setEan(isset($data['ean']) && $data['ean'] !== '' ? (string) $data['ean'] : null);
         $produit->setFormatCarton((string) ($data['formatCarton'] ?? ''));
-        $produit->setPrixAchatCarton((string) ($data['prixAchatCarton'] ?? ''));
+        $produit->setPrixAchatCarton(str_replace(',', '.', (string) ($data['prixAchatCarton'] ?? '')));
         $produit->setCartonsParPalette(isset($data['cartonsParPalette']) && $data['cartonsParPalette'] !== '' ? (int) $data['cartonsParPalette'] : null);
         $produit->setStockDisponible((int) ($data['stockDisponible'] ?? 0));
         $produit->setCategorie($categorie);

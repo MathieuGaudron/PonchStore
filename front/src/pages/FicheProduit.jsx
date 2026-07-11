@@ -59,9 +59,9 @@ export default function FicheProduit() {
 
         {produit && (
           <div className="mt-4 flex max-w-4xl gap-8">
-            <div className="flex h-80 w-80 shrink-0 items-center justify-center rounded-md bg-[#1C1C1C]">
+            <div className="flex h-80 w-80 shrink-0 items-center justify-center rounded-md bg-[#F2F2F2] p-4">
               {produit.imageUrl ? (
-                <img src={produit.imageUrl} alt={produit.nom} className="h-full object-contain" />
+                <img src={produit.imageUrl} alt={produit.nom} className="h-full w-full object-contain" />
               ) : (
                 <span className="text-[#888888]">Pas d'image</span>
               )}
@@ -108,6 +108,13 @@ export default function FicheProduit() {
                       <dd>
                         {produit.prixPalette} €
                         <span className="text-[#888888]"> ({produit.cartonsParPalette} cartons)</span>
+                      </dd>
+                    </div>
+                    <div className="flex gap-2">
+                      <dt className="w-40 text-[#888888]">Remises volume</dt>
+                      <dd className="text-[#F5A623]">
+                        <span className="font-bold">−5%</span> dès 5 palettes ·{' '}
+                        <span className="font-bold">−10%</span> dès 10 palettes
                       </dd>
                     </div>
                   </>

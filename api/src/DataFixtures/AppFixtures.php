@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\Categorie;
 use App\Entity\CreneauRetrait;
-use App\Entity\Produit;
 use App\Entity\Utilisateur;
 use App\Enum\RoleEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -19,7 +18,6 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $categories = [];
         $nomsCategories = [
             'Vodka',
             'Rhum',
@@ -40,7 +38,6 @@ class AppFixtures extends Fixture
             $categorie->setNom($nom);
             $categorie->setDescription('Sélection de ' . $nom . ' pour la revente CHR.');
             $manager->persist($categorie);
-            $categories[$nom] = $categorie;
         }
 
         $admin = new Utilisateur();

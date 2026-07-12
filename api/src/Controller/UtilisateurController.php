@@ -11,12 +11,56 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/utilisateurs')]
 class UtilisateurController extends AbstractController
 {
+    private const GROUPES = ['user:read', 'user:admin'];
+
+    #[Route('', name: 'api_utilisateurs_liste', methods: ['GET'])]
+    public function liste(UtilisateurRepository $utilisateurRepository): JsonResponse
+    {
+        $utilisateurs = $utilisateurRepository->findBy([], ['nom' => 'ASC', 'prenom' => 'ASC']);
+
+        return $this->json($utilisateurs, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
+    #[Route('/{id}/actif', name: 'api_utilisateurs_actif', methods: ['PATCH'], requirements: ['id' => '\d+'])]
+    public function changerActif(
+        int $id,
+        Request $request,
+        #[CurrentUser] Utilisateur $connecte,
+        UtilisateurRepository $utilisateurRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $utilisateur = $utilisateurRepository->find($id);
+        if ($utilisateur === null) {
+            return $this->json(['message' => 'Utilisateur introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data) || !isset($data['actif'])) {
+            return $this->json(['message' => 'Champ actif requis.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $actif = (bool) $data['actif'];
+
+        if ($utilisateur->getId() === $connecte->getId() && !$actif) {
+            return $this->json(
+                ['message' => 'Impossible de désactiver votre propre compte.'],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        }
+
+        $utilisateur->setActif($actif);
+        $em->flush();
+
+        return $this->json($utilisateur, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
     #[Route('', name: 'api_utilisateurs_create', methods: ['POST'])]
     public function create(
         Request $request,

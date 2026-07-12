@@ -5,7 +5,7 @@ import RoutePrivee from './components/RoutePrivee'
 import Connexion from './pages/Connexion'
 import MotDePasseOublie from './pages/MotDePasseOublie'
 import Reinitialisation from './pages/Reinitialisation'
-import CreerUtilisateur from './pages/CreerUtilisateur'
+import GestionUtilisateurs from './pages/GestionUtilisateurs'
 import Catalogue from './pages/Catalogue'
 import FicheProduit from './pages/FicheProduit'
 import Panier from './pages/Panier'
@@ -98,10 +98,10 @@ function App() {
               }
             />
             <Route
-              path="/admin/utilisateurs/nouveau"
+              path="/admin/utilisateurs"
               element={
                 <RoutePrivee roles={['ADMIN']}>
-                  <CreerUtilisateur />
+                  <GestionUtilisateurs />
                 </RoutePrivee>
               }
             />

@@ -37,6 +37,7 @@ export default function GestionProduits() {
   const [succes, setSucces] = useState(null)
   const [version, setVersion] = useState(0)
   const [filtreStock, setFiltreStock] = useState(params.get('stock') || 'tous')
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false)
   const [importMsg, setImportMsg] = useState(null)
   const [recherche, setRecherche] = useState('')
   const [resultats, setResultats] = useState([])
@@ -140,7 +141,22 @@ export default function GestionProduits() {
     setErreur(null)
   }
 
+  function fermerFormulaire() {
+    reinitialiser()
+    setFormulaireOuvert(false)
+  }
+
+  function basculerFormulaire() {
+    if (formulaireOuvert) {
+      fermerFormulaire()
+    } else {
+      reinitialiser()
+      setFormulaireOuvert(true)
+    }
+  }
+
   function editer(p) {
+    setFormulaireOuvert(true)
     setEditionId(p.id)
     setErreur(null)
     setForm({
@@ -166,7 +182,7 @@ export default function GestionProduits() {
     try {
       await apiFetch(chemin, { method: methode, body: JSON.stringify(form) })
       const message = editionId ? 'Produit modifié ✓' : 'Produit ajouté au catalogue ✓'
-      reinitialiser()
+      fermerFormulaire()
       setVersion((v) => v + 1)
       setSucces(message)
       setTimeout(() => setSucces(null), 3000)
@@ -218,7 +234,12 @@ export default function GestionProduits() {
 
       <main className="p-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Gestion des produits</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-[#222222]">Gestion des produits</h1>
+          <Button onClick={basculerFormulaire}>
+            {formulaireOuvert ? 'Fermer' : '+ Nouveau produit'}
+          </Button>
+        </div>
 
         {succes && (
           <div className="fixed right-6 top-6 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg">
@@ -226,9 +247,10 @@ export default function GestionProduits() {
           </div>
         )}
 
+        {formulaireOuvert && (
         <form onSubmit={soumettre} className="mb-8 max-w-3xl rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
           <h2 className="mb-3 font-bold text-[#222222]">
-            {editionId ? 'Modifier le produit' : 'Nouveau produit'}
+            {editionId ? `Modifier « ${form.nom} »` : 'Nouveau produit'}
           </h2>
 
           <div className="relative mb-4 rounded bg-[#F9F9F9] p-3">
@@ -348,13 +370,12 @@ export default function GestionProduits() {
 
           <div className="mt-4 flex gap-3">
             <Button type="submit">{editionId ? 'Enregistrer' : 'Créer le produit'}</Button>
-            {editionId && (
-              <Button type="button" variant="outline" onClick={reinitialiser}>
-                Annuler
-              </Button>
-            )}
+            <Button type="button" variant="outline" onClick={fermerFormulaire}>
+              Annuler
+            </Button>
           </div>
         </form>
+        )}
 
         <div className="mb-4 flex flex-wrap gap-2">
           {FILTRES_STOCK.map((f) => (

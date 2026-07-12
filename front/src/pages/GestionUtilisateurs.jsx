@@ -45,6 +45,7 @@ export default function GestionUtilisateurs() {
   const [succes, setSucces] = useState(null)
   const [loading, setLoading] = useState(false)
   const [version, setVersion] = useState(0)
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -77,6 +78,7 @@ export default function GestionUtilisateurs() {
     try {
       const cree = await creerUtilisateur(form)
       setForm(FORM_VIDE)
+      setFormulaireOuvert(false)
       setVersion((v) => v + 1)
       afficherSucces(`Compte créé pour ${cree.prenom} ${cree.nom} (${cree.role}) ✓`)
     } catch (err) {
@@ -134,7 +136,12 @@ export default function GestionUtilisateurs() {
 
       <main className="p-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Gestion des utilisateurs</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-[#222222]">Gestion des utilisateurs</h1>
+          <Button onClick={() => setFormulaireOuvert((o) => !o)}>
+            {formulaireOuvert ? 'Fermer' : '+ Nouvel utilisateur'}
+          </Button>
+        </div>
 
         {succes && (
           <div className="fixed right-6 top-6 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg">
@@ -142,6 +149,7 @@ export default function GestionUtilisateurs() {
           </div>
         )}
 
+        {formulaireOuvert && (
         <form
           onSubmit={handleSubmit}
           className="mb-8 max-w-3xl rounded bg-white p-6 shadow-[0_1px_4px_#E8E8E8]"
@@ -188,6 +196,7 @@ export default function GestionUtilisateurs() {
             </Button>
           </div>
         </form>
+        )}
 
         <h2 className="mb-4 font-bold text-[#222222]">Comptes existants ({utilisateurs.length})</h2>
 

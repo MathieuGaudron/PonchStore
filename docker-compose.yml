@@ -30,6 +30,13 @@ services:
     ports:
       - "8080:8000"
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: ponchstore-mailhog
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+
   front:
     build: ./front
     container_name: ponchstore-front

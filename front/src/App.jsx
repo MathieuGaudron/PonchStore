@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthContext'
 import { PanierProvider } from './context/PanierContext'
 import RoutePrivee from './components/RoutePrivee'
 import Connexion from './pages/Connexion'
+import MotDePasseOublie from './pages/MotDePasseOublie'
+import Reinitialisation from './pages/Reinitialisation'
 import CreerUtilisateur from './pages/CreerUtilisateur'
 import Catalogue from './pages/Catalogue'
 import FicheProduit from './pages/FicheProduit'
@@ -21,6 +23,8 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/connexion" element={<Connexion />} />
+            <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+            <Route path="/reinitialisation" element={<Reinitialisation />} />
             <Route
               path="/catalogue"
               element={

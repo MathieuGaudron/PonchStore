@@ -38,6 +38,8 @@ security:
 
     access_control:
         - { path: ^/api/auth/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/mot-de-passe-oublie, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/reinitialisation, roles: PUBLIC_ACCESS }
         - { path: ^/api/utilisateurs, roles: ROLE_ADMIN }
         - { path: ^/api, roles: ROLE_CLIENT_PRO }
 

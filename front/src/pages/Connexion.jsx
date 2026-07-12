@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 
 export default function Connexion() {
@@ -65,6 +65,13 @@ export default function Connexion() {
         >
           {loading ? 'Connexion…' : 'Se connecter'}
         </button>
+
+        <Link
+          to="/mot-de-passe-oublie"
+          className="text-center text-sm text-[#888888] hover:text-[#F5A623]"
+        >
+          Mot de passe oublié ?
+        </Link>
       </form>
     </div>
   )

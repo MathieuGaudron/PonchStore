@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Enum\RoleEnum;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,15 +38,32 @@ class ProfilController extends AbstractController
             return $this->json(['message' => 'Corps de requête JSON invalide.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
+        foreach (['telephone', 'nomEtablissement', 'adresseEtablissement', 'siret'] as $champ) {
+            if (isset($data[$champ]) && trim((string) $data[$champ]) === '') {
+                $data[$champ] = null;
+            }
+        }
+
+        $estClientPro = $utilisateur->getRole() === RoleEnum::CLIENT_PRO;
+        $contrainteSiret = new Assert\Length(exactly: 14, exactMessage: 'Le SIRET doit contenir exactement 14 caractères.');
+
         $constraints = new Assert\Collection([
             'fields' => [
                 'nom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
                 'prenom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
                 'email' => [new Assert\NotBlank(), new Assert\Email(), new Assert\Length(max: 180)],
-                'telephone' => new Assert\Optional([new Assert\Length(max: 20)]),
-                'nomEtablissement' => new Assert\Optional([new Assert\Length(max: 150)]),
-                'adresseEtablissement' => new Assert\Optional(),
-                'siret' => new Assert\Optional([new Assert\Length(exactly: 14)]),
+                'telephone' => $estClientPro
+                    ? [new Assert\NotBlank(message: 'Le téléphone est obligatoire.'), new Assert\Length(max: 20)]
+                    : new Assert\Optional([new Assert\Length(max: 20)]),
+                'nomEtablissement' => $estClientPro
+                    ? [new Assert\NotBlank(message: 'Le nom de l\'établissement est obligatoire.'), new Assert\Length(max: 150)]
+                    : new Assert\Optional([new Assert\Length(max: 150)]),
+                'adresseEtablissement' => $estClientPro
+                    ? [new Assert\NotBlank(message: 'L\'adresse de l\'établissement est obligatoire.')]
+                    : new Assert\Optional(),
+                'siret' => $estClientPro
+                    ? [new Assert\NotBlank(message: 'Le SIRET est obligatoire.'), $contrainteSiret]
+                    : new Assert\Optional([$contrainteSiret]),
             ],
         ]);
 

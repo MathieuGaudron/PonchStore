@@ -4,14 +4,18 @@ namespace App\Controller;
 
 use App\Entity\Categorie;
 use App\Entity\Produit;
+use App\Entity\Utilisateur;
 use App\Repository\CategorieRepository;
+use App\Repository\MouvementStockRepository;
 use App\Repository\ProduitRepository;
 use App\Service\EanImportService;
+use App\Service\StockService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -66,8 +70,11 @@ class ProduitController extends AbstractController
     }
 
     #[Route('', name: 'api_produits_creer', methods: ['POST'])]
-    public function creer(Request $request): JsonResponse
-    {
+    public function creer(
+        Request $request,
+        #[CurrentUser] Utilisateur $utilisateur,
+        StockService $stockService,
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         if (!is_array($data)) {
             return $this->json(['message' => 'Corps de requête JSON invalide.'], JsonResponse::HTTP_BAD_REQUEST);
@@ -80,6 +87,7 @@ class ProduitController extends AbstractController
 
         $produit = new Produit();
         $this->appliquer($produit, $data, $categorie);
+        $produit->setStockDisponible((int) ($data['stockDisponible'] ?? 0));
 
         $erreurs = $this->valider($produit, $data['ean'] ?? null, null);
         if ($erreurs !== null) {
@@ -87,6 +95,7 @@ class ProduitController extends AbstractController
         }
 
         $this->em->persist($produit);
+        $stockService->enregistrerStockInitial($produit, $utilisateur);
         $this->em->flush();
 
         return $this->json($produit, JsonResponse::HTTP_CREATED, [], ['groups' => self::GROUPES]);
@@ -123,7 +132,7 @@ class ProduitController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_produits_supprimer', methods: ['DELETE'], requirements: ['id' => '\d+'])]
-    public function supprimer(int $id): JsonResponse
+    public function supprimer(int $id, MouvementStockRepository $mouvementRepository): JsonResponse
     {
         $produit = $this->produitRepository->find($id);
         if ($produit === null) {
@@ -131,6 +140,9 @@ class ProduitController extends AbstractController
         }
 
         try {
+            foreach ($mouvementRepository->findBy(['produit' => $produit]) as $mouvement) {
+                $this->em->remove($mouvement);
+            }
             $this->em->remove($produit);
             $this->em->flush();
         } catch (\Throwable) {
@@ -162,7 +174,6 @@ class ProduitController extends AbstractController
         $produit->setFormatCarton((string) ($data['formatCarton'] ?? ''));
         $produit->setPrixAchatCarton(str_replace(',', '.', (string) ($data['prixAchatCarton'] ?? '')));
         $produit->setCartonsParPalette(isset($data['cartonsParPalette']) && $data['cartonsParPalette'] !== '' ? (int) $data['cartonsParPalette'] : null);
-        $produit->setStockDisponible((int) ($data['stockDisponible'] ?? 0));
         $produit->setCategorie($categorie);
         if (isset($data['actif'])) {
             $produit->setActif((bool) $data['actif']);

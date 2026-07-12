@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\TypeMouvementEnum;
 use App\Repository\MouvementStockRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MouvementStockRepository::class)]
@@ -14,29 +15,36 @@ class MouvementStock
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_mouvement')]
+    #[Groups(['mouvement:list'])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'type_mouvement', enumType: TypeMouvementEnum::class)]
     #[Assert\NotNull]
+    #[Groups(['mouvement:list'])]
     private ?TypeMouvementEnum $typeMouvement = null;
 
     #[ORM\Column]
     #[Assert\Positive]
+    #[Groups(['mouvement:list'])]
     private ?int $quantite = null;
 
     #[ORM\Column(name: 'date_mouvement', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[Groups(['mouvement:list'])]
     private ?\DateTimeImmutable $dateMouvement = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['mouvement:list'])]
     private ?string $commentaire = null;
 
     #[ORM\ManyToOne(targetEntity: Produit::class)]
     #[ORM\JoinColumn(name: 'id_produit', referencedColumnName: 'id_produit', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
+    #[Groups(['mouvement:list'])]
     private ?Produit $produit = null;
 
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'mouvementsStock')]
     #[ORM\JoinColumn(name: 'id_utilisateur', referencedColumnName: 'id_utilisateur', nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['mouvement:list'])]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne(targetEntity: Commande::class)]
@@ -128,6 +136,12 @@ class MouvementStock
     public function getCommande(): ?Commande
     {
         return $this->commande;
+    }
+
+    #[Groups(['mouvement:list'])]
+    public function getCommandeId(): ?int
+    {
+        return $this->commande?->getId();
     }
 
     public function setCommande(?Commande $commande): static

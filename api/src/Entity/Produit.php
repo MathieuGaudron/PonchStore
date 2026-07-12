@@ -69,6 +69,7 @@ class Produit
     private int $stockDisponible = 0;
 
     #[ORM\Column(options: ['default' => 1])]
+    #[Groups(['produit:admin'])]
     private bool $actif = true;
 
     #[ORM\Column(name: 'date_creation', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]

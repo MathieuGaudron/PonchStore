@@ -47,7 +47,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Assert\Length(max: 20)]
-    #[Groups(['profil:read'])]
+    #[Groups(['profil:read', 'user:admin'])]
     private ?string $telephone = null;
 
     #[ORM\Column(name: 'nom_etablissement', length: 150, nullable: true)]
@@ -69,9 +69,11 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private RoleEnum $role = RoleEnum::CLIENT_PRO;
 
     #[ORM\Column(name: 'date_inscription', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[Groups(['user:admin'])]
     private ?\DateTimeImmutable $dateInscription = null;
 
     #[ORM\Column(options: ['default' => 1])]
+    #[Groups(['user:admin'])]
     private bool $actif = true;
 
     #[ORM\Column(name: 'reset_token', length: 100, nullable: true)]

@@ -69,6 +69,11 @@ export function AuthProvider({ children }) {
     setUtilisateur(null)
   }
 
+  function remplacerToken(nouveauToken) {
+    setAuthToken(nouveauToken)
+    setToken(nouveauToken)
+  }
+
   async function rafraichirUtilisateur() {
     const moi = await apiFetch('/api/auth/me').catch(() => null)
     if (moi) {
@@ -82,6 +87,7 @@ export function AuthProvider({ children }) {
     seConnecter,
     creerUtilisateur,
     seDeconnecter,
+    remplacerToken,
     rafraichirUtilisateur,
   }
 

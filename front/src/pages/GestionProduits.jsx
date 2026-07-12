@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { apiFetch } from '../services/api'
 import Navbar from '../components/Navbar'
 import BoutonRetour from '../components/BoutonRetour'
+import Tableau from '../components/Tableau'
 import { Button } from '@/components/ui/button'
 
 const FILTRES_STOCK = [
@@ -299,7 +300,21 @@ export default function GestionProduits() {
               {importMsg && <p className="mt-1 text-xs text-[#888888]">{importMsg}</p>}
             </div>
             <Champ label="Prix d'achat carton (€)" valeur={form.prixAchatCarton} onChange={(v) => maj('prixAchatCarton', v)} />
-            <Champ label="Stock (cartons)" valeur={form.stockDisponible} onChange={(v) => maj('stockDisponible', v)} />
+            <div>
+              <label className="mb-1 block text-xs text-[#888888]">Stock (cartons)</label>
+              <input
+                type="text"
+                value={form.stockDisponible}
+                onChange={(e) => maj('stockDisponible', e.target.value)}
+                disabled={editionId !== null}
+                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm disabled:bg-[#F2F2F2] disabled:text-[#888888]"
+              />
+              {editionId !== null && (
+                <p className="mt-1 text-xs text-[#888888]">
+                  Le stock se modifie via la page Stock (mouvements).
+                </p>
+              )}
+            </div>
             <Champ label="Cartons par palette" valeur={form.cartonsParPalette} onChange={(v) => maj('cartonsParPalette', v)} />
             <div>
               <label className="mb-1 block text-xs text-[#888888]">Catégorie</label>
@@ -354,73 +369,68 @@ export default function GestionProduits() {
           ))}
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#E8E8E8] text-left text-[#888888]">
-                <th className="py-2">Produit</th>
-                <th className="py-2">Catégorie</th>
-                <th className="py-2 text-right">Prix carton</th>
-                <th className="py-2 text-right">Stock</th>
-                <th className="py-2 text-center">Actif</th>
-                <th className="py-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {produitsAffiches.map((p) => (
-                <tr key={p.id} className="border-b border-[#E8E8E8]">
-                  <td className="py-2 text-[#222222]">
-                    {p.nom} <span className="text-[#888888]">· {p.marque}</span>
-                  </td>
-                  <td className="py-2 text-[#888888]">{p.categorie?.nom}</td>
-                  <td className="py-2 text-right">{p.prixCarton} €</td>
-                  <td className="py-2 text-right">
-                    {p.stockDisponible === 0 ? (
-                      <span className="font-bold text-[#CC3333]">0 · rupture</span>
-                    ) : p.stockDisponible <= SEUIL_STOCK_FAIBLE ? (
-                      <span className="font-bold text-[#E67E22]">{p.stockDisponible} · faible</span>
-                    ) : (
-                      <span>{p.stockDisponible}</span>
-                    )}
-                  </td>
-                  <td className="py-2 text-center">
-                    {p.actif ? (
-                      <span className="text-[#2ECC71]">oui</span>
-                    ) : (
-                      <span className="text-[#CC3333]">non</span>
-                    )}
-                  </td>
-                  <td className="py-2 text-right">
-                    <button onClick={() => editer(p)} className="text-[#F5A623] hover:underline">
-                      Modifier
-                    </button>
-                    {p.actif ? (
-                      <button
-                        onClick={() => changerActif(p, false)}
-                        className="ml-3 text-[#CC3333] hover:underline"
-                      >
-                        Désactiver
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => changerActif(p, true)}
-                        className="ml-3 text-[#2ECC71] hover:underline"
-                      >
-                        Réactiver
-                      </button>
-                    )}
-                    <button
-                      onClick={() => supprimer(p)}
-                      className="ml-3 text-[#CC3333] hover:underline"
-                    >
-                      Supprimer
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tableau
+          colonnes={[
+            { titre: 'Produit' },
+            { titre: 'Catégorie' },
+            { titre: 'Prix carton', alignement: 'droite' },
+            { titre: 'Stock', alignement: 'droite' },
+            { titre: 'Actif', alignement: 'centre' },
+            { titre: 'Actions', alignement: 'droite' },
+          ]}
+        >
+          {produitsAffiches.map((p) => (
+            <tr key={p.id} className="border-b border-[#E8E8E8]">
+              <td className="px-2 py-2 text-[#222222]">
+                {p.nom} <span className="text-[#888888]">· {p.marque}</span>
+              </td>
+              <td className="px-2 py-2 text-[#888888]">{p.categorie?.nom}</td>
+              <td className="px-2 py-2 text-right">{p.prixCarton} €</td>
+              <td className="px-2 py-2 text-right">
+                {p.stockDisponible === 0 ? (
+                  <span className="font-bold text-[#CC3333]">0 · rupture</span>
+                ) : p.stockDisponible <= SEUIL_STOCK_FAIBLE ? (
+                  <span className="font-bold text-[#E67E22]">{p.stockDisponible} · faible</span>
+                ) : (
+                  <span>{p.stockDisponible}</span>
+                )}
+              </td>
+              <td className="px-2 py-2 text-center">
+                {p.actif ? (
+                  <span className="text-[#2ECC71]">oui</span>
+                ) : (
+                  <span className="text-[#CC3333]">non</span>
+                )}
+              </td>
+              <td className="px-2 py-2 text-right">
+                <button onClick={() => editer(p)} className="text-[#F5A623] hover:underline">
+                  Modifier
+                </button>
+                {p.actif ? (
+                  <button
+                    onClick={() => changerActif(p, false)}
+                    className="ml-3 text-[#CC3333] hover:underline"
+                  >
+                    Désactiver
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => changerActif(p, true)}
+                    className="ml-3 text-[#2ECC71] hover:underline"
+                  >
+                    Réactiver
+                  </button>
+                )}
+                <button
+                  onClick={() => supprimer(p)}
+                  className="ml-3 text-[#CC3333] hover:underline"
+                >
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          ))}
+        </Tableau>
       </main>
     </div>
   )

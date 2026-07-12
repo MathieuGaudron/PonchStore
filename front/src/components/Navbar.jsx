@@ -26,6 +26,9 @@ export default function Navbar() {
             <Link to="/preparation" className="text-white hover:text-[#F5A623]">
               Préparation
             </Link>
+            <Link to="/stock" className="text-white hover:text-[#F5A623]">
+              Stock
+            </Link>
           </>
         )}
         {utilisateur?.role === 'ADMIN' && (

@@ -12,4 +12,19 @@ class MouvementStockRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MouvementStock::class);
     }
+
+    public function historique(?int $idProduit = null, int $limite = 100): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->orderBy('m.dateMouvement', 'DESC')
+            ->addOrderBy('m.id', 'DESC')
+            ->setMaxResults($limite);
+
+        if ($idProduit !== null) {
+            $qb->andWhere('m.produit = :idProduit')
+                ->setParameter('idProduit', $idProduit);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

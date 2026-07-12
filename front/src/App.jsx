@@ -11,6 +11,7 @@ import CommandeDetail from './pages/CommandeDetail'
 import MonCompte from './pages/MonCompte'
 import PreparationCommandes from './pages/PreparationCommandes'
 import GestionProduits from './pages/GestionProduits'
+import GestionStock from './pages/GestionStock'
 import TableauBord from './pages/TableauBord'
 
 function App() {
@@ -73,6 +74,14 @@ function App() {
               element={
                 <RoutePrivee roles={['STAFF']}>
                   <PreparationCommandes />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/stock"
+              element={
+                <RoutePrivee roles={['STAFF']}>
+                  <GestionStock />
                 </RoutePrivee>
               }
             />

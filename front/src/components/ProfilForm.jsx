@@ -79,7 +79,8 @@ export default function ProfilForm() {
       setModeEdition(false)
       setMessage('Profil mis à jour.')
     } catch (err) {
-      setErreur(err.data?.message || 'Échec de la mise à jour.')
+      const erreursChamps = err.data?.errors ? Object.values(err.data.errors).join(' ') : null
+      setErreur(err.data?.message || erreursChamps || 'Échec de la mise à jour.')
     } finally {
       setEnvoi(false)
     }
@@ -106,32 +107,48 @@ export default function ProfilForm() {
     )
   }
 
+  const estClientPro = role === 'CLIENT_PRO'
+
   return (
     <form onSubmit={enregistrer} className="max-w-lg space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <Champ label="Prénom" valeur={form.prenom} onChange={(v) => maj('prenom', v)} />
-        <Champ label="Nom" valeur={form.nom} onChange={(v) => maj('nom', v)} />
+        <Champ label="Prénom" valeur={form.prenom} onChange={(v) => maj('prenom', v)} obligatoire />
+        <Champ label="Nom" valeur={form.nom} onChange={(v) => maj('nom', v)} obligatoire />
       </div>
 
-      <Champ label="Email" type="email" valeur={form.email} onChange={(v) => maj('email', v)} />
-      <Champ label="Téléphone" valeur={form.telephone} onChange={(v) => maj('telephone', v)} />
+      <Champ label="Email" type="email" valeur={form.email} onChange={(v) => maj('email', v)} obligatoire />
+      <Champ
+        label="Téléphone"
+        valeur={form.telephone}
+        onChange={(v) => maj('telephone', v)}
+        obligatoire={estClientPro}
+      />
       <Champ
         label="Établissement"
         valeur={form.nomEtablissement}
         onChange={(v) => maj('nomEtablissement', v)}
+        obligatoire={estClientPro}
       />
 
       <div>
-        <label className="mb-1 block text-xs text-[#888888]">Adresse de l'établissement</label>
+        <label className="mb-1 block text-xs text-[#888888]">
+          Adresse de l'établissement{estClientPro && ' *'}
+        </label>
         <textarea
           value={form.adresseEtablissement}
           onChange={(e) => maj('adresseEtablissement', e.target.value)}
           rows="2"
+          required={estClientPro}
           className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
         />
       </div>
 
-      <Champ label="SIRET" valeur={form.siret} onChange={(v) => maj('siret', v)} />
+      <Champ
+        label="SIRET"
+        valeur={form.siret}
+        onChange={(v) => maj('siret', v)}
+        obligatoire={estClientPro}
+      />
 
       {erreur && <p className="text-sm text-[#CC3333]">{erreur}</p>}
 
@@ -156,14 +173,18 @@ function Ligne({ label, valeur }) {
   )
 }
 
-function Champ({ label, valeur, onChange, type = 'text' }) {
+function Champ({ label, valeur, onChange, type = 'text', obligatoire = false }) {
   return (
     <div>
-      <label className="mb-1 block text-xs text-[#888888]">{label}</label>
+      <label className="mb-1 block text-xs text-[#888888]">
+        {label}
+        {obligatoire && ' *'}
+      </label>
       <input
         type={type}
         value={valeur}
         onChange={(e) => onChange(e.target.value)}
+        required={obligatoire}
         className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
       />
     </div>

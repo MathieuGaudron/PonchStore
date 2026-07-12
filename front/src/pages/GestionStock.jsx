@@ -39,6 +39,7 @@ export default function GestionStock() {
   const [erreur, setErreur] = useState(null)
   const [succes, setSucces] = useState(null)
   const [version, setVersion] = useState(0)
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false)
 
   useEffect(() => {
     apiFetch('/api/stock/produits')
@@ -80,7 +81,8 @@ export default function GestionStock() {
           commentaire: form.commentaire,
         }),
       })
-      setForm((actuel) => ({ ...actuel, quantite: '', commentaire: '' }))
+      setForm(FORM_VIDE)
+      setFormulaireOuvert(false)
       setVersion((v) => v + 1)
       setSucces('Mouvement enregistré ✓')
       setTimeout(() => setSucces(null), 3000)
@@ -95,7 +97,12 @@ export default function GestionStock() {
 
       <main className="p-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Gestion du stock</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-[#222222]">Gestion du stock</h1>
+          <Button onClick={() => setFormulaireOuvert((o) => !o)}>
+            {formulaireOuvert ? 'Fermer' : '+ Nouveau mouvement'}
+          </Button>
+        </div>
 
         {succes && (
           <div className="fixed right-6 top-6 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg">
@@ -103,6 +110,7 @@ export default function GestionStock() {
           </div>
         )}
 
+        {formulaireOuvert && (
         <form onSubmit={soumettre} className="mb-8 max-w-3xl rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
           <h2 className="mb-3 font-bold text-[#222222]">Nouveau mouvement</h2>
 
@@ -175,6 +183,7 @@ export default function GestionStock() {
             <Button type="submit">Enregistrer le mouvement</Button>
           </div>
         </form>
+        )}
 
         <div className="mb-4 flex items-center gap-3">
           <h2 className="font-bold text-[#222222]">Historique des mouvements</h2>

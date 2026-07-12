@@ -6,6 +6,7 @@ use App\Entity\Utilisateur;
 use App\Enum\RoleEnum;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +32,7 @@ class ProfilController extends AbstractController
         ValidatorInterface $validator,
         UtilisateurRepository $utilisateurRepository,
         EntityManagerInterface $em,
+        JWTTokenManagerInterface $jwtManager,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -45,7 +47,7 @@ class ProfilController extends AbstractController
         }
 
         $estClientPro = $utilisateur->getRole() === RoleEnum::CLIENT_PRO;
-        $contrainteSiret = new Assert\Length(exactly: 14, exactMessage: 'Le SIRET doit contenir exactement 14 caractères.');
+        $contrainteSiret = new Assert\Regex(pattern: '/^\d{14}$/', message: 'Le SIRET doit contenir exactement 14 chiffres.');
 
         $constraints = new Assert\Collection([
             'fields' => [
@@ -82,6 +84,8 @@ class ProfilController extends AbstractController
             return $this->json(['message' => 'Cet email est déjà utilisé.'], JsonResponse::HTTP_CONFLICT);
         }
 
+        $emailInitial = $utilisateur->getEmail();
+
         $utilisateur->setNom($data['nom']);
         $utilisateur->setPrenom($data['prenom']);
         $utilisateur->setEmail($data['email']);
@@ -92,7 +96,12 @@ class ProfilController extends AbstractController
 
         $em->flush();
 
-        return $this->json($utilisateur, JsonResponse::HTTP_OK, [], ['groups' => 'profil:read']);
+        $reponse = [
+            'utilisateur' => $utilisateur,
+            'token' => $utilisateur->getEmail() !== $emailInitial ? $jwtManager->create($utilisateur) : null,
+        ];
+
+        return $this->json($reponse, JsonResponse::HTTP_OK, [], ['groups' => 'profil:read']);
     }
 
     #[Route('/mot-de-passe', name: 'api_profil_mot_de_passe', methods: ['PUT'])]

@@ -14,7 +14,7 @@ const CHAMPS_VIDES = {
 }
 
 export default function ProfilForm() {
-  const { rafraichirUtilisateur } = useAuth()
+  const { rafraichirUtilisateur, remplacerToken } = useAuth()
   const [reference, setReference] = useState(CHAMPS_VIDES)
   const [form, setForm] = useState(CHAMPS_VIDES)
   const [role, setRole] = useState('')
@@ -73,7 +73,10 @@ export default function ProfilForm() {
     setErreur(null)
     setEnvoi(true)
     try {
-      await apiFetch('/api/profil', { method: 'PUT', body: JSON.stringify(form) })
+      const data = await apiFetch('/api/profil', { method: 'PUT', body: JSON.stringify(form) })
+      if (data?.token) {
+        remplacerToken(data.token)
+      }
       await rafraichirUtilisateur()
       setReference(form)
       setModeEdition(false)

@@ -41,7 +41,7 @@ class UtilisateurController extends AbstractController
                 'telephone' => new Assert\Optional([new Assert\Length(max: 20)]),
                 'nomEtablissement' => new Assert\Optional([new Assert\Length(max: 150)]),
                 'adresseEtablissement' => new Assert\Optional(),
-                'siret' => new Assert\Optional([new Assert\Length(exactly: 14)]),
+                'siret' => new Assert\Optional([new Assert\Regex(pattern: '/^\d{14}$/', message: 'Le SIRET doit contenir exactement 14 chiffres.')]),
             ],
         ]);
 

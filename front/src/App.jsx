@@ -13,6 +13,7 @@ import CommandeDetail from './pages/CommandeDetail'
 import MonCompte from './pages/MonCompte'
 import PreparationCommandes from './pages/PreparationCommandes'
 import GestionProduits from './pages/GestionProduits'
+import GestionCreneaux from './pages/GestionCreneaux'
 import GestionStock from './pages/GestionStock'
 import TableauBord from './pages/TableauBord'
 
@@ -102,6 +103,14 @@ function App() {
               element={
                 <RoutePrivee roles={['ADMIN']}>
                   <GestionUtilisateurs />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/admin/creneaux"
+              element={
+                <RoutePrivee roles={['ADMIN']}>
+                  <GestionCreneaux />
                 </RoutePrivee>
               }
             />

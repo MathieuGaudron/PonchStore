@@ -35,6 +35,9 @@ docker compose up -d
 | MailHog (boîte mail de dev) | http://localhost:8025 |
 | MySQL | localhost:3306 |
 
+Le conteneur `ponchstore-scheduler` (sans port exposé) exécute les tâches planifiées
+via Symfony Scheduler.
+
 ### 3. Initialiser la base de données
 
 ```bash
@@ -52,6 +55,21 @@ le catalogue produits se construit ensuite via le back-office (import EAN Open F
 |---|---|---|
 | ADMIN | admin@ponchstore.fr | Test1234! |
 | CLIENT_PRO | jean@lecomptoir.fr | Test1234! |
+
+## Créneaux de retrait
+
+Les créneaux se gèrent depuis le back-office (`/admin/creneaux`) : création, génération
+en masse, capacité, suppression. En complément, une tâche planifiée (tous les jours à
+02h30) maintient automatiquement 14 jours ouvrés de créneaux devant :
+
+```bash
+docker exec ponchstore-api php bin/console app:generer-creneaux            # manuel (14 jours)
+docker exec ponchstore-api php bin/console app:generer-creneaux --jours=30 --capacite=2
+docker exec ponchstore-api php bin/console debug:scheduler                 # voir la planification
+```
+
+Par défaut : jours ouvrés uniquement, plages 09h-12h et 14h-18h, créneaux de 20 min,
+capacité 1. La génération est idempotente (les créneaux existants sont ignorés).
 
 ## Emails (mot de passe oublié)
 

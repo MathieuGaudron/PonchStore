@@ -88,7 +88,7 @@ export default function Navbar() {
         PONCH'STORE
       </Link>
 
-      <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-6">
+      <div className="absolute left-1/2 z-50 flex -translate-x-1/2 items-center gap-6">
         <LienNav vers="/catalogue">Catalogue</LienNav>
         {estStaff && (
           <MenuDeroulant libelle="Gestion">
@@ -99,6 +99,7 @@ export default function Navbar() {
               <>
                 <div className="my-1 border-t border-[#333333]" />
                 <LienMenu vers="/admin/produits">Produits</LienMenu>
+                <LienMenu vers="/admin/creneaux">Créneaux</LienMenu>
                 <LienMenu vers="/admin/utilisateurs">Utilisateurs</LienMenu>
               </>
             )}

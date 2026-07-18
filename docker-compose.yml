@@ -30,6 +30,17 @@ services:
     ports:
       - "8080:8000"
 
+  scheduler:
+    build: ./api
+    container_name: ponchstore-scheduler
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/var/www/api
+    command: php bin/console messenger:consume scheduler_creneaux --no-interaction
+
   mailhog:
     image: mailhog/mailhog
     container_name: ponchstore-mailhog

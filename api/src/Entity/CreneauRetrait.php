@@ -43,6 +43,9 @@ class CreneauRetrait
     #[Groups(['creneau:read'])]
     private bool $disponible = true;
 
+    #[Groups(['creneau:admin'])]
+    private int $nbReservations = 0;
+
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'creneau')]
     private Collection $commandes;
 
@@ -112,6 +115,18 @@ class CreneauRetrait
     public function setDisponible(bool $disponible): static
     {
         $this->disponible = $disponible;
+
+        return $this;
+    }
+
+    public function getNbReservations(): int
+    {
+        return $this->nbReservations;
+    }
+
+    public function setNbReservations(int $nbReservations): static
+    {
+        $this->nbReservations = $nbReservations;
 
         return $this;
     }

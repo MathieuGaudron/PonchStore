@@ -16,9 +16,19 @@ class CreneauRetraitRepository extends ServiceEntityRepository
 
     public function futurs(): array
     {
+        return $this->listerAvecReservations('c.date > :aujourdhui');
+    }
+
+    public function pourAdmin(): array
+    {
+        return $this->listerAvecReservations('c.date >= :aujourdhui');
+    }
+
+    private function listerAvecReservations(string $conditionDate): array
+    {
         $lignes = $this->createQueryBuilder('c')
             ->select('c AS creneau', '(SELECT COUNT(co.id) FROM App\Entity\Commande co WHERE co.creneau = c AND co.statut != :annulee) AS nbReservations')
-            ->andWhere('c.date > :aujourdhui')
+            ->andWhere($conditionDate)
             ->setParameter('aujourdhui', new \DateTimeImmutable('today'))
             ->setParameter('annulee', StatutCommandeEnum::ANNULEE)
             ->orderBy('c.date', 'ASC')
@@ -29,6 +39,7 @@ class CreneauRetraitRepository extends ServiceEntityRepository
         $creneaux = [];
         foreach ($lignes as $ligne) {
             $creneau = $ligne['creneau'];
+            $creneau->setNbReservations((int) $ligne['nbReservations']);
             $creneau->setDisponible((int) $ligne['nbReservations'] < $creneau->getCapaciteMax());
             $creneaux[] = $creneau;
         }

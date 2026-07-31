@@ -30,7 +30,7 @@ class CreneauController extends AbstractController
     }
 
     #[Route('/admin', name: 'api_creneaux_admin', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_STAFF')]
     public function listeAdmin(): JsonResponse
     {
         $creneaux = $this->creneauRepository->pourAdmin();
@@ -39,7 +39,7 @@ class CreneauController extends AbstractController
     }
 
     #[Route('', name: 'api_creneaux_creer', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_STAFF')]
     public function creer(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -64,7 +64,7 @@ class CreneauController extends AbstractController
     }
 
     #[Route('/generer', name: 'api_creneaux_generer', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_STAFF')]
     public function generer(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

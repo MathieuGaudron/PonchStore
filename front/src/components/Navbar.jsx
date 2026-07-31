@@ -95,11 +95,11 @@ export default function Navbar() {
             <LienMenu vers="/tableau-bord">Tableau de bord</LienMenu>
             <LienMenu vers="/preparation">Préparation</LienMenu>
             <LienMenu vers="/stock">Stock</LienMenu>
+            <LienMenu vers="/admin/creneaux">Créneaux</LienMenu>
             {estAdmin && (
               <>
                 <div className="my-1 border-t border-[#333333]" />
                 <LienMenu vers="/admin/produits">Produits</LienMenu>
-                <LienMenu vers="/admin/creneaux">Créneaux</LienMenu>
                 <LienMenu vers="/admin/utilisateurs">Utilisateurs</LienMenu>
               </>
             )}

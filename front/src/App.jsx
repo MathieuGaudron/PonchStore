@@ -109,7 +109,7 @@ function App() {
             <Route
               path="/admin/creneaux"
               element={
-                <RoutePrivee roles={['ADMIN']}>
+                <RoutePrivee roles={['STAFF']}>
                   <GestionCreneaux />
                 </RoutePrivee>
               }

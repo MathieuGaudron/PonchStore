@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../services/api'
+import { useAuth } from '../context/auth-context'
 import Navbar from '../components/Navbar'
 import BoutonRetour from '../components/BoutonRetour'
 import Tableau from '../components/Tableau'
@@ -36,6 +37,8 @@ function heure(valeur) {
 }
 
 export default function GestionCreneaux() {
+  const { utilisateur } = useAuth()
+  const estAdmin = utilisateur?.role === 'ADMIN'
   const [creneaux, setCreneaux] = useState([])
   const [formulaire, setFormulaire] = useState(null)
   const [formCreation, setFormCreation] = useState(FORM_CREATION_VIDE)
@@ -400,34 +403,42 @@ export default function GestionCreneaux() {
                 )}
               </td>
               <td className="px-2 py-2 text-center">
-                <span className="inline-flex items-center gap-1">
-                  <input
-                    type="number"
-                    min="1"
-                    value={capacites[c.id] ?? c.capaciteMax}
-                    onChange={(e) =>
-                      setCapacites((prev) => ({ ...prev, [c.id]: e.target.value }))
-                    }
-                    className="w-16 rounded border border-[#E8E8E8] bg-white px-2 py-1 text-center text-sm"
-                  />
-                  {capacites[c.id] !== undefined &&
-                    Number(capacites[c.id]) !== c.capaciteMax && (
-                      <button
-                        onClick={() => enregistrerCapacite(c)}
-                        className="font-bold text-[#F5A623] hover:underline"
-                      >
-                        OK
-                      </button>
-                    )}
-                </span>
+                {estAdmin ? (
+                  <span className="inline-flex items-center gap-1">
+                    <input
+                      type="number"
+                      min="1"
+                      value={capacites[c.id] ?? c.capaciteMax}
+                      onChange={(e) =>
+                        setCapacites((prev) => ({ ...prev, [c.id]: e.target.value }))
+                      }
+                      className="w-16 rounded border border-[#E8E8E8] bg-white px-2 py-1 text-center text-sm"
+                    />
+                    {capacites[c.id] !== undefined &&
+                      Number(capacites[c.id]) !== c.capaciteMax && (
+                        <button
+                          onClick={() => enregistrerCapacite(c)}
+                          className="font-bold text-[#F5A623] hover:underline"
+                        >
+                          OK
+                        </button>
+                      )}
+                  </span>
+                ) : (
+                  c.capaciteMax
+                )}
               </td>
               <td className="px-2 py-2 text-right">
-                <button
-                  onClick={() => supprimer(c)}
-                  className="text-[#CC3333] hover:underline"
-                >
-                  Supprimer
-                </button>
+                {estAdmin ? (
+                  <button
+                    onClick={() => supprimer(c)}
+                    className="text-[#CC3333] hover:underline"
+                  >
+                    Supprimer
+                  </button>
+                ) : (
+                  <span className="text-[#888888]">—</span>
+                )}
               </td>
             </tr>
           ))}

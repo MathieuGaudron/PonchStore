@@ -98,6 +98,18 @@ class CommandeController extends AbstractController
         return $this->json($commandes, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list', 'commande:staff', 'user:read']]);
     }
 
+    #[Route('/historique', name: 'api_commandes_historique', methods: ['GET'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function historique(Request $request, CommandeRepository $commandeRepository): JsonResponse
+    {
+        $commandes = $commandeRepository->historique(
+            $request->query->get('statut'),
+            $request->query->get('recherche'),
+        );
+
+        return $this->json($commandes, JsonResponse::HTTP_OK, [], ['groups' => ['commande:read', 'produit:list', 'commande:staff', 'user:read']]);
+    }
+
     #[Route('/{id}/annuler-staff', name: 'api_commandes_annuler_staff', methods: ['PATCH'], requirements: ['id' => '\d+'])]
     #[IsGranted('ROLE_STAFF')]
     public function annulerStaff(

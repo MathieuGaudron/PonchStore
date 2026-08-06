@@ -28,13 +28,21 @@ export default function TableauBord() {
         {!stats ? (
           <p className="text-[#888888]">Chargement…</p>
         ) : (
-          <div className="grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               to="/preparation"
               className="rounded bg-white p-5 shadow-[0_1px_4px_#E8E8E8] hover:shadow-[0_2px_8px_#D0D0D0]"
             >
               <p className="text-4xl font-bold text-[#F5A623]">{stats.commandesAPreparer}</p>
               <p className="mt-1 text-sm text-[#888888]">Commandes à préparer</p>
+            </Link>
+
+            <Link
+              to="/historique-commandes"
+              className="rounded bg-white p-5 shadow-[0_1px_4px_#E8E8E8] hover:shadow-[0_2px_8px_#D0D0D0]"
+            >
+              <p className="text-4xl font-bold text-[#1C1C1C]">{stats.commandesTotal}</p>
+              <p className="mt-1 text-sm text-[#888888]">Historique des commandes</p>
             </Link>
 
             <Carte

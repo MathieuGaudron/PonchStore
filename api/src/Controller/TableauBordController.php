@@ -22,6 +22,7 @@ class TableauBordController extends AbstractController
     ): JsonResponse {
         return $this->json([
             'commandesAPreparer' => $commandeRepository->compterAPreparer(),
+            'commandesTotal' => $commandeRepository->compterTotal(),
             'produitsEnRupture' => $produitRepository->compterEnRupture(),
             'produitsStockFaible' => $produitRepository->compterStockFaible(self::SEUIL_STOCK_FAIBLE),
             'seuilStockFaible' => self::SEUIL_STOCK_FAIBLE,

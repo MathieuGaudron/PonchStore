@@ -55,6 +55,35 @@ class CommandeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function historique(?string $statut, ?string $recherche): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->leftJoin('c.utilisateur', 'u')
+            ->addSelect('u')
+            ->orderBy('c.dateCommande', 'DESC');
+
+        $statutFiltre = $statut !== null ? StatutCommandeEnum::tryFrom($statut) : null;
+        if ($statutFiltre !== null) {
+            $qb->andWhere('c.statut = :statut')->setParameter('statut', $statutFiltre);
+        }
+
+        $recherche = $recherche !== null ? trim($recherche) : '';
+        if ($recherche !== '') {
+            $qb->andWhere('u.nom LIKE :recherche OR u.prenom LIKE :recherche OR u.nomEtablissement LIKE :recherche OR u.email LIKE :recherche')
+                ->setParameter('recherche', '%' . $recherche . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function compterTotal(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function compterAPreparer(): int
     {
         return (int) $this->createQueryBuilder('c')

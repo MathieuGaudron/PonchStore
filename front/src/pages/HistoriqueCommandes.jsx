@@ -80,7 +80,7 @@ export default function HistoriqueCommandes() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Historique des commandes</h1>
 
@@ -101,11 +101,11 @@ export default function HistoriqueCommandes() {
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
             placeholder="Rechercher un client, un établissement…"
-            className="ml-auto w-72 rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+            className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm sm:ml-auto sm:w-72"
           />
         </div>
 
-        <div className="mb-4 flex gap-6 text-sm text-[#888888]">
+        <div className="mb-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#888888]">
           <span>
             <strong className="text-[#222222]">{commandes.length}</strong> commande(s)
           </span>

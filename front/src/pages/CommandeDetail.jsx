@@ -47,7 +47,7 @@ export default function CommandeDetail() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         {erreur && <p className="text-[#CC3333]">{erreur}</p>}
 
         {commande && (
@@ -83,24 +83,26 @@ export default function CommandeDetail() {
               )}
             </div>
 
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#E8E8E8] text-left text-[#888888]">
-                  <th className="py-2">Produit</th>
-                  <th className="py-2 text-center">Quantité</th>
-                  <th className="py-2 text-right">Prix carton</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commande.lignes.map((l) => (
-                  <tr key={l.produit.id} className="border-b border-[#E8E8E8]">
-                    <td className="py-2 text-[#222222]">{l.produit.nom}</td>
-                    <td className="py-2 text-center">{l.quantite}</td>
-                    <td className="py-2 text-right">{l.prixUnitaire} €</td>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[320px] text-sm">
+                <thead>
+                  <tr className="border-b border-[#E8E8E8] text-left text-[#888888]">
+                    <th className="py-2">Produit</th>
+                    <th className="py-2 text-center">Quantité</th>
+                    <th className="py-2 text-right">Prix carton</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {commande.lignes.map((l) => (
+                    <tr key={l.produit.id} className="border-b border-[#E8E8E8]">
+                      <td className="py-2 text-[#222222]">{l.produit.nom}</td>
+                      <td className="py-2 text-center">{l.quantite}</td>
+                      <td className="py-2 text-right">{l.prixUnitaire} €</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             <p className="mt-4 text-right">
               <span className="text-[#888888]">Total : </span>

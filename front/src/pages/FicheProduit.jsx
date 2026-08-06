@@ -49,7 +49,7 @@ export default function FicheProduit() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <Link to="/catalogue" className="text-sm text-[#888888] hover:text-[#F5A623]">
           ← Retour au catalogue
         </Link>
@@ -58,8 +58,8 @@ export default function FicheProduit() {
         {erreur && <p className="mt-4 text-[#CC3333]">{erreur}</p>}
 
         {produit && (
-          <div className="mt-4 flex max-w-4xl gap-8">
-            <div className="flex h-80 w-80 shrink-0 items-center justify-center rounded-md bg-[#F2F2F2] p-4">
+          <div className="mt-4 flex max-w-4xl flex-col gap-8 md:flex-row">
+            <div className="flex h-64 w-full shrink-0 items-center justify-center rounded-md bg-[#F2F2F2] p-4 sm:h-80 md:w-80">
               {produit.imageUrl ? (
                 <img src={produit.imageUrl} alt={produit.nom} className="h-full w-full object-contain" />
               ) : (
@@ -67,9 +67,9 @@ export default function FicheProduit() {
               )}
             </div>
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-4">
-                <h1 className="text-3xl font-bold text-[#222222]">{produit.nom}</h1>
+                <h1 className="text-2xl font-bold text-[#222222] sm:text-3xl">{produit.nom}</h1>
                 {produit.stockDisponible > 0 ? (
                   <span className="whitespace-nowrap rounded-full bg-[#2ECC71] px-3 py-1 text-sm text-[#111111]">
                     En stock
@@ -90,28 +90,28 @@ export default function FicheProduit() {
 
               <dl className="mt-6 space-y-1 text-sm text-[#222222]">
                 <div className="flex gap-2">
-                  <dt className="w-40 text-[#888888]">Format carton</dt>
+                  <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Format carton</dt>
                   <dd>{produit.formatCarton}</dd>
                 </div>
                 <div className="flex gap-2">
-                  <dt className="w-40 text-[#888888]">Stock disponible</dt>
+                  <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Stock disponible</dt>
                   <dd>{produit.stockDisponible} carton(s)</dd>
                 </div>
                 {produit.cartonsParPalette && (
                   <>
                     <div className="flex gap-2">
-                      <dt className="w-40 text-[#888888]">Cartons par palette</dt>
+                      <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Cartons par palette</dt>
                       <dd>{produit.cartonsParPalette}</dd>
                     </div>
                     <div className="flex gap-2">
-                      <dt className="w-40 text-[#888888]">Prix palette</dt>
+                      <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Prix palette</dt>
                       <dd>
                         {produit.prixPalette} €
                         <span className="text-[#888888]"> ({produit.cartonsParPalette} cartons)</span>
                       </dd>
                     </div>
                     <div className="flex gap-2">
-                      <dt className="w-40 text-[#888888]">Remises volume</dt>
+                      <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Remises volume</dt>
                       <dd className="text-[#F5A623]">
                         <span className="font-bold">−5%</span> dès 5 palettes ·{' '}
                         <span className="font-bold">−10%</span> dès 10 palettes
@@ -126,7 +126,7 @@ export default function FicheProduit() {
               )}
 
               {produit.stockDisponible > 0 && (
-                <div className="mt-8 flex items-center gap-3">
+                <div className="mt-8 flex flex-wrap items-center gap-3">
                   <ChampQuantite
                     valeur={quantite}
                     onChanger={(n) => {

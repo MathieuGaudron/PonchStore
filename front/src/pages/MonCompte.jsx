@@ -18,11 +18,11 @@ export default function MonCompte() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Mon compte</h1>
 
-        <div className="mb-6 flex gap-6 border-b border-[#E8E8E8]">
+        <div className="mb-6 flex flex-wrap gap-6 border-b border-[#E8E8E8]">
           <button onClick={() => setOnglet('commandes')} className={classeOnglet('commandes')}>
             Mes commandes
           </button>

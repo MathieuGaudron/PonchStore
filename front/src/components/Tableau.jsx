@@ -6,7 +6,7 @@ const ALIGNEMENTS = {
 export default function Tableau({ colonnes, children }) {
   return (
     <div className="max-h-[60vh] overflow-x-auto overflow-y-auto">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[640px] text-sm">
         <thead className="sticky top-0 bg-[#F9F9F9]">
           <tr className="border-b border-[#E8E8E8] text-left text-[#888888]">
             {colonnes.map((colonne) => (

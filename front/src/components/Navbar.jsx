@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Menu, X } from 'lucide-react'
 import { useAuth } from '../context/auth-context'
 import { usePanier } from '../context/panier-context'
 
@@ -73,6 +73,7 @@ export default function Navbar() {
   const { utilisateur, seDeconnecter } = useAuth()
   const { nombreArticles } = usePanier()
   const navigate = useNavigate()
+  const [menuMobileOuvert, setMenuMobileOuvert] = useState(false)
 
   const estStaff = ['STAFF', 'ADMIN'].includes(utilisateur?.role)
   const estAdmin = utilisateur?.role === 'ADMIN'
@@ -88,7 +89,7 @@ export default function Navbar() {
         PONCH'STORE
       </Link>
 
-      <div className="absolute left-1/2 z-50 flex -translate-x-1/2 items-center gap-6">
+      <div className="absolute left-1/2 z-50 hidden -translate-x-1/2 items-center gap-6 md:flex">
         <LienNav vers="/catalogue">Catalogue</LienNav>
         {estStaff && (
           <MenuDeroulant libelle="Gestion">
@@ -117,29 +118,80 @@ export default function Navbar() {
             </span>
           )}
         </LienNav>
-        <MenuDeroulant
-          alignement="droite"
-          libelle={
-            <span className="flex items-center gap-2">
-              {utilisateur?.prenom}
-              {estStaff && (
-                <span className="rounded bg-[#F5A623] px-1.5 py-0.5 text-[10px] font-bold text-[#111111]">
-                  {utilisateur?.role}
-                </span>
-              )}
-            </span>
-          }
+
+        <div className="hidden md:block">
+          <MenuDeroulant
+            alignement="droite"
+            libelle={
+              <span className="flex items-center gap-2">
+                {utilisateur?.prenom}
+                {estStaff && (
+                  <span className="rounded bg-[#F5A623] px-1.5 py-0.5 text-[10px] font-bold text-[#111111]">
+                    {utilisateur?.role}
+                  </span>
+                )}
+              </span>
+            }
+          >
+            <LienMenu vers="/compte">Mon compte</LienMenu>
+            <div className="my-1 border-t border-[#333333]" />
+            <button
+              onClick={handleDeconnexion}
+              className="block w-full px-4 py-2 text-left text-sm text-[#CC3333] hover:bg-[#111111]"
+            >
+              Déconnexion
+            </button>
+          </MenuDeroulant>
+        </div>
+
+        <button
+          onClick={() => setMenuMobileOuvert((o) => !o)}
+          aria-label="Menu"
+          aria-expanded={menuMobileOuvert}
+          className="text-white hover:text-[#F5A623] md:hidden"
         >
-          <LienMenu vers="/compte">Mon compte</LienMenu>
+          {menuMobileOuvert ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
+
+      {menuMobileOuvert && (
+        <div
+          onClick={() => setMenuMobileOuvert(false)}
+          className="absolute left-0 right-0 top-full z-50 border-t border-[#333333] bg-[#1C1C1C] py-1 shadow-lg md:hidden"
+        >
+          <LienMenu vers="/catalogue">Catalogue</LienMenu>
+
+          {estStaff && (
+            <>
+              <div className="my-1 border-t border-[#333333]" />
+              <p className="px-4 py-1 text-xs uppercase text-[#888888]">Gestion</p>
+              <LienMenu vers="/tableau-bord">Tableau de bord</LienMenu>
+              <LienMenu vers="/preparation">Préparation</LienMenu>
+              <LienMenu vers="/historique-commandes">Historique commandes</LienMenu>
+              <LienMenu vers="/stock">Stock</LienMenu>
+              <LienMenu vers="/admin/creneaux">Créneaux</LienMenu>
+              {estAdmin && (
+                <>
+                  <LienMenu vers="/admin/produits">Produits</LienMenu>
+                  <LienMenu vers="/admin/utilisateurs">Utilisateurs</LienMenu>
+                </>
+              )}
+            </>
+          )}
+
           <div className="my-1 border-t border-[#333333]" />
+          <p className="px-4 py-1 text-xs uppercase text-[#888888]">
+            {utilisateur?.prenom} {estStaff && `· ${utilisateur?.role}`}
+          </p>
+          <LienMenu vers="/compte">Mon compte</LienMenu>
           <button
             onClick={handleDeconnexion}
             className="block w-full px-4 py-2 text-left text-sm text-[#CC3333] hover:bg-[#111111]"
           >
             Déconnexion
           </button>
-        </MenuDeroulant>
-      </div>
+        </div>
+      )}
     </nav>
   )
 }

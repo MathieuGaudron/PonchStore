@@ -12,6 +12,7 @@ import Panier from './pages/Panier'
 import CommandeDetail from './pages/CommandeDetail'
 import MonCompte from './pages/MonCompte'
 import PreparationCommandes from './pages/PreparationCommandes'
+import HistoriqueCommandes from './pages/HistoriqueCommandes'
 import GestionProduits from './pages/GestionProduits'
 import GestionCreneaux from './pages/GestionCreneaux'
 import GestionStock from './pages/GestionStock'
@@ -79,6 +80,14 @@ function App() {
               element={
                 <RoutePrivee roles={['STAFF']}>
                   <PreparationCommandes />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/historique-commandes"
+              element={
+                <RoutePrivee roles={['STAFF']}>
+                  <HistoriqueCommandes />
                 </RoutePrivee>
               }
             />

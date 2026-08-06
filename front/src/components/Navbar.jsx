@@ -94,6 +94,7 @@ export default function Navbar() {
           <MenuDeroulant libelle="Gestion">
             <LienMenu vers="/tableau-bord">Tableau de bord</LienMenu>
             <LienMenu vers="/preparation">Préparation</LienMenu>
+            <LienMenu vers="/historique-commandes">Historique commandes</LienMenu>
             <LienMenu vers="/stock">Stock</LienMenu>
             <LienMenu vers="/admin/creneaux">Créneaux</LienMenu>
             {estAdmin && (

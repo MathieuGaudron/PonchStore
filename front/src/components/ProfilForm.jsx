@@ -114,7 +114,7 @@ export default function ProfilForm() {
 
   return (
     <form onSubmit={enregistrer} className="max-w-lg space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Champ label="Prénom" valeur={form.prenom} onChange={(v) => maj('prenom', v)} obligatoire />
         <Champ label="Nom" valeur={form.nom} onChange={(v) => maj('nom', v)} obligatoire />
       </div>
@@ -155,7 +155,7 @@ export default function ProfilForm() {
 
       {erreur && <p className="text-sm text-[#CC3333]">{erreur}</p>}
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={envoi}>
           {envoi ? 'Enregistrement…' : 'Enregistrer'}
         </Button>

@@ -21,7 +21,7 @@ export default function TableauBord() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Tableau de bord</h1>
 

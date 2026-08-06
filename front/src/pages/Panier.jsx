@@ -54,7 +54,7 @@ export default function Panier() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Mon panier</h1>
 
@@ -66,12 +66,12 @@ export default function Panier() {
             </Link>
           </p>
         ) : (
-          <div className="flex flex-wrap gap-8">
-            <section className="flex-1 space-y-3" style={{ minWidth: '320px' }}>
+          <div className="flex flex-col gap-8 lg:flex-row">
+            <section className="min-w-0 flex-1 space-y-3">
               {lignes.map((l) => (
                 <div
                   key={l.produitId}
-                  className="flex items-center gap-4 rounded bg-[#F2F2F2] p-3"
+                  className="flex flex-wrap items-center gap-3 rounded bg-[#F2F2F2] p-3 sm:gap-4"
                 >
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded bg-[#1C1C1C]">
                     {l.imageUrl ? (
@@ -81,31 +81,35 @@ export default function Panier() {
                     )}
                   </div>
 
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1 basis-40">
                     <p className="font-bold text-[#222222]">{l.nom}</p>
                     <p className="text-xs text-[#888888]">
                       {l.marque} · {l.formatCarton} · {l.prixCarton} € / carton
                     </p>
                   </div>
 
-                  <ChampQuantite
-                    valeur={l.quantite}
-                    onChanger={(n) => modifierQuantite(l.produitId, n)}
-                    onMin={() => retirer(l.produitId)}
-                  />
+                  <div className="ml-auto flex items-center gap-3 sm:gap-4">
+                    <ChampQuantite
+                      valeur={l.quantite}
+                      onChanger={(n) => modifierQuantite(l.produitId, n)}
+                      onMin={() => retirer(l.produitId)}
+                    />
 
-                  <div className="w-28 text-right">
-                    <p className="font-bold text-[#222222]">{l.montant} €</p>
-                    {l.remiseAppliquee && <p className="text-xs text-[#2ECC71]">remise appliquée</p>}
-                    {!l.disponible && <p className="text-xs text-[#CC3333]">stock insuffisant</p>}
+                    <div className="w-28 text-right">
+                      <p className="font-bold text-[#222222]">{l.montant} €</p>
+                      {l.remiseAppliquee && (
+                        <p className="text-xs text-[#2ECC71]">remise appliquée</p>
+                      )}
+                      {!l.disponible && <p className="text-xs text-[#CC3333]">stock insuffisant</p>}
+                    </div>
+
+                    <button
+                      onClick={() => retirer(l.produitId)}
+                      className="text-sm text-[#CC3333] hover:underline"
+                    >
+                      Retirer
+                    </button>
                   </div>
-
-                  <button
-                    onClick={() => retirer(l.produitId)}
-                    className="text-sm text-[#CC3333] hover:underline"
-                  >
-                    Retirer
-                  </button>
                 </div>
               ))}
 
@@ -120,7 +124,7 @@ export default function Panier() {
               </div>
             </section>
 
-            <aside className="w-full max-w-md space-y-4">
+            <aside className="w-full space-y-4 lg:max-w-md">
               <h2 className="font-bold text-[#222222]">Créneau de retrait</h2>
               <SelecteurCreneau creneauChoisi={creneauChoisi} onChoisir={setCreneauChoisi} />
 

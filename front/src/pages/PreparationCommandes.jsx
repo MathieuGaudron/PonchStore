@@ -67,7 +67,7 @@ export default function PreparationCommandes() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <BoutonRetour />
         <h1 className="mb-6 text-2xl font-bold text-[#222222]">Commandes à préparer</h1>
 
@@ -82,7 +82,7 @@ export default function PreparationCommandes() {
             const etape = PROCHAINE_ETAPE[c.statut]
             return (
               <div key={c.id} className="rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="font-bold text-[#222222]">
                       Commande n°{c.id} · {c.utilisateur?.prenom} {c.utilisateur?.nom}
@@ -111,7 +111,7 @@ export default function PreparationCommandes() {
                   ))}
                 </ul>
 
-                <div className="mt-3 flex items-center justify-between">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                   <span className="font-bold text-[#F5A623]">{c.montantTotal} €</span>
                   <div className="flex items-center gap-3">
                     <button

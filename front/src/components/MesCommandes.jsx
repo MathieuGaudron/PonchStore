@@ -85,7 +85,7 @@ export default function MesCommandes() {
               key={c.id}
               className="rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="font-bold text-[#222222]">Commande n°{c.id}</p>
                   <p className="text-xs text-[#888888]">
@@ -100,7 +100,7 @@ export default function MesCommandes() {
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center gap-4 border-t border-[#E8E8E8] pt-3">
+              <div className="mt-3 flex flex-wrap items-center gap-4 border-t border-[#E8E8E8] pt-3">
                 <Link to={`/commande/${c.id}`} className="text-sm text-[#F5A623] hover:underline">
                   Voir le détail →
                 </Link>

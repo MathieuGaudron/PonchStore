@@ -49,8 +49,8 @@ export default function Catalogue() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="flex gap-4 p-4">
-        <aside className="w-[150px] shrink-0 bg-[#1C1C1C] rounded p-3 text-white">
+      <main className="flex flex-col gap-4 p-4 md:flex-row">
+        <aside className="w-full shrink-0 bg-[#1C1C1C] rounded p-3 text-white md:w-[150px]">
           <h2 className="font-bold mb-3">Filtres</h2>
 
           <label className="block text-xs text-[#888888] mb-1">Recherche</label>
@@ -86,7 +86,7 @@ export default function Catalogue() {
           </label>
         </aside>
 
-        <section className="flex-1">
+        <section className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold text-[#222222] mb-4">Catalogue</h1>
 
           {chargement && <p className="text-[#888888]">Chargement…</p>}
@@ -95,7 +95,7 @@ export default function Catalogue() {
             <p className="text-[#888888]">Aucun produit ne correspond.</p>
           )}
 
-          <div className="grid grid-cols-3 gap-[10px]">
+          <div className="grid grid-cols-1 gap-[10px] sm:grid-cols-2 lg:grid-cols-3">
             {produits.map((p) => (
               <Link
                 key={p.id}

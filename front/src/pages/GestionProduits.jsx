@@ -232,9 +232,9 @@ export default function GestionProduits() {
     <div className="min-h-screen bg-[#F9F9F9]">
       <Navbar />
 
-      <main className="p-8">
+      <main className="p-4 sm:p-8">
         <BoutonRetour />
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-[#222222]">Gestion des produits</h1>
           <Button onClick={basculerFormulaire}>
             {formulaireOuvert ? 'Fermer' : '+ Nouveau produit'}
@@ -242,7 +242,7 @@ export default function GestionProduits() {
         </div>
 
         {succes && (
-          <div className="fixed right-6 top-6 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg">
+          <div className="fixed right-4 top-16 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg sm:right-6 sm:top-6">
             {succes}
           </div>
         )}
@@ -302,7 +302,7 @@ export default function GestionProduits() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Champ label="Nom" valeur={form.nom} onChange={(v) => maj('nom', v)} />
             <Champ label="Marque" valeur={form.marque} onChange={(v) => maj('marque', v)} />
             <Champ label="Format carton (ex: 6x70cl)" valeur={form.formatCarton} onChange={(v) => maj('formatCarton', v)} />

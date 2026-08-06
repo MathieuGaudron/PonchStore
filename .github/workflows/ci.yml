@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  api:
+    name: API — tests PHPUnit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: intl, pdo_mysql, ctype, iconv
+          coverage: none
+
+      - name: Préparation des variables d'environnement
+        working-directory: api
+        run: cp .env.example .env
+
+      - name: Cache des dépendances Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('api/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Installation des dépendances
+        working-directory: api
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Analyse syntaxique (php -l)
+        working-directory: api
+        run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Tests unitaires
+        working-directory: api
+        run: php bin/phpunit --testdox
+
+  front:
+    name: Front — lint et build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Installation des dépendances
+        working-directory: front
+        run: npm ci
+
+      - name: Lint (ESLint)
+        working-directory: front
+        run: npx eslint src
+
+      - name: Build de production (Vite)
+        working-directory: front
+        run: npm run build
+
+  docker:
+    name: Images Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Préparation des variables d'environnement
+        run: cp .env.example .env
+
+      - name: Build des images
+        run: docker compose build

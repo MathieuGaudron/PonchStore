@@ -64,7 +64,7 @@ jobs:
 
       - name: Lint (ESLint)
         working-directory: front
-        run: npx eslint src
+        run: npm run lint
 
       - name: Build de production (Vite)
         working-directory: front

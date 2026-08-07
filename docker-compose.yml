@@ -29,6 +29,7 @@ services:
       - ./api:/var/www/api
     ports:
       - "8080:8000"
+    command: sh -c "composer install --no-interaction --no-progress && php -S 0.0.0.0:8000 -t public"
 
   scheduler:
     build: ./api
@@ -39,7 +40,7 @@ services:
         condition: service_healthy
     volumes:
       - ./api:/var/www/api
-    command: php bin/console messenger:consume scheduler_creneaux --no-interaction
+    command: sh -c "until [ -f vendor/autoload.php ]; do sleep 2; done; php bin/console messenger:consume scheduler_creneaux --no-interaction"
 
   mailhog:
     image: mailhog/mailhog
@@ -58,6 +59,7 @@ services:
       - ./front:/app
     ports:
       - "3000:5173"
+    command: sh -c "npm install && npm run dev"
 
 volumes:
   db_data:

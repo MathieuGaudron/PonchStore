@@ -18,6 +18,7 @@ Les fichiers `.env` ne sont pas versionnés. Copier les exemples fournis :
 ```bash
 cp .env.example .env
 cp api/.env.example api/.env
+cp front/.env.example front/.env
 ```
 
 Les valeurs par défaut fonctionnent telles quelles en local.
@@ -27,6 +28,11 @@ Les valeurs par défaut fonctionnent telles quelles en local.
 ```bash
 docker compose up -d
 ```
+
+Au premier démarrage, les conteneurs installent eux-mêmes leurs dépendances
+(`composer install` pour l'API, `npm install` pour le front). Compter une à deux
+minutes avant que les services répondent — suivre l'avancement avec
+`docker compose logs -f api front`.
 
 | Service | URL |
 |---|---|

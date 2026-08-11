@@ -1,7 +1,9 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { PanierProvider } from './context/PanierContext'
 import RoutePrivee from './components/RoutePrivee'
+import Accueil from './pages/Accueil'
+import NonTrouve from './pages/NonTrouve'
 import Connexion from './pages/Connexion'
 import MotDePasseOublie from './pages/MotDePasseOublie'
 import Reinitialisation from './pages/Reinitialisation'
@@ -24,6 +26,7 @@ function App() {
       <PanierProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Accueil />} />
             <Route path="/connexion" element={<Connexion />} />
             <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
             <Route path="/reinitialisation" element={<Reinitialisation />} />
@@ -123,8 +126,7 @@ function App() {
                 </RoutePrivee>
               }
             />
-            <Route path="/" element={<Navigate to="/catalogue" replace />} />
-            <Route path="*" element={<Navigate to="/connexion" replace />} />
+            <Route path="*" element={<NonTrouve />} />
           </Routes>
         </BrowserRouter>
       </PanierProvider>

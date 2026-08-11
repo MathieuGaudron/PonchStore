@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 
 export default function Connexion() {
-  const { seConnecter } = useAuth()
+  const { token, seConnecter } = useAuth()
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
@@ -24,6 +24,10 @@ export default function Connexion() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (token !== null) {
+    return <Navigate to="/catalogue" replace />
   }
 
   return (

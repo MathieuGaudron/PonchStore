@@ -49,8 +49,8 @@ class ProfilController extends AbstractController
         $estClientPro = $utilisateur->getRole() === RoleEnum::CLIENT_PRO;
         $contrainteSiret = new Assert\Regex(pattern: '/^\d{14}$/', message: 'Le SIRET doit contenir exactement 14 chiffres.');
 
-        $constraints = new Assert\Collection([
-            'fields' => [
+        $constraints = new Assert\Collection(
+            fields: [
                 'nom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
                 'prenom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
                 'email' => [new Assert\NotBlank(), new Assert\Email(), new Assert\Length(max: 180)],
@@ -67,7 +67,7 @@ class ProfilController extends AbstractController
                     ? [new Assert\NotBlank(message: 'Le SIRET est obligatoire.'), $contrainteSiret]
                     : new Assert\Optional([$contrainteSiret]),
             ],
-        ]);
+        );
 
         $errors = $validator->validate($data, $constraints);
         if (count($errors) > 0) {

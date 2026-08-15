@@ -23,3 +23,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+when@test:
+    services:
+        # Sans Monolog, le logger par défaut écrit sur la sortie d'erreur : chaque 401
+        # ou 403 attendu par un test polluerait le rapport PHPUnit.
+        logger:
+            class: Psr\Log\NullLogger

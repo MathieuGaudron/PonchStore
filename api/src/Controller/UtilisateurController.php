@@ -75,8 +75,8 @@ class UtilisateurController extends AbstractController
             return $this->json(['message' => 'Corps de requête JSON invalide.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $constraints = new Assert\Collection([
-            'fields' => [
+        $constraints = new Assert\Collection(
+            fields: [
                 'nom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
                 'prenom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
                 'email' => [new Assert\NotBlank(), new Assert\Email(), new Assert\Length(max: 180)],
@@ -87,7 +87,7 @@ class UtilisateurController extends AbstractController
                 'adresseEtablissement' => new Assert\Optional(),
                 'siret' => new Assert\Optional([new Assert\Regex(pattern: '/^\d{14}$/', message: 'Le SIRET doit contenir exactement 14 chiffres.')]),
             ],
-        ]);
+        );
 
         $errors = $validator->validate($data, $constraints);
         if (count($errors) > 0) {

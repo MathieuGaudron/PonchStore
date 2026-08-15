@@ -125,8 +125,9 @@ Deux familles de tests PHPUnit :
 
 - **unitaires** — logique métier isolée (remises palette, marge, mouvements de stock,
   rappels de retrait), sans base de données ;
-- **fonctionnels** — l'application entière répond à de vraies requêtes HTTP, en base.
-  Ils vérifient l'authentification, les droits d'accès et les codes de réponse.
+- **fonctionnels** — l'application entière répond à de vraies requêtes HTTP, en base :
+  authentification, matrice des rôles sur les routes protégées, et parcours complet
+  panier → commande → stock, annulation comprise.
 
 ```bash
 docker exec ponchstore-api php bin/phpunit                    # tout

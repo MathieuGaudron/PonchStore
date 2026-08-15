@@ -2,120 +2,78 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Utilisateur;
 use App\Enum\RoleEnum;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class AuthControllerTest extends WebTestCase
+class AuthControllerTest extends ApiTestCase
 {
     private const EMAIL = 'test-auth@ponchstore.fr';
-    private const MOT_DE_PASSE = 'Test1234!';
-
-    private KernelBrowser $client;
-    private EntityManagerInterface $em;
-
-    protected function setUp(): void
-    {
-        $this->client = static::createClient();
-        $this->em = static::getContainer()->get(EntityManagerInterface::class);
-
-        $this->supprimerUtilisateurDeTest();
-        $this->creerUtilisateurDeTest(actif: true);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->supprimerUtilisateurDeTest();
-
-        parent::tearDown();
-    }
 
     public function testConnexionValideRenvoieUnToken(): void
     {
-        $reponse = $this->connexion(self::MOT_DE_PASSE);
+        $this->creerUtilisateur(RoleEnum::CLIENT_PRO, self::EMAIL);
 
-        self::assertResponseIsSuccessful();
-        self::assertArrayHasKey('token', $reponse);
-        self::assertNotEmpty($reponse['token']);
+        $this->connexion(self::MOT_DE_PASSE);
+
+        self::assertSame(Response::HTTP_OK, $this->statut());
+        self::assertNotEmpty($this->reponse()['token']);
     }
 
     public function testMauvaisMotDePasseRefuse(): void
     {
+        $this->creerUtilisateur(RoleEnum::CLIENT_PRO, self::EMAIL);
+
         $this->connexion('MauvaisMotDePasse1!');
 
-        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->statut());
+    }
+
+    public function testCompteInconnuRefuse(): void
+    {
+        $this->connexion(self::MOT_DE_PASSE);
+
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->statut());
     }
 
     public function testCompteDesactiveRefuse(): void
     {
-        $this->supprimerUtilisateurDeTest();
-        $this->creerUtilisateurDeTest(actif: false);
+        $this->creerUtilisateur(RoleEnum::CLIENT_PRO, self::EMAIL, actif: false);
 
         $this->connexion(self::MOT_DE_PASSE);
 
-        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->statut());
     }
 
     public function testProfilInaccessibleSansToken(): void
     {
-        $this->client->request('GET', '/api/auth/me');
+        $this->requete('GET', '/api/auth/me');
 
-        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->statut());
+    }
+
+    public function testProfilInaccessibleAvecUnTokenInvalide(): void
+    {
+        $this->requete('GET', '/api/auth/me', null, 'jeton.completement.invalide');
+
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->statut());
     }
 
     public function testProfilNExposeJamaisLeMotDePasse(): void
     {
-        $token = $this->connexion(self::MOT_DE_PASSE)['token'];
+        $this->creerUtilisateur(RoleEnum::CLIENT_PRO, self::EMAIL);
 
-        $this->client->request('GET', '/api/auth/me', server: [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requete('GET', '/api/auth/me', null, $this->token(self::EMAIL));
 
-        self::assertResponseIsSuccessful();
+        self::assertSame(Response::HTTP_OK, $this->statut());
 
-        $profil = json_decode($this->client->getResponse()->getContent(), true);
-
+        $profil = $this->reponse();
         self::assertSame(self::EMAIL, $profil['email']);
         self::assertArrayNotHasKey('motDePasse', $profil);
         self::assertArrayNotHasKey('password', $profil);
     }
 
-    private function connexion(string $motDePasse): array
+    private function connexion(string $motDePasse): void
     {
-        $this->client->request(
-            'POST',
-            '/api/auth/login',
-            server: ['CONTENT_TYPE' => 'application/json'],
-            content: json_encode(['email' => self::EMAIL, 'password' => $motDePasse]),
-        );
-
-        return json_decode($this->client->getResponse()->getContent(), true) ?? [];
-    }
-
-    private function creerUtilisateurDeTest(bool $actif): void
-    {
-        $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
-
-        $utilisateur = new Utilisateur();
-        $utilisateur->setNom('Test');
-        $utilisateur->setPrenom('Auth');
-        $utilisateur->setEmail(self::EMAIL);
-        $utilisateur->setRole(RoleEnum::CLIENT_PRO);
-        $utilisateur->setActif($actif);
-        $utilisateur->setMotDePasse($hasher->hashPassword($utilisateur, self::MOT_DE_PASSE));
-
-        $this->em->persist($utilisateur);
-        $this->em->flush();
-    }
-
-    private function supprimerUtilisateurDeTest(): void
-    {
-        $this->em->createQuery('DELETE FROM App\Entity\Utilisateur u WHERE u.email = :email')
-            ->setParameter('email', self::EMAIL)
-            ->execute();
+        $this->requete('POST', '/api/auth/login', ['email' => self::EMAIL, 'password' => $motDePasse]);
     }
 }

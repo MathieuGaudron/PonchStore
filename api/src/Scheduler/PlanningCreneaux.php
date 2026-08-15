@@ -20,6 +20,7 @@ class PlanningCreneaux implements ScheduleProviderInterface
     {
         return (new Schedule())
             ->add(RecurringMessage::cron('30 2 * * *', new RunCommandMessage('app:generer-creneaux')))
+            ->add(RecurringMessage::cron('0 8 * * *', new RunCommandMessage('app:rappeler-creneaux')))
             ->stateful($this->cache)
             ->processOnlyLastMissedRun(true);
     }

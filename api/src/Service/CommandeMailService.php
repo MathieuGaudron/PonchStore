@@ -44,6 +44,41 @@ class CommandeMailService
         $this->mailer->send($message);
     }
 
+    public function rappelerRetrait(Commande $commande): void
+    {
+        $utilisateur = $commande->getUtilisateur();
+        $creneau = $commande->getCreneau();
+
+        if ($utilisateur === null || $creneau === null) {
+            return;
+        }
+
+        $message = (new Email())
+            ->from(self::EXPEDITEUR)
+            ->to($utilisateur->getEmail())
+            ->subject("PONCH'STORE — Retrait demain de votre commande n°{$commande->getId()}")
+            ->text($this->corpsRappel($commande, $creneau));
+
+        $this->mailer->send($message);
+    }
+
+    private function corpsRappel(Commande $commande, CreneauRetrait $creneau): string
+    {
+        return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
+            . "Petit rappel : votre commande n°{$commande->getId()} est à retirer demain,\n"
+            . $this->jour($creneau->getDate())
+            . ', entre ' . $this->heure($creneau->getHeureDebut())
+            . ' et ' . $this->heure($creneau->getHeureFin()) . ".\n\n"
+            . "Montant à régler : " . number_format($commande->getMontantTtc(), 2, ',', ' ') . " € TTC\n"
+            . '(' . number_format((float) $commande->getMontantTotal(), 2, ',', ' ') . " € HT)\n\n"
+            . "Le détail de votre commande est consultable ici :\n"
+            . $this->urlFront . '/commande/' . $commande->getId() . "\n\n"
+            . "Si vous ne pouvez pas venir, annulez votre commande depuis votre espace\n"
+            . "client pour libérer le créneau.\n\n"
+            . "À demain,\n"
+            . "L'équipe PONCH'STORE";
+    }
+
     private function corps(Commande $commande, CreneauRetrait $creneau): string
     {
         $recapitulatif = '';

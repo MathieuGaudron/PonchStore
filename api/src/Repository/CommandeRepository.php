@@ -55,6 +55,24 @@ class CommandeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function aRappelerPourLe(\DateTimeImmutable $date): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.creneau', 'cr')
+            ->andWhere('cr.date = :date')
+            ->andWhere('c.rappelEnvoyeAt IS NULL')
+            ->andWhere('c.statut IN (:statuts)')
+            ->setParameter('date', $date->setTime(0, 0))
+            ->setParameter('statuts', [
+                StatutCommandeEnum::EN_ATTENTE,
+                StatutCommandeEnum::EN_PREPARATION,
+                StatutCommandeEnum::PRETE,
+            ])
+            ->orderBy('cr.heureDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function historique(?string $statut, ?string $recherche): array
     {
         $qb = $this->createQueryBuilder('c')

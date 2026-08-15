@@ -77,11 +77,34 @@ docker exec ponchstore-api php bin/console debug:scheduler                 # voi
 Par défaut : jours ouvrés uniquement, plages 09h-12h et 14h-18h, créneaux de 20 min,
 capacité 1. La génération est idempotente (les créneaux existants sont ignorés).
 
-## Emails (mot de passe oublié)
+## Emails
 
-Aucun email ne part réellement en dev : MailHog intercepte tout.
-Demander un reset depuis la page de connexion, puis ouvrir http://localhost:8025
-pour cliquer le lien de réinitialisation (valable 1 h, usage unique).
+Aucun email ne part réellement en dev : MailHog les intercepte tous et les affiche
+sur http://localhost:8025.
+
+Trois emails sont envoyés :
+
+| Email | Déclencheur |
+|---|---|
+| Réinitialisation du mot de passe | Demande depuis la page de connexion (lien valable 1 h, usage unique) |
+| Confirmation de commande | Validation d'une réservation, avec le créneau de retrait et les montants |
+| Rappel de retrait | La veille du créneau, envoyé automatiquement à 08h00 |
+
+Les envois passent par une **file d'attente** (table `messenger_messages`) plutôt que
+par la requête HTTP : l'API dépose le message et rend la main, le conteneur
+`ponchstore-mailer` le consomme et envoie. Une panne du serveur mail ne fait donc
+jamais échouer une commande — les messages patientent et repartent au rétablissement
+(3 tentatives, puis file `failed`).
+
+```bash
+docker exec ponchstore-api php bin/console app:rappeler-creneaux                # retraits de demain
+docker exec ponchstore-api php bin/console app:rappeler-creneaux --date=2026-08-17
+docker compose logs -f mailer                                                   # suivre les envois
+docker exec ponchstore-api php bin/console messenger:failed:show                # envois en échec
+```
+
+Un rappel déjà envoyé n'est jamais renvoyé : la commande porte la date d'envoi dans
+`rappel_envoye_at`.
 
 ## Tests
 

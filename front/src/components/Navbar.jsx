@@ -102,6 +102,7 @@ export default function Navbar() {
               <>
                 <div className="my-1 border-t border-[#333333]" />
                 <LienMenu vers="/admin/produits">Produits</LienMenu>
+                <LienMenu vers="/admin/categories">Catégories</LienMenu>
                 <LienMenu vers="/admin/utilisateurs">Utilisateurs</LienMenu>
               </>
             )}
@@ -173,6 +174,7 @@ export default function Navbar() {
               {estAdmin && (
                 <>
                   <LienMenu vers="/admin/produits">Produits</LienMenu>
+                  <LienMenu vers="/admin/categories">Catégories</LienMenu>
                   <LienMenu vers="/admin/utilisateurs">Utilisateurs</LienMenu>
                 </>
               )}

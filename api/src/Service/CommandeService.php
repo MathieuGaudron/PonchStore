@@ -96,8 +96,6 @@ class CommandeService
             throw $e;
         }
 
-        // La commande est enregistrée : un envoi qui échoue ne doit pas la remettre
-        // en cause, le client la retrouve dans son espace.
         try {
             $this->commandeMailService->confirmerReservation($commande);
         } catch (\Throwable) {

@@ -16,6 +16,7 @@ import MonCompte from './pages/MonCompte'
 import PreparationCommandes from './pages/PreparationCommandes'
 import HistoriqueCommandes from './pages/HistoriqueCommandes'
 import GestionProduits from './pages/GestionProduits'
+import GestionCategories from './pages/GestionCategories'
 import GestionCreneaux from './pages/GestionCreneaux'
 import GestionStock from './pages/GestionStock'
 import TableauBord from './pages/TableauBord'
@@ -107,6 +108,14 @@ function App() {
               element={
                 <RoutePrivee roles={['ADMIN']}>
                   <GestionProduits />
+                </RoutePrivee>
+              }
+            />
+            <Route
+              path="/admin/categories"
+              element={
+                <RoutePrivee roles={['ADMIN']}>
+                  <GestionCategories />
                 </RoutePrivee>
               }
             />

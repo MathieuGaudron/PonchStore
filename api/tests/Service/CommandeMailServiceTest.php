@@ -37,15 +37,35 @@ class CommandeMailServiceTest extends TestCase
         self::assertStringContainsString(self::URL_FRONT . '/commande/12', $corps);
     }
 
+    public function testLeRappelAnnonceLeRetraitDuLendemain(): void
+    {
+        $email = $this->capturer(fn (CommandeMailService $s) => $s->rappelerRetrait($this->commande()));
+        $corps = $email->getTextBody();
+
+        self::assertStringContainsString('Retrait demain', $email->getSubject());
+        self::assertStringContainsString('n°12', $email->getSubject());
+        self::assertStringContainsString('samedi 22 août 2026', $corps);
+        self::assertStringContainsString('entre 09h00 et 09h20', $corps);
+        self::assertStringContainsString('174,60 € TTC', $corps);
+        self::assertStringContainsString(self::URL_FRONT . '/commande/12', $corps);
+    }
+
     public function testAucunEnvoiSansCreneauNiClient(): void
     {
         $mailer = $this->createMock(MailerInterface::class);
         $mailer->expects(self::never())->method('send');
 
-        (new CommandeMailService($mailer, self::URL_FRONT))->confirmerReservation(new Commande());
+        $service = new CommandeMailService($mailer, self::URL_FRONT);
+        $service->confirmerReservation(new Commande());
+        $service->rappelerRetrait(new Commande());
     }
 
     private function envoyer(Commande $commande): Email
+    {
+        return $this->capturer(fn (CommandeMailService $s) => $s->confirmerReservation($commande));
+    }
+
+    private function capturer(callable $action): Email
     {
         $capture = null;
 
@@ -56,7 +76,7 @@ class CommandeMailServiceTest extends TestCase
                 $capture = $message;
             });
 
-        (new CommandeMailService($mailer, self::URL_FRONT))->confirmerReservation($commande);
+        $action(new CommandeMailService($mailer, self::URL_FRONT));
 
         self::assertInstanceOf(Email::class, $capture);
 

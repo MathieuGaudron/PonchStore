@@ -40,6 +40,9 @@ class Commande
     #[Groups(['commande:read'])]
     private ?string $commentaire = null;
 
+    #[ORM\Column(name: 'rappel_envoye_at', type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $rappelEnvoyeAt = null;
+
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'commandes')]
     #[ORM\JoinColumn(name: 'id_utilisateur', referencedColumnName: 'id_utilisateur', nullable: false, onDelete: 'RESTRICT')]
     #[Groups(['commande:staff'])]
@@ -139,6 +142,18 @@ class Commande
     public function setCommentaire(?string $commentaire): static
     {
         $this->commentaire = $commentaire;
+
+        return $this;
+    }
+
+    public function getRappelEnvoyeAt(): ?\DateTimeImmutable
+    {
+        return $this->rappelEnvoyeAt;
+    }
+
+    public function setRappelEnvoyeAt(?\DateTimeImmutable $rappelEnvoyeAt): static
+    {
+        $this->rappelEnvoyeAt = $rappelEnvoyeAt;
 
         return $this;
     }

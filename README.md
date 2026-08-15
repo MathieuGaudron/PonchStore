@@ -78,6 +78,20 @@ Par défaut : jours ouvrés uniquement, plages 09h-12h et 14h-18h, créneaux de 
 capacité 1. La génération est idempotente (les créneaux existants sont ignorés).
 
 ## Emails
+## Authentification
+
+L'API est stateless : la connexion renvoie un JWT (HS256) que le front conserve en
+`sessionStorage` et renvoie dans l'en-tête `Authorization`.
+
+Le token vaut **4 heures**, durée absolue à partir de la connexion — il n'est pas
+prolongé par l'activité. Passé ce délai, l'utilisateur est redirigé vers la page de
+connexion. Le réglage est dans `api/config/packages/lexik_jwt_authentication.yaml` :
+
+```yaml
+token_ttl: 14400
+```
+
+## Emails (mot de passe oublié)
 
 Aucun email ne part réellement en dev : MailHog les intercepte tous et les affiche
 sur http://localhost:8025.

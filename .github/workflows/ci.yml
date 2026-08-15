@@ -9,6 +9,25 @@ jobs:
     name: API — tests PHPUnit
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ponchstore_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      # Doctrine ajoute le suffixe _test en environnement de test : la base visée
+      # est donc ponchstore_test, celle créée par le service ci-dessus.
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/ponchstore?serverVersion=8.0&charset=utf8mb4"
+
     steps:
       - name: Récupération du code
         uses: actions/checkout@v4
@@ -39,7 +58,11 @@ jobs:
         working-directory: api
         run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
 
-      - name: Tests unitaires
+      - name: Migrations sur la base de test
+        working-directory: api
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      - name: Tests unitaires et fonctionnels
         working-directory: api
         run: php bin/phpunit --testdox
 

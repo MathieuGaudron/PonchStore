@@ -77,7 +77,6 @@ docker exec ponchstore-api php bin/console debug:scheduler                 # voi
 Par défaut : jours ouvrés uniquement, plages 09h-12h et 14h-18h, créneaux de 20 min,
 capacité 1. La génération est idempotente (les créneaux existants sont ignorés).
 
-## Emails
 ## Authentification
 
 L'API est stateless : la connexion renvoie un JWT (HS256) que le front conserve en
@@ -91,7 +90,7 @@ connexion. Le réglage est dans `api/config/packages/lexik_jwt_authentication.ya
 token_ttl: 14400
 ```
 
-## Emails (mot de passe oublié)
+## Emails
 
 Aucun email ne part réellement en dev : MailHog les intercepte tous et les affiche
 sur http://localhost:8025.
@@ -122,10 +121,31 @@ Un rappel déjà envoyé n'est jamais renvoyé : la commande porte la date d'env
 
 ## Tests
 
-Tests unitaires PHPUnit sur la logique métier (remises palette, marge, mouvements de stock) :
+Deux familles de tests PHPUnit :
+
+- **unitaires** — logique métier isolée (remises palette, marge, mouvements de stock,
+  rappels de retrait), sans base de données ;
+- **fonctionnels** — l'application entière répond à de vraies requêtes HTTP, en base.
+  Ils vérifient l'authentification, les droits d'accès et les codes de réponse.
 
 ```bash
-docker exec ponchstore-api php bin/phpunit
+docker exec ponchstore-api php bin/phpunit                    # tout
+docker exec ponchstore-api php bin/phpunit --testdox tests/Controller
+```
+
+Les tests fonctionnels tournent sur une base séparée, `ponchstore_test`, jamais sur tes
+données de développement. Elle est créée automatiquement au premier démarrage du
+conteneur MySQL ; il reste à y jouer les migrations :
+
+```bash
+docker exec ponchstore-api php bin/console doctrine:migrations:migrate --env=test --no-interaction
+```
+
+Sur une installation antérieure à cette base de test, le volume MySQL existe déjà et le
+script d'initialisation ne se rejouera pas — accorder les droits une fois à la main :
+
+```bash
+docker exec -i ponchstore-db mysql -uroot -proot < docker/db/init/10-base-de-test.sql
 ```
 
 ## Architecture

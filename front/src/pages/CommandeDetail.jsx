@@ -97,17 +97,21 @@ export default function CommandeDetail() {
                     <tr key={l.produit.id} className="border-b border-[#E8E8E8]">
                       <td className="py-2 text-[#222222]">{l.produit.nom}</td>
                       <td className="py-2 text-center">{l.quantite}</td>
-                      <td className="py-2 text-right">{l.prixUnitaire} €</td>
+                      <td className="py-2 text-right">{l.prixUnitaire} € HT</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <p className="mt-4 text-right">
-              <span className="text-[#888888]">Total : </span>
-              <span className="text-xl font-bold text-[#F5A623]">{commande.montantTotal} €</span>
-            </p>
+            <div className="mt-4 space-y-1 text-right">
+              <p className="text-sm text-[#888888]">Total HT : {commande.montantTotal} €</p>
+              <p className="text-sm text-[#888888]">TVA 20 % : {commande.montantTva} €</p>
+              <p>
+                <span className="text-[#888888]">Total TTC : </span>
+                <span className="text-xl font-bold text-[#F5A623]">{commande.montantTtc} €</span>
+              </p>
+            </div>
 
             <div className="mt-6 flex flex-col gap-2">
               <Link to="/compte" className="text-sm text-[#F5A623] hover:underline">

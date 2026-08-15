@@ -85,7 +85,7 @@ export default function FicheProduit() {
               <p className="mt-1 text-sm text-[#888888]">{produit.categorie?.nom}</p>
 
               <p className="mt-4 text-2xl font-bold text-[#F5A623]">
-                {produit.prixCarton} € / carton
+                {produit.prixCarton} € HT / carton
               </p>
 
               <dl className="mt-6 space-y-1 text-sm text-[#222222]">
@@ -106,7 +106,7 @@ export default function FicheProduit() {
                     <div className="flex gap-2">
                       <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Prix palette</dt>
                       <dd>
-                        {produit.prixPalette} €
+                        {produit.prixPalette} € HT
                         <span className="text-[#888888]"> ({produit.cartonsParPalette} cartons)</span>
                       </dd>
                     </div>

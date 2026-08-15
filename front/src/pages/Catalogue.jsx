@@ -138,7 +138,7 @@ export default function Catalogue() {
             ))}
           </select>
 
-          <label className="block text-xs text-[#888888] mb-1">Prix par carton (€)</label>
+          <label className="block text-xs text-[#888888] mb-1">Prix par carton (€ HT)</label>
           <div className="mb-3 flex gap-1">
             <input
               type="number"
@@ -227,7 +227,7 @@ export default function Catalogue() {
                   <p className="text-[#888888] text-xs mb-2">
                     {p.categorie?.nom} · {p.formatCarton}
                   </p>
-                  <p className="text-[#F5A623] font-bold">{p.prixCarton} € / carton</p>
+                  <p className="text-[#F5A623] font-bold">{p.prixCarton} € HT / carton</p>
                 </div>
               </Link>
             ))}

@@ -96,7 +96,7 @@ export default function MesCommandes() {
                   <span className={`rounded-full px-3 py-1 text-xs ${statut.classe}`}>
                     {statut.libelle}
                   </span>
-                  <span className="font-bold text-[#F5A623]">{c.montantTotal} €</span>
+                  <span className="font-bold text-[#F5A623]">{c.montantTotal} € HT</span>
                 </div>
               </div>
 

@@ -111,7 +111,7 @@ export default function HistoriqueCommandes() {
           </span>
           <span>
             Total hors annulées :{' '}
-            <strong className="text-[#F5A623]">{chiffreAffaires.toFixed(2)} €</strong>
+            <strong className="text-[#F5A623]">{chiffreAffaires.toFixed(2)} € HT</strong>
           </span>
         </div>
 
@@ -152,7 +152,7 @@ export default function HistoriqueCommandes() {
                     <td className="px-2 py-2 text-[#888888]">{formaterCreneau(c.creneau)}</td>
                     <td className="px-2 py-2 text-right text-[#222222]">{c.lignes.length}</td>
                     <td className="px-2 py-2 text-right font-bold text-[#F5A623]">
-                      {c.montantTotal} €
+                      {c.montantTotal} € HT
                     </td>
                     <td className="px-2 py-2">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${badge.classes}`}>
@@ -185,7 +185,7 @@ export default function HistoriqueCommandes() {
                                 )}
                               </span>
                               <span className="text-[#888888]">
-                                × {l.quantite} — {l.prixUnitaire} €
+                                × {l.quantite} — {l.prixUnitaire} € HT
                               </span>
                             </li>
                           ))}

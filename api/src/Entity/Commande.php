@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\StatutCommandeEnum;
 use App\Repository\CommandeRepository;
+use App\Service\PanierService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -116,6 +117,20 @@ class Commande
         $this->montantTotal = $montantTotal;
 
         return $this;
+    }
+
+    // Le montant stocké est hors taxes : la TVA est ajoutée à la facturation, elle
+    // n'entre jamais dans le calcul de la marge.
+    #[Groups(['commande:read'])]
+    public function getMontantTva(): float
+    {
+        return round((float) $this->montantTotal * PanierService::TAUX_TVA, 2);
+    }
+
+    #[Groups(['commande:read'])]
+    public function getMontantTtc(): float
+    {
+        return round((float) $this->montantTotal * (1 + PanierService::TAUX_TVA), 2);
     }
 
     public function getCommentaire(): ?string

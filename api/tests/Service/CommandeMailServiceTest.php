@@ -31,7 +31,9 @@ class CommandeMailServiceTest extends TestCase
         $corps = $this->envoyer($this->commande())->getTextBody();
 
         self::assertStringContainsString('3 × Ricard 1L (6 x 1L)', $corps);
-        self::assertStringContainsString('Montant total : 145,50 €', $corps);
+        self::assertStringContainsString('Montant total HT : 145,50 €', $corps);
+        self::assertStringContainsString('TVA 20 % : 29,10 €', $corps);
+        self::assertStringContainsString('Total TTC : 174,60 €', $corps);
         self::assertStringContainsString(self::URL_FRONT . '/commande/12', $corps);
     }
 

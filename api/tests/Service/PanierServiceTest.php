@@ -15,46 +15,105 @@ class PanierServiceTest extends TestCase
         $this->panierService = new PanierService();
     }
 
-    public function testAucuneRemiseEnDessousDe5Palettes(): void
+    public function testMargeDeBaseEnDessousDe5Palettes(): void
     {
         // palette = 10 cartons
-        $this->assertSame(0.0, $this->panierService->tauxRemise(9, 10));   // 0 palette
-        $this->assertSame(0.0, $this->panierService->tauxRemise(40, 10));  // 4 palettes
-        $this->assertSame(0.0, $this->panierService->tauxRemise(49, 10));  // 4 palettes
+        $this->assertSame(1.28, $this->panierService->tauxMarge(9, 10));   // 0 palette
+        $this->assertSame(1.28, $this->panierService->tauxMarge(40, 10));  // 4 palettes
+        $this->assertSame(1.28, $this->panierService->tauxMarge(49, 10));  // 4 palettes
     }
 
-    public function testRemise5PourCentEntre5Et9Palettes(): void
+    public function testMarge22PourCentEntre5Et9Palettes(): void
     {
-        $this->assertSame(0.05, $this->panierService->tauxRemise(50, 10)); // 5 palettes
-        $this->assertSame(0.05, $this->panierService->tauxRemise(90, 10)); // 9 palettes
+        $this->assertSame(1.22, $this->panierService->tauxMarge(50, 10)); // 5 palettes
+        $this->assertSame(1.22, $this->panierService->tauxMarge(90, 10)); // 9 palettes
     }
 
-    public function testRemise10PourCentAPartirDe10Palettes(): void
+    public function testMarge18PourCentAPartirDe10Palettes(): void
     {
-        $this->assertSame(0.10, $this->panierService->tauxRemise(100, 10)); // 10 palettes
-        $this->assertSame(0.10, $this->panierService->tauxRemise(250, 10)); // 25 palettes
+        $this->assertSame(1.18, $this->panierService->tauxMarge(100, 10)); // 10 palettes
+        $this->assertSame(1.18, $this->panierService->tauxMarge(250, 10)); // 25 palettes
     }
 
-    public function testAucuneRemiseSansPalette(): void
+    public function testMargeDeBaseSansPalette(): void
     {
-        $this->assertSame(0.0, $this->panierService->tauxRemise(1000, null));
-        $this->assertSame(0.0, $this->panierService->tauxRemise(1000, 0));
+        $this->assertSame(1.28, $this->panierService->tauxMarge(1000, null));
+        $this->assertSame(1.28, $this->panierService->tauxMarge(1000, 0));
+    }
+
+    public function testRemiseAfficheeDeduiteDeLaMarge(): void
+    {
+        $this->assertSame(0.0, $this->panierService->tauxRemise(40, 10));
+        $this->assertSame(0.0469, $this->panierService->tauxRemise(50, 10));
+        $this->assertSame(0.0781, $this->panierService->tauxRemise(100, 10));
     }
 
     public function testMontantLigneAppliqueLaMarge(): void
     {
         $produit = $this->creerProduit('100.00', null);
 
-        // prix carton = 100 x 1.28 = 128 ; 4 cartons, pas de remise
+        // prix carton = 100 x 1.28 = 128 ; 4 cartons, palier de base
         $this->assertSame(512.0, $this->panierService->montantLigne($produit, 4));
     }
 
-    public function testMontantLigneAppliqueLaRemisePalette(): void
+    public function testMontantLigneAppliqueLePalierPalette(): void
     {
         $produit = $this->creerProduit('100.00', 10);
 
-        // 50 cartons = 5 palettes => 5% : 128 x 50 x 0.95 = 6080
-        $this->assertEqualsWithDelta(6080.0, $this->panierService->montantLigne($produit, 50), 0.001);
+        // 50 cartons = 5 palettes => marge 1.22 : 122 x 50
+        $this->assertEqualsWithDelta(6100.0, $this->panierService->montantLigne($produit, 50), 0.001);
+
+        // 100 cartons = 10 palettes => marge 1.18 : 118 x 100
+        $this->assertEqualsWithDelta(11800.0, $this->panierService->montantLigne($produit, 100), 0.001);
+    }
+
+    public function testUnCartonDePlusNeCoutePlusJamaisMoinsCher(): void
+    {
+        $produit = $this->creerProduit('100.00', 30);
+
+        // 149 cartons seraient facturés 19 072 € au palier de base : on plafonne au
+        // prix de 150 cartons, qui déclenchent le palier suivant.
+        $this->assertSame(18300.0, $this->panierService->montantLigne($produit, 149));
+        $this->assertSame(18300.0, $this->panierService->montantLigne($produit, 150));
+
+        $precedent = 0.0;
+        for ($quantite = 1; $quantite <= 400; $quantite++) {
+            $montant = $this->panierService->montantLigne($produit, $quantite);
+            $this->assertGreaterThanOrEqual(
+                $precedent,
+                $montant,
+                "Commander {$quantite} cartons coûte moins cher que d'en commander un de moins.",
+            );
+            $precedent = $montant;
+        }
+    }
+
+    public function testLePrixCartonAfficheRedonneLeMontantDeLaLigne(): void
+    {
+        $produit = $this->creerProduit('100.00', 30);
+
+        // 149 cartons sont facturés au prix de 150 : le carton affiché doit suivre,
+        // sinon le client lit un prix unitaire qui ne redonne pas son total.
+        $this->assertSame(122.82, $this->panierService->prixCartonFacture($produit, 149));
+        $this->assertSame(122.0, $this->panierService->prixCartonFacture($produit, 150));
+        $this->assertSame(128.0, $this->panierService->prixCartonFacture($produit, 4));
+    }
+
+    public function testAucuneQuantiteNeDescendSousLeMargePlancher(): void
+    {
+        foreach ([null, 1, 6, 12, 30] as $cartonsParPalette) {
+            $produit = $this->creerProduit('100.00', $cartonsParPalette);
+
+            foreach ([1, 4, 5, 29, 30, 149, 150, 299, 300, 1000] as $quantite) {
+                $plancher = 100.0 * PanierService::MARGE_PLANCHER * $quantite;
+
+                $this->assertGreaterThanOrEqual(
+                    $plancher,
+                    $this->panierService->montantLigne($produit, $quantite),
+                    "Marge sous le plancher pour {$quantite} cartons.",
+                );
+            }
+        }
     }
 
     private function creerProduit(string $prixAchat, ?int $cartonsParPalette): Produit

@@ -42,6 +42,17 @@ services:
       - ./api:/var/www/api
     command: sh -c "until [ -f vendor/autoload.php ]; do sleep 2; done; php bin/console messenger:consume scheduler_creneaux --no-interaction"
 
+  mailer:
+    build: ./api
+    container_name: ponchstore-mailer
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/var/www/api
+    command: sh -c "until [ -f vendor/autoload.php ]; do sleep 2; done; php bin/console messenger:consume async --no-interaction --time-limit=3600"
+
   mailhog:
     image: mailhog/mailhog
     container_name: ponchstore-mailhog

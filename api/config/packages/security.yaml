@@ -22,12 +22,15 @@ security:
             pattern: ^/api/auth/login
             stateless: true
             user_checker: App\Security\UtilisateurChecker
+            login_throttling:
+                max_attempts: 5
+                interval: '1 minute'
             json_login:
                 check_path: /api/auth/login
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                failure_handler: App\Security\AuthenticationFailureHandler
 
         api:
             pattern: ^/api

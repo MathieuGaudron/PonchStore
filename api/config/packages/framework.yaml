@@ -2,6 +2,12 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
+    rate_limiter:
+        mot_de_passe_oublie:
+            policy: 'sliding_window'
+            limit: 3
+            interval: '15 minutes'
+
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 

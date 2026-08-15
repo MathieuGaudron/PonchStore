@@ -7,6 +7,7 @@ use App\Service\MotDePasseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -30,8 +31,18 @@ class AuthController extends AbstractController
     }
 
     #[Route('/mot-de-passe-oublie', name: 'api_auth_mot_de_passe_oublie', methods: ['POST'])]
-    public function motDePasseOublie(Request $request, MotDePasseService $motDePasseService): JsonResponse
-    {
+    public function motDePasseOublie(
+        Request $request,
+        MotDePasseService $motDePasseService,
+        RateLimiterFactoryInterface $motDePasseOublieLimiter,
+    ): JsonResponse {
+        if (!$motDePasseOublieLimiter->create($request->getClientIp())->consume()->isAccepted()) {
+            return $this->json(
+                ['message' => 'Trop de demandes. Réessayez dans quelques minutes.'],
+                JsonResponse::HTTP_TOO_MANY_REQUESTS,
+            );
+        }
+
         $data = json_decode($request->getContent(), true);
         $email = is_array($data) ? trim((string) ($data['email'] ?? '')) : '';
 

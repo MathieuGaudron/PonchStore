@@ -50,6 +50,10 @@ abstract class ApiTestCase extends WebTestCase
         $connexion->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
 
         $this->em->clear();
+
+        // Les compteurs du rate limiter survivent d'un test à l'autre : sans remise à
+        // zéro, les connexions répétées de la suite finiraient par être bloquées.
+        static::getContainer()->get('cache.rate_limiter')->clear();
     }
 
     protected function creerUtilisateur(RoleEnum $role, ?string $email = null, bool $actif = true): Utilisateur

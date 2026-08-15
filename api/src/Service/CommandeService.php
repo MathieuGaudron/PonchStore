@@ -21,6 +21,7 @@ class CommandeService
         private readonly PanierArticleRepository $panierRepository,
         private readonly CreneauRetraitRepository $creneauRepository,
         private readonly CommandeRepository $commandeRepository,
+        private readonly CommandeMailService $commandeMailService,
     ) {
     }
 
@@ -90,12 +91,19 @@ class CommandeService
 
             $this->em->flush();
             $this->em->commit();
-
-            return $commande;
         } catch (\Throwable $e) {
             $this->em->rollback();
             throw $e;
         }
+
+        // La commande est enregistrée : un envoi qui échoue ne doit pas la remettre
+        // en cause, le client la retrouve dans son espace.
+        try {
+            $this->commandeMailService->confirmerReservation($commande);
+        } catch (\Throwable) {
+        }
+
+        return $commande;
     }
 
     public function changerStatut(Commande $commande, StatutCommandeEnum $nouveauStatut): Commande

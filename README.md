@@ -90,6 +90,13 @@ connexion. Le réglage est dans `api/config/packages/lexik_jwt_authentication.ya
 token_ttl: 14400
 ```
 
+Deux routes publiques sont plafonnées pour éviter qu'on les martèle :
+
+| Route | Limite | Effet au-delà |
+|---|---|---|
+| `POST /api/auth/login` | 5 tentatives échouées par minute, par compte et par IP | `429`, une connexion réussie remet le compteur à zéro |
+| `POST /api/auth/mot-de-passe-oublie` | 3 demandes par IP toutes les 15 minutes | `429` |
+
 ## Emails
 
 Aucun email ne part réellement en dev : MailHog les intercepte tous et les affiche

@@ -11,6 +11,7 @@ use App\Enum\StatutCommandeEnum;
 use App\Repository\CommandeRepository;
 use App\Repository\CreneauRetraitRepository;
 use App\Repository\PanierArticleRepository;
+use App\Service\CommandeMailService;
 use App\Service\CommandeService;
 use App\Service\PanierService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,6 +38,7 @@ class CommandeServiceTest extends TestCase
             $this->panierRepository,
             $this->creneauRepository,
             $this->commandeRepository,
+            $this->createMock(CommandeMailService::class),
         );
         $this->utilisateur = new Utilisateur();
     }

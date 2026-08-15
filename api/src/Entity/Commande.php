@@ -119,8 +119,6 @@ class Commande
         return $this;
     }
 
-    // Le montant stocké est hors taxes : la TVA est ajoutée à la facturation, elle
-    // n'entre jamais dans le calcul de la marge.
     #[Groups(['commande:read'])]
     public function getMontantTva(): float
     {

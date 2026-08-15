@@ -6,21 +6,14 @@ use App\Entity\Produit;
 
 class PanierService
 {
-    // Les paliers sont exprimés en marge conservée, pas en remise consentie : le
-    // taux écrit ici est celui qu'on gagne. La remise affichée au client en est
-    // déduite, jamais l'inverse.
     public const MARGE_5_A_9_PALETTES = 1.22;
     public const MARGE_10_PALETTES_OU_PLUS = 1.18;
 
-    // Filet de sécurité : aucune règle de prix, présente ou future, ne peut faire
-    // descendre un carton sous cette marge sur le prix d'achat.
     public const MARGE_PLANCHER = 1.15;
 
     public const SEUIL_PALIER_INFERIEUR = 5;
     public const SEUIL_PALIER_SUPERIEUR = 10;
 
-    // Tous les montants manipulés ici sont hors taxes : la TVA est collectée pour
-    // l'État, elle n'entre pas dans le calcul de la marge.
     public const TAUX_TVA = 0.20;
 
     public function tauxMarge(int $quantite, ?int $cartonsParPalette): float
@@ -54,8 +47,6 @@ class PanierService
     {
         $montant = $this->montantAuPalier($produit, $quantite);
 
-        // Ajouter un carton ne doit jamais faire monter la facture : on plafonne au
-        // montant qu'on paierait en atteignant le seuil suivant.
         foreach ($this->seuils($produit) as $seuil) {
             if ($seuil > $quantite) {
                 $montant = min($montant, $this->montantAuPalier($produit, $seuil));
@@ -104,10 +95,6 @@ class PanierService
         ];
     }
 
-    /**
-     * Prix réellement facturé au carton, plafonnement compris : c'est celui qu'on
-     * affiche, pour qu'il redonne toujours le montant de la ligne une fois multiplié.
-     */
     public function prixCartonFacture(Produit $produit, int $quantite): float
     {
         if ($quantite <= 0) {
@@ -122,9 +109,6 @@ class PanierService
         return $this->prixCarton($produit, $quantite) * $quantite;
     }
 
-    /**
-     * @return int[] quantités, en cartons, qui déclenchent un changement de palier
-     */
     private function seuils(Produit $produit): array
     {
         $cartonsParPalette = $produit->getCartonsParPalette();

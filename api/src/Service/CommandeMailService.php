@@ -84,9 +84,6 @@ class CommandeMailService
             . "L'équipe PONCH'STORE";
     }
 
-    // Formatage explicite plutôt qu'IntlDateFormatter : l'image Alpine n'embarque
-    // que les données ICU anglaises, la date sortirait en anglais en conteneur et
-    // en français en CI.
     private function jour(\DateTimeImmutable $date): string
     {
         $jour = (int) $date->format('j');

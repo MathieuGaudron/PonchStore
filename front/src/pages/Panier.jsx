@@ -9,7 +9,8 @@ import ChampQuantite from '../components/ChampQuantite'
 import { Button } from '@/components/ui/button'
 
 export default function Panier() {
-  const { lignes, montantTotal, modifierQuantite, retirer, vider, rafraichir } = usePanier()
+  const { lignes, montantTotal, montantTva, montantTtc, tauxTva, modifierQuantite, retirer, vider, rafraichir } =
+    usePanier()
   const navigate = useNavigate()
 
   const [creneauChoisi, setCreneauChoisi] = useState(null)
@@ -84,7 +85,7 @@ export default function Panier() {
                   <div className="min-w-0 flex-1 basis-40">
                     <p className="font-bold text-[#222222]">{l.nom}</p>
                     <p className="text-xs text-[#888888]">
-                      {l.marque} · {l.formatCarton} · {l.prixCarton} € / carton
+                      {l.marque} · {l.formatCarton} · {l.prixCarton} € HT / carton
                     </p>
                   </div>
 
@@ -96,9 +97,11 @@ export default function Panier() {
                     />
 
                     <div className="w-28 text-right">
-                      <p className="font-bold text-[#222222]">{l.montant} €</p>
+                      <p className="font-bold text-[#222222]">{l.montant} € HT</p>
                       {l.remiseAppliquee && (
-                        <p className="text-xs text-[#2ECC71]">remise appliquée</p>
+                        <p className="text-xs text-[#2ECC71]">
+                          remise palette · ≈ {l.prixCartonApplique} € HT / carton
+                        </p>
                       )}
                       {!l.disponible && <p className="text-xs text-[#CC3333]">stock insuffisant</p>}
                     </div>
@@ -117,9 +120,15 @@ export default function Panier() {
                 <button onClick={vider} className="text-sm text-[#CC3333] hover:underline">
                   Vider le panier
                 </button>
-                <div className="text-right">
-                  <span className="text-[#888888]">Total : </span>
-                  <span className="text-xl font-bold text-[#F5A623]">{montantTotal} €</span>
+                <div className="space-y-1 text-right">
+                  <p className="text-sm text-[#888888]">Total HT : {montantTotal} €</p>
+                  <p className="text-sm text-[#888888]">
+                    TVA {Math.round(tauxTva * 100)} % : {montantTva} €
+                  </p>
+                  <p>
+                    <span className="text-[#888888]">Total TTC : </span>
+                    <span className="text-xl font-bold text-[#F5A623]">{montantTtc} €</span>
+                  </p>
                 </div>
               </div>
             </section>

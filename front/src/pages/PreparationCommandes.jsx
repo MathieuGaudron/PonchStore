@@ -112,7 +112,7 @@ export default function PreparationCommandes() {
                 </ul>
 
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                  <span className="font-bold text-[#F5A623]">{c.montantTotal} €</span>
+                  <span className="font-bold text-[#F5A623]">{c.montantTotal} € HT</span>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => refuser(c.id)}

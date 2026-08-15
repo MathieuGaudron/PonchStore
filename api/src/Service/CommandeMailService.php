@@ -61,7 +61,10 @@ class CommandeMailService
             );
         }
 
-        $montant = number_format((float) $commande->getMontantTotal(), 2, ',', ' ');
+        $ht = number_format((float) $commande->getMontantTotal(), 2, ',', ' ');
+        $tva = number_format($commande->getMontantTva(), 2, ',', ' ');
+        $ttc = number_format($commande->getMontantTtc(), 2, ',', ' ');
+        $tauxTva = (int) round(PanierService::TAUX_TVA * 100);
 
         return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
             . "Nous avons bien reçu votre commande n°{$commande->getId()}.\n\n"
@@ -70,7 +73,9 @@ class CommandeMailService
             . ' et ' . $this->heure($creneau->getHeureFin()) . ".\n\n"
             . "Votre commande :\n"
             . $recapitulatif . "\n"
-            . "Montant total : {$montant} €\n\n"
+            . "Montant total HT : {$ht} €\n"
+            . "TVA {$tauxTva} % : {$tva} €\n"
+            . "Total TTC : {$ttc} €\n\n"
             . "Le détail de votre commande est consultable ici :\n"
             . $this->urlFront . '/commande/' . $commande->getId() . "\n\n"
             . "Si vous ne pouvez pas vous présenter à ce créneau, annulez votre commande\n"

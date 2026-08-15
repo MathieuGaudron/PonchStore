@@ -3,7 +3,14 @@ import { apiFetch } from '../services/api'
 import { useAuth } from './auth-context'
 import { PanierContext } from './panier-context'
 
-const PANIER_VIDE = { lignes: [], montantTotal: '0.00', nombreArticles: 0 }
+const PANIER_VIDE = {
+  lignes: [],
+  montantTotal: '0.00',
+  montantTva: '0.00',
+  montantTtc: '0.00',
+  tauxTva: 0.2,
+  nombreArticles: 0,
+}
 
 export function PanierProvider({ children }) {
   const { utilisateur } = useAuth()
@@ -64,6 +71,9 @@ export function PanierProvider({ children }) {
   const value = {
     lignes: panier.lignes,
     montantTotal: panier.montantTotal,
+    montantTva: panier.montantTva,
+    montantTtc: panier.montantTtc,
+    tauxTva: panier.tauxTva,
     nombreArticles: panier.nombreArticles,
     ajouter,
     modifierQuantite,

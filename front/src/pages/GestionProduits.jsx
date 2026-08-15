@@ -321,7 +321,7 @@ export default function GestionProduits() {
               </div>
               {importMsg && <p className="mt-1 text-xs text-[#888888]">{importMsg}</p>}
             </div>
-            <Champ label="Prix d'achat carton (€)" valeur={form.prixAchatCarton} onChange={(v) => maj('prixAchatCarton', v)} />
+            <Champ label="Prix d'achat carton (€ HT)" valeur={form.prixAchatCarton} onChange={(v) => maj('prixAchatCarton', v)} />
             <div>
               <label className="mb-1 block text-xs text-[#888888]">Stock (cartons)</label>
               <input
@@ -406,7 +406,7 @@ export default function GestionProduits() {
                 {p.nom} <span className="text-[#888888]">· {p.marque}</span>
               </td>
               <td className="px-2 py-2 text-[#888888]">{p.categorie?.nom}</td>
-              <td className="px-2 py-2 text-right">{p.prixCarton} €</td>
+              <td className="px-2 py-2 text-right">{p.prixCarton} € HT</td>
               <td className="px-2 py-2 text-right">
                 {p.stockDisponible === 0 ? (
                   <span className="font-bold text-[#CC3333]">0 · rupture</span>

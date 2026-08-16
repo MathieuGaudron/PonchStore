@@ -54,6 +54,13 @@ jobs:
         working-directory: api
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      # Échoue dès qu'une dépendance PHP fait l'objet d'un avis de sécurité.
+      # Placé avant les tests : inutile de valider le comportement d'un code
+      # qu'on sait vulnérable.
+      - name: Audit de sécurité des dépendances (composer audit)
+        working-directory: api
+        run: composer audit
+
       - name: Analyse syntaxique (php -l)
         working-directory: api
         run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
@@ -84,6 +91,14 @@ jobs:
       - name: Installation des dépendances
         working-directory: front
         run: npm ci
+
+      # Seuil à "high" : l'écosystème npm signale en permanence des avis
+      # mineurs sur des outils de développement qui ne sont jamais livrés au
+      # navigateur. Bloquer là-dessus rendrait la CI rouge en continu et on
+      # finirait par ignorer le signal.
+      - name: Audit de sécurité des dépendances (npm audit)
+        working-directory: front
+        run: npm audit --audit-level=high
 
       - name: Lint (ESLint)
         working-directory: front

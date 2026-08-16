@@ -18,3 +18,8 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+# Fichier d'aide à l'autocomplétion régénéré par Symfony à chaque changement de
+# dépendances : inutile à l'exécution, et il polluait le diff de chaque
+# composer update.
+/config/reference.php

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 /*
  * Écran d'authentification en deux volets : un panneau de marque sombre à
  * gauche, le formulaire sur fond clair à droite. Remplace la carte centrée
@@ -34,6 +36,13 @@ export default function CadreAuth({ surtitre, titre, children }) {
           <h1 className="mt-3 font-display text-4xl leading-tight text-graphite">{titre}</h1>
 
           <div className="mt-10">{children}</div>
+
+          <Link
+            to="/mentions-legales"
+            className="mt-12 inline-block text-xs text-brume underline decoration-trait-fonce underline-offset-4 transition-colors hover:text-encre"
+          >
+            Mentions légales
+          </Link>
         </div>
       </main>
     </div>

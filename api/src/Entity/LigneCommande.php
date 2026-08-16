@@ -22,11 +22,28 @@ class LigneCommande
     #[Groups(['commande:read'])]
     private ?int $quantite = null;
 
+    /*
+     * Prix au carton réellement facturé, remise palier comprise. Le prix
+     * catalogue reste lisible via le produit lié : c'est le prix payé qui est
+     * figé ici, pour que la commande reste fidèle même si le tarif bouge.
+     */
     #[ORM\Column(name: 'prix_unitaire', type: 'decimal', precision: 8, scale: 2)]
     #[Assert\NotBlank]
     #[Assert\PositiveOrZero]
     #[Groups(['commande:read'])]
     private ?string $prixUnitaire = null;
+
+    /*
+     * Montant de la ligne, seule valeur qui somme exactement au total de la
+     * commande. Il ne vaut pas toujours quantite x prixUnitaire : sous un
+     * palier, la ligne est plafonnée au prix de la quantité supérieure, et le
+     * prix au carton affiché n'en est que la moyenne arrondie au centime.
+     */
+    #[ORM\Column(name: 'montant_ligne', type: 'decimal', precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\PositiveOrZero]
+    #[Groups(['commande:read'])]
+    private ?string $montantLigne = null;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'lignes')]
     #[ORM\JoinColumn(name: 'id_commande', referencedColumnName: 'id_commande', nullable: false, onDelete: 'CASCADE')]
@@ -63,6 +80,18 @@ class LigneCommande
     public function setPrixUnitaire(string $prixUnitaire): static
     {
         $this->prixUnitaire = $prixUnitaire;
+
+        return $this;
+    }
+
+    public function getMontantLigne(): ?string
+    {
+        return $this->montantLigne;
+    }
+
+    public function setMontantLigne(string $montantLigne): static
+    {
+        $this->montantLigne = $montantLigne;
 
         return $this;
     }

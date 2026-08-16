@@ -63,10 +63,32 @@ export default function ConditionsGenerales() {
         </p>
         <p>
           Le tarif est dégressif : le prix au carton diminue par paliers en fonction du nombre de
-          palettes complètes commandées, à partir de 5 palettes puis de 10 palettes. La grille
-          applicable est <ARemplir>taux de remise exacts à confirmer — voir note ci-dessous</ARemplir>.
+          <strong className="font-medium"> palettes complètes</strong> commandées. La grille
+          applicable est la suivante :
+        </p>
+        <ul className="ml-5 list-disc space-y-1">
+          <li>moins de 5 palettes complètes : prix au carton du catalogue, sans remise ;</li>
+          <li>
+            de 5 à 9 palettes complètes : <strong className="font-medium">remise de 5 %</strong> sur
+            le prix au carton du catalogue ;
+          </li>
+          <li>
+            à partir de 10 palettes complètes :{' '}
+            <strong className="font-medium">remise de 10 %</strong> sur le prix au carton du
+            catalogue.
+          </li>
+        </ul>
+        <p>
+          Le nombre de palettes complètes s'apprécie produit par produit : seules les palettes
+          entières sont comptées, le reliquat de cartons ne s'additionne pas d'un produit à
+          l'autre. La remise est appliquée automatiquement au panier et reprise sur le
+          récapitulatif de commande.
+        </p>
+        <p>
           Le prix retenu est toujours le plus avantageux pour le Client : si une quantité
-          supérieure ouvre un palier plus favorable, c'est ce montant qui est facturé.
+          supérieure ouvre un palier plus favorable, c'est ce montant qui est facturé. Une commande
+          proche d'un palier est ainsi facturée au prix de la quantité qui déclenche ce palier, sans
+          que le Client ait à commander davantage.
         </p>
         <p>
           Les prix applicables sont ceux affichés au moment de la validation de la commande. Le

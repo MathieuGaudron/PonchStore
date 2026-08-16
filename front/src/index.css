@@ -1,8 +1,143 @@
 @import "tailwindcss";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/inter";
+
+/*
+ * Charte PONCH'STORE — direction éditoriale.
+ *
+ * Deux familles seulement : une serif de titrage (Fraunces) qui porte l'identité,
+ * une grotesque neutre (Inter) pour tout le reste, y compris les tableaux de
+ * gestion où la lisibilité prime. Les couleurs sont celles d'origine, remontées
+ * ici en jetons : plus aucun hexadécimal ne doit apparaître dans les composants.
+ */
+@theme {
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Sombres — fonds de marque et texte sur clair */
+  --color-encre: #111111;
+  --color-encre-clair: #1c1c1c;
+  --color-graphite: #222222;
+  --color-ardoise: #333333;
+  --color-ardoise-clair: #444444;
+
+  /* Gris — texte secondaire et filets */
+  --color-brume: #888888;
+  --color-brume-clair: #bbbbbb;
+  --color-trait: #e8e8e8;
+  --color-trait-fonce: #d0d0d0;
+
+  /* Clairs — fonds de page et surfaces */
+  --color-papier: #f9f9f9;
+  --color-papier-fonce: #f2f2f2;
+
+  /* Ambre — accent de marque */
+  --color-ambre: #f5a623;
+  --color-ambre-fonce: #e0961a;
+  --color-ambre-clair: #f7c948;
+  --color-cuivre: #e67e22;
+
+  /* États */
+  --color-cinabre: #cc3333;
+  --color-cinabre-fonce: #b32d2d;
+  --color-menthe: #2ecc71;
+}
 
 @layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--color-papier);
+    color: var(--color-graphite);
+  }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+
+  /*
+   * Fraunces expose un axe SOFT (adoucissement des angles) : une valeur basse
+   * réchauffe le dessin sans le rendre fantaisiste. L'axe opsz est laissé au
+   * navigateur, sauf sur les très grands titres où on le pousse à fond.
+   */
+  .font-display {
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 15;
+  }
+
+  .titre-affiche {
+    font-variation-settings: "opsz" 144, "SOFT" 15;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Filet de section : le séparateur récurrent de la charte. */
+  .filet {
+    border-top: 1px solid var(--color-trait);
+  }
+
+  .filet-sombre {
+    border-top: 1px solid var(--color-ardoise);
+  }
+
+  /*
+   * Surtitre éditorial : petite capitale espacée, précédée d'un tiret cadratin.
+   * Remplace l'ancien bandeau centré en tracking-widest.
+   */
+  .surtitre {
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Champ de formulaire : filet bas seul, pas de boîte. */
+  .champ {
+    width: 100%;
+    border: 1px solid var(--color-trait);
+    background-color: #ffffff;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-graphite);
+  }
+
+  .champ::placeholder {
+    color: var(--color-brume);
+  }
+
+  .champ:focus {
+    outline: none;
+    border-color: var(--color-encre);
+  }
+
+  .champ-sombre {
+    width: 100%;
+    border: 1px solid var(--color-ardoise);
+    background-color: var(--color-encre);
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    color: #ffffff;
+  }
+
+  .champ-sombre::placeholder {
+    color: var(--color-brume);
+  }
+
+  .champ-sombre:focus {
+    outline: none;
+    border-color: var(--color-ambre);
+  }
+
+  .etiquette {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-brume);
+    margin-bottom: 0.375rem;
   }
 }

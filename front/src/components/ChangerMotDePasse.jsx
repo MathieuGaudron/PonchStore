@@ -1,113 +1,53 @@
 import { useState } from 'react'
 import { apiFetch } from '../services/api'
+import { useAuth } from '../context/auth-context'
 import { Button } from '@/components/ui/button'
 
-const CHAMPS_VIDES = { ancien: '', nouveau: '', confirmation: '' }
-
+/*
+ * Le changement de mot de passe passe par le lien reçu par email : le
+ * formulaire ancien / nouveau / confirmation n'a plus lieu d'être ici. Le
+ * bouton déclenche simplement l'envoi du lien sur l'adresse du compte.
+ */
 export default function ChangerMotDePasse() {
-  const [ouvert, setOuvert] = useState(false)
-  const [form, setForm] = useState(CHAMPS_VIDES)
+  const { utilisateur } = useAuth()
   const [message, setMessage] = useState(null)
   const [erreur, setErreur] = useState(null)
   const [envoi, setEnvoi] = useState(false)
 
-  function maj(champ, valeur) {
-    setForm((actuel) => ({ ...actuel, [champ]: valeur }))
-  }
-
-  function fermer() {
-    setForm(CHAMPS_VIDES)
-    setErreur(null)
-    setOuvert(false)
-  }
-
-  async function enregistrer(e) {
-    e.preventDefault()
+  async function demanderLien() {
     setMessage(null)
     setErreur(null)
-
-    if (form.nouveau.length < 8) {
-      setErreur('Le nouveau mot de passe doit faire au moins 8 caractères.')
-      return
-    }
-    if (form.nouveau !== form.confirmation) {
-      setErreur('La confirmation ne correspond pas.')
-      return
-    }
-
     setEnvoi(true)
+
     try {
-      await apiFetch('/api/profil/mot-de-passe', {
-        method: 'PUT',
-        body: JSON.stringify({
-          ancienMotDePasse: form.ancien,
-          nouveauMotDePasse: form.nouveau,
-        }),
+      await apiFetch('/api/auth/mot-de-passe-oublie', {
+        method: 'POST',
+        body: JSON.stringify({ email: utilisateur?.email }),
       })
-      setForm(CHAMPS_VIDES)
-      setOuvert(false)
-      setMessage('Mot de passe mis à jour.')
+      setMessage(
+        `Un lien de réinitialisation a été envoyé à ${utilisateur?.email}. Il est valable une heure.`,
+      )
     } catch (err) {
-      setErreur(err.data?.message || 'Échec de la mise à jour.')
+      setErreur(err.data?.message || "L'envoi a échoué. Réessayez dans quelques minutes.")
     } finally {
       setEnvoi(false)
     }
   }
 
   return (
-    <div className="max-w-lg border-t border-[#E8E8E8] pt-6">
-      <h2 className="mb-3 font-bold text-[#222222]">Mot de passe</h2>
+    <div className="filet max-w-lg pt-8">
+      <h2 className="mb-4 font-display text-2xl text-graphite">Mot de passe</h2>
 
-      {message && <p className="mb-3 text-sm text-[#2ECC71]">{message}</p>}
+      <p className="mb-6 text-sm leading-relaxed text-brume">
+        Pour changer votre mot de passe, nous vous envoyons un lien sécurisé par email.
+      </p>
 
-      {!ouvert ? (
-        <Button variant="outline" onClick={() => setOuvert(true)}>
-          Changer mon mot de passe
-        </Button>
-      ) : (
-        <form onSubmit={enregistrer} className="space-y-3">
-          <Champ
-            label="Mot de passe actuel"
-            valeur={form.ancien}
-            onChange={(v) => maj('ancien', v)}
-          />
-          <Champ
-            label="Nouveau mot de passe"
-            valeur={form.nouveau}
-            onChange={(v) => maj('nouveau', v)}
-          />
-          <Champ
-            label="Confirmer le nouveau mot de passe"
-            valeur={form.confirmation}
-            onChange={(v) => maj('confirmation', v)}
-          />
+      {message && <p className="mb-6 text-sm text-menthe">{message}</p>}
+      {erreur && <p className="mb-6 text-sm text-cinabre">{erreur}</p>}
 
-          {erreur && <p className="text-sm text-[#CC3333]">{erreur}</p>}
-
-          <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={envoi}>
-              {envoi ? 'Enregistrement…' : 'Valider'}
-            </Button>
-            <Button type="button" variant="outline" onClick={fermer}>
-              Annuler
-            </Button>
-          </div>
-        </form>
-      )}
-    </div>
-  )
-}
-
-function Champ({ label, valeur, onChange }) {
-  return (
-    <div>
-      <label className="mb-1 block text-xs text-[#888888]">{label}</label>
-      <input
-        type="password"
-        value={valeur}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
-      />
+      <Button variant="outline" onClick={demanderLien} disabled={envoi}>
+        {envoi ? 'Envoi…' : 'Recevoir le lien par email'}
+      </Button>
     </div>
   )
 }

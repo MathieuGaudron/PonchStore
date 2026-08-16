@@ -10,19 +10,21 @@ export default function MonCompte() {
 
   function classeOnglet(cle) {
     return onglet === cle
-      ? 'border-b-2 border-[#F5A623] pb-2 font-bold text-[#222222]'
-      : 'pb-2 text-[#888888] hover:text-[#222222]'
+      ? '-mb-px border-b border-encre pb-3 text-graphite'
+      : 'pb-3 text-brume transition-colors hover:text-graphite'
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Mon compte</h1>
 
-        <div className="mb-6 flex flex-wrap gap-6 border-b border-[#E8E8E8]">
+        <p className="surtitre text-brume">Espace professionnel</p>
+        <h1 className="mt-3 font-display text-4xl text-graphite md:text-5xl">Mon compte</h1>
+
+        <div className="mb-10 mt-10 flex flex-wrap gap-8 border-b border-trait text-sm">
           <button onClick={() => setOnglet('commandes')} className={classeOnglet('commandes')}>
             Mes commandes
           </button>
@@ -34,7 +36,7 @@ export default function MonCompte() {
         {onglet === 'commandes' ? (
           <MesCommandes />
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-10">
             <ProfilForm />
             <ChangerMotDePasse />
           </div>

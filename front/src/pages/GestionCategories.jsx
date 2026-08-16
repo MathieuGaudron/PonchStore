@@ -105,20 +105,22 @@ export default function GestionCategories() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-[#222222]">Gestion des catégories</h1>
+
+        <p className="surtitre text-brume">Administration</p>
+        <div className="mb-10 mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h1 className="font-display text-4xl text-graphite md:text-5xl">Gestion des catégories</h1>
           <Button onClick={() => (formulaireOuvert ? fermer() : ouvrirCreation())}>
             {formulaireOuvert ? 'Fermer' : '+ Nouvelle catégorie'}
           </Button>
         </div>
 
         {succes && (
-          <div className="fixed right-4 top-16 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg sm:right-6 sm:top-6">
+          <div className="fixed right-4 top-16 z-50 bg-menthe px-4 py-2 text-sm font-medium text-encre sm:right-6 sm:top-6">
             {succes}
           </div>
         )}
@@ -126,32 +128,32 @@ export default function GestionCategories() {
         {formulaireOuvert && (
           <form
             onSubmit={enregistrer}
-            className="mb-8 max-w-3xl rounded bg-white p-6 shadow-[0_1px_4px_#E8E8E8]"
+            className="mb-10 max-w-3xl border border-trait bg-white p-6"
           >
-            <h2 className="mb-3 font-bold text-[#222222]">
+            <h2 className="mb-5 font-display text-2xl text-graphite">
               {enEdition ? `Modifier « ${enEdition.nom} »` : 'Nouvelle catégorie'}
             </h2>
 
-            {erreur && <p className="mb-3 text-sm text-[#CC3333]">{erreur}</p>}
+            {erreur && <p className="mb-3 text-sm text-cinabre">{erreur}</p>}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs text-[#888888]">Nom *</label>
+                <label className="etiquette">Nom *</label>
                 <input
                   value={form.nom}
                   onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
                   required
                   maxLength={80}
-                  className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+                  className="champ"
                 />
-                {errors?.nom && <span className="text-xs text-[#CC3333]">{errors.nom}</span>}
+                {errors?.nom && <span className="text-xs text-cinabre">{errors.nom}</span>}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#888888]">Description</label>
+                <label className="etiquette">Description</label>
                 <input
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+                  className="champ"
                 />
               </div>
             </div>
@@ -167,22 +169,22 @@ export default function GestionCategories() {
           </form>
         )}
 
-        <div className="rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
+        <div className="border border-trait bg-white p-6">
           <Tableau colonnes={COLONNES}>
             {categories.map((c) => (
-              <tr key={c.id} className="border-b border-[#E8E8E8]">
-                <td className="px-2 py-2 font-bold text-[#222222]">{c.nom}</td>
-                <td className="px-2 py-2 text-[#888888]">{c.description || '—'}</td>
-                <td className="px-2 py-2 text-right whitespace-nowrap">
+              <tr key={c.id} className="border-b border-trait">
+                <td className="px-3 py-3 font-medium text-graphite">{c.nom}</td>
+                <td className="px-3 py-3 text-brume">{c.description || '—'}</td>
+                <td className="px-3 py-3 text-right whitespace-nowrap">
                   <button
                     onClick={() => ouvrirEdition(c)}
-                    className="text-sm text-[#F5A623] hover:underline"
+                    className="text-sm text-graphite underline decoration-trait-fonce underline-offset-4 transition-colors hover:decoration-encre"
                   >
                     Modifier
                   </button>
                   <button
                     onClick={() => supprimer(c)}
-                    className="ml-4 text-sm text-[#CC3333] hover:underline"
+                    className="ml-4 text-sm text-cinabre hover:underline"
                   >
                     Supprimer
                   </button>
@@ -192,7 +194,7 @@ export default function GestionCategories() {
           </Tableau>
 
           {categories.length === 0 && (
-            <p className="px-2 py-4 text-sm text-[#888888]">Aucune catégorie.</p>
+            <p className="px-2 py-4 text-sm text-brume">Aucune catégorie.</p>
           )}
         </div>
       </main>

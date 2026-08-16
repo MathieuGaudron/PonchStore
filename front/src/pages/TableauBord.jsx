@@ -18,44 +18,44 @@ export default function TableauBord() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Tableau de bord</h1>
+
+        <p className="surtitre text-brume">Exploitation</p>
+        <h1 className="mt-3 font-display text-4xl text-graphite md:text-5xl">Tableau de bord</h1>
 
         {!stats ? (
-          <p className="text-[#888888]">Chargement…</p>
+          <p className="mt-10 text-sm text-brume">Chargement…</p>
         ) : (
-          <div className="grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              to="/preparation"
-              className="rounded bg-white p-5 shadow-[0_1px_4px_#E8E8E8] hover:shadow-[0_2px_8px_#D0D0D0]"
-            >
-              <p className="text-4xl font-bold text-[#F5A623]">{stats.commandesAPreparer}</p>
-              <p className="mt-1 text-sm text-[#888888]">Commandes à préparer</p>
-            </Link>
+          <div className="mt-10 grid grid-cols-1 gap-px border border-trait bg-trait sm:grid-cols-2 lg:grid-cols-4">
+            <Carte
+              valeur={stats.commandesAPreparer}
+              libelle="Commandes à préparer"
+              accent="bg-ambre"
+              lien="/preparation"
+            />
 
-            <Link
-              to="/historique-commandes"
-              className="rounded bg-white p-5 shadow-[0_1px_4px_#E8E8E8] hover:shadow-[0_2px_8px_#D0D0D0]"
-            >
-              <p className="text-4xl font-bold text-[#1C1C1C]">{stats.commandesTotal}</p>
-              <p className="mt-1 text-sm text-[#888888]">Historique des commandes</p>
-            </Link>
+            <Carte
+              valeur={stats.commandesTotal}
+              libelle="Historique des commandes"
+              accent="bg-encre"
+              lien="/historique-commandes"
+            />
 
             <Carte
               valeur={stats.produitsEnRupture}
               libelle="Produits en rupture"
-              couleur="#CC3333"
+              accent="bg-cinabre"
               lien={estAdmin ? '/admin/produits?stock=rupture' : null}
             />
 
             <Carte
               valeur={stats.produitsStockFaible}
               libelle={`Stock faible (≤ ${stats.seuilStockFaible})`}
-              couleur="#E67E22"
+              accent="bg-cuivre"
               lien={estAdmin ? '/admin/produits?stock=faible' : null}
             />
           </div>
@@ -65,26 +65,28 @@ export default function TableauBord() {
   )
 }
 
-function Carte({ valeur, libelle, couleur, lien }) {
+/*
+ * Le chiffre reste en gris d'encre pour la lisibilité ; c'est un bandeau de
+ * couleur en tête de cellule qui distingue les indicateurs entre eux.
+ */
+function Carte({ valeur, libelle, accent, lien }) {
   const contenu = (
     <>
-      <p className="text-4xl font-bold" style={{ color: couleur }}>
-        {valeur}
-      </p>
-      <p className="mt-1 text-sm text-[#888888]">{libelle}</p>
+      <span className={`block h-1 w-10 ${accent}`} />
+      <p className="mt-6 font-display text-6xl leading-none text-graphite">{valeur}</p>
+      <p className="surtitre mt-5 text-brume">{libelle}</p>
     </>
   )
 
+  const classe = 'block bg-white p-6 pb-8'
+
   if (lien) {
     return (
-      <Link
-        to={lien}
-        className="rounded bg-white p-5 shadow-[0_1px_4px_#E8E8E8] hover:shadow-[0_2px_8px_#D0D0D0]"
-      >
+      <Link to={lien} className={`${classe} transition-colors hover:bg-papier`}>
         {contenu}
       </Link>
     )
   }
 
-  return <div className="rounded bg-white p-5 shadow-[0_1px_4px_#E8E8E8]">{contenu}</div>
+  return <div className={classe}>{contenu}</div>
 }

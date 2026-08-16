@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { apiFetch } from '../services/api'
+import CadreAuth from '../components/CadreAuth'
+import { Button } from '@/components/ui/button'
 
 export default function Reinitialisation() {
   const [params] = useSearchParams()
@@ -40,70 +42,60 @@ export default function Reinitialisation() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#111111] px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm bg-[#1C1C1C] rounded-md p-8 flex flex-col gap-4"
-      >
-        <h1 className="text-2xl font-bold text-[#F5A623] text-center">Nouveau mot de passe</h1>
+    <CadreAuth surtitre="Accès au compte" titre="Nouveau mot de passe">
+      {succes ? (
+        <div className="flex flex-col items-start gap-6">
+          <p className="text-sm text-menthe">
+            Mot de passe réinitialisé — vous pouvez vous connecter.
+          </p>
+          <Link
+            to="/connexion"
+            className="inline-flex h-11 items-center bg-encre px-5 text-sm font-medium tracking-wide text-white transition-colors hover:bg-graphite"
+          >
+            Se connecter
+          </Link>
+        </div>
+      ) : !token ? (
+        <div className="flex flex-col gap-6">
+          <p className="text-sm text-cinabre">Lien invalide : le token est manquant.</p>
+          <Link
+            to="/mot-de-passe-oublie"
+            className="text-sm text-graphite underline decoration-trait-fonce underline-offset-4 transition-colors hover:decoration-encre"
+          >
+            Refaire une demande →
+          </Link>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {erreur && <p className="text-sm text-cinabre">{erreur}</p>}
 
-        {succes ? (
-          <>
-            <p className="text-sm text-[#2ECC71] text-center">
-              Mot de passe réinitialisé — tu peux te connecter.
-            </p>
-            <Link
-              to="/connexion"
-              className="bg-[#F5A623] text-[#111111] font-bold rounded py-2 text-center"
-            >
-              Se connecter
-            </Link>
-          </>
-        ) : !token ? (
-          <>
-            <p className="text-sm text-[#CC3333] text-center">
-              Lien invalide : le token est manquant.
-            </p>
-            <Link to="/mot-de-passe-oublie" className="text-center text-sm text-[#F5A623] hover:underline">
-              Refaire une demande
-            </Link>
-          </>
-        ) : (
-          <>
-            {erreur && <p className="text-[#CC3333] text-sm text-center">{erreur}</p>}
+          <div>
+            <label className="etiquette">Nouveau mot de passe</label>
+            <input
+              type="password"
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+              required
+              className="champ"
+            />
+          </div>
 
-            <label className="flex flex-col gap-1 text-sm text-[#888888]">
-              Nouveau mot de passe
-              <input
-                type="password"
-                value={motDePasse}
-                onChange={(e) => setMotDePasse(e.target.value)}
-                required
-                className="bg-[#111111] border border-[#888888]/50 rounded px-3 py-2 text-white"
-              />
-            </label>
+          <div>
+            <label className="etiquette">Confirmer le mot de passe</label>
+            <input
+              type="password"
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+              required
+              className="champ"
+            />
+          </div>
 
-            <label className="flex flex-col gap-1 text-sm text-[#888888]">
-              Confirmer le mot de passe
-              <input
-                type="password"
-                value={confirmation}
-                onChange={(e) => setConfirmation(e.target.value)}
-                required
-                className="bg-[#111111] border border-[#888888]/50 rounded px-3 py-2 text-white"
-              />
-            </label>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-[#F5A623] text-[#111111] font-bold rounded py-2 disabled:opacity-60"
-            >
-              {loading ? 'Enregistrement…' : 'Valider'}
-            </button>
-          </>
-        )}
-      </form>
-    </div>
+          <Button type="submit" disabled={loading} className="mt-2 w-full">
+            {loading ? 'Enregistrement…' : 'Valider'}
+          </Button>
+        </form>
+      )}
+    </CadreAuth>
   )
 }

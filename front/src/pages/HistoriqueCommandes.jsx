@@ -16,11 +16,11 @@ const FILTRES = [
 ]
 
 const STATUT = {
-  EN_ATTENTE: { libelle: 'En attente', classes: 'bg-[#888888] text-white' },
-  EN_PREPARATION: { libelle: 'En préparation', classes: 'bg-[#F5A623] text-[#111111]' },
-  PRETE: { libelle: 'Prête', classes: 'bg-[#2ECC71] text-[#111111]' },
-  RECUPEREE: { libelle: 'Récupérée', classes: 'bg-[#1C1C1C] text-white' },
-  ANNULEE: { libelle: 'Annulée', classes: 'bg-[#CC3333] text-white' },
+  EN_ATTENTE: { libelle: 'En attente', classes: 'bg-brume text-white' },
+  EN_PREPARATION: { libelle: 'En préparation', classes: 'bg-ambre text-encre' },
+  PRETE: { libelle: 'Prête', classes: 'bg-menthe text-encre' },
+  RECUPEREE: { libelle: 'Récupérée', classes: 'bg-encre-clair text-white' },
+  ANNULEE: { libelle: 'Annulée', classes: 'bg-cinabre text-white' },
 }
 
 function formaterDate(valeur) {
@@ -77,14 +77,18 @@ export default function HistoriqueCommandes() {
     .reduce((total, c) => total + Number(c.montantTotal), 0)
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Historique des commandes</h1>
 
-        <div className="mb-4 flex flex-wrap items-center gap-2">
+        <p className="surtitre text-brume">Exploitation</p>
+        <h1 className="mt-3 font-display text-4xl text-graphite md:text-5xl">
+          Historique des commandes
+        </h1>
+
+        <div className="mb-5 mt-10 flex flex-wrap items-center gap-2">
           {FILTRES.map((f) => (
             <Button
               key={f.cle || 'tout'}
@@ -101,21 +105,23 @@ export default function HistoriqueCommandes() {
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
             placeholder="Rechercher un client, un établissement…"
-            className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm sm:ml-auto sm:w-72"
+            className="champ sm:ml-auto sm:w-72"
           />
         </div>
 
-        <div className="mb-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#888888]">
+        <div className="mb-6 flex flex-wrap gap-x-8 gap-y-1 text-sm text-brume">
           <span>
-            <strong className="text-[#222222]">{commandes.length}</strong> commande(s)
+            <strong className="font-medium text-graphite">{commandes.length}</strong> commande(s)
           </span>
           <span>
             Total hors annulées :{' '}
-            <strong className="text-[#F5A623]">{chiffreAffaires.toFixed(2)} € HT</strong>
+            <strong className="font-medium text-graphite">
+              {chiffreAffaires.toFixed(2)} € HT
+            </strong>
           </span>
         </div>
 
-        {chargement && <p className="text-[#888888]">Chargement…</p>}
+        {chargement && <p className="text-sm text-brume">Chargement…</p>}
 
         {!chargement && (
           <Tableau
@@ -134,35 +140,33 @@ export default function HistoriqueCommandes() {
             {commandes.map((c) => {
               const badge = STATUT[c.statut] ?? {
                 libelle: c.statut,
-                classes: 'bg-[#F2F2F2] text-[#222222]',
+                classes: 'bg-papier-fonce text-graphite',
               }
               const ouvert = detailOuvert === c.id
 
               return (
                 <Fragment key={c.id}>
-                  <tr className="border-b border-[#E8E8E8]">
-                    <td className="px-2 py-2 font-bold text-[#222222]">#{c.id}</td>
-                    <td className="px-2 py-2 text-[#888888]">{formaterDate(c.dateCommande)}</td>
-                    <td className="px-2 py-2 text-[#222222]">
+                  <tr className="border-b border-trait">
+                    <td className="px-3 py-3 font-medium text-graphite">#{c.id}</td>
+                    <td className="px-3 py-3 text-brume">{formaterDate(c.dateCommande)}</td>
+                    <td className="px-3 py-3 text-graphite">
                       {c.utilisateur ? `${c.utilisateur.prenom} ${c.utilisateur.nom}` : '—'}
                     </td>
-                    <td className="px-2 py-2 text-[#888888]">
+                    <td className="px-3 py-3 text-brume">
                       {c.utilisateur?.nomEtablissement || '—'}
                     </td>
-                    <td className="px-2 py-2 text-[#888888]">{formaterCreneau(c.creneau)}</td>
-                    <td className="px-2 py-2 text-right text-[#222222]">{c.lignes.length}</td>
-                    <td className="px-2 py-2 text-right font-bold text-[#F5A623]">
+                    <td className="px-3 py-3 text-brume">{formaterCreneau(c.creneau)}</td>
+                    <td className="px-3 py-3 text-right text-graphite">{c.lignes.length}</td>
+                    <td className="px-3 py-3 text-right font-medium text-graphite">
                       {c.montantTotal} € HT
                     </td>
-                    <td className="px-2 py-2">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${badge.classes}`}>
-                        {badge.libelle}
-                      </span>
+                    <td className="px-3 py-3">
+                      <span className={`surtitre px-2 py-1 ${badge.classes}`}>{badge.libelle}</span>
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-3 py-3">
                       <button
                         onClick={() => setDetailOuvert(ouvert ? null : c.id)}
-                        className="flex items-center gap-1 text-xs text-[#888888] hover:text-[#F5A623]"
+                        className="flex items-center gap-1 text-xs text-brume transition-colors hover:text-encre"
                       >
                         Détail
                         <ChevronDown
@@ -173,25 +177,25 @@ export default function HistoriqueCommandes() {
                   </tr>
 
                   {ouvert && (
-                    <tr className="border-b border-[#E8E8E8] bg-[#F2F2F2]">
-                      <td colSpan="9" className="px-6 py-3">
-                        <ul className="space-y-1 text-sm text-[#222222]">
+                    <tr className="border-b border-trait bg-papier-fonce">
+                      <td colSpan="9" className="px-6 py-4">
+                        <ul className="space-y-1 text-sm text-graphite">
                           {c.lignes.map((l) => (
                             <li key={l.produit.id} className="flex justify-between">
                               <span>
                                 {l.produit.nom}
                                 {l.produit.marque && (
-                                  <span className="text-[#888888]"> · {l.produit.marque}</span>
+                                  <span className="text-brume"> · {l.produit.marque}</span>
                                 )}
                               </span>
-                              <span className="text-[#888888]">
+                              <span className="text-brume">
                                 × {l.quantite} — {l.prixUnitaire} € HT
                               </span>
                             </li>
                           ))}
                         </ul>
                         {c.commentaire && (
-                          <p className="mt-2 border-t border-[#E8E8E8] pt-2 text-xs text-[#888888]">
+                          <p className="mt-3 border-t border-trait pt-3 text-xs text-brume">
                             Commentaire : {c.commentaire}
                           </p>
                         )}
@@ -204,7 +208,7 @@ export default function HistoriqueCommandes() {
 
             {commandes.length === 0 && (
               <tr>
-                <td colSpan="9" className="py-4 text-center text-[#888888]">
+                <td colSpan="9" className="py-6 text-center text-sm text-brume">
                   Aucune commande ne correspond.
                 </td>
               </tr>

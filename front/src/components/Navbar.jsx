@@ -22,15 +22,15 @@ function MenuDeroulant({ libelle, alignement = 'gauche', children }) {
     <div ref={conteneur} className="relative">
       <button
         onClick={() => setOuvert((o) => !o)}
-        className="flex items-center gap-1 text-white hover:text-[#F5A623]"
+        className="flex items-center gap-1.5 text-white transition-colors hover:text-ambre"
       >
         {libelle}
-        <ChevronDown className={`h-4 w-4 transition-transform ${ouvert ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${ouvert ? 'rotate-180' : ''}`} />
       </button>
       {ouvert && (
         <div
           onClick={() => setOuvert(false)}
-          className={`absolute top-full z-50 mt-2 min-w-44 rounded border border-[#333333] bg-[#1C1C1C] py-1 shadow-lg ${
+          className={`absolute top-full z-50 mt-3 min-w-52 border border-ardoise bg-encre-clair py-1.5 ${
             alignement === 'droite' ? 'right-0' : 'left-0'
           }`}
         >
@@ -46,8 +46,8 @@ function LienMenu({ vers, children }) {
     <NavLink
       to={vers}
       className={({ isActive }) =>
-        `block px-4 py-2 text-sm hover:bg-[#111111] hover:text-[#F5A623] ${
-          isActive ? 'text-[#F5A623]' : 'text-white'
+        `block px-4 py-2 text-sm transition-colors hover:bg-encre hover:text-ambre ${
+          isActive ? 'text-ambre' : 'text-white'
         }`
       }
     >
@@ -61,7 +61,9 @@ function LienNav({ vers, children }) {
     <NavLink
       to={vers}
       className={({ isActive }) =>
-        `hover:text-[#F5A623] ${isActive ? 'text-[#F5A623]' : 'text-white'}`
+        `underline-offset-[6px] transition-colors hover:text-ambre ${
+          isActive ? 'text-ambre underline decoration-ambre' : 'text-white'
+        }`
       }
     >
       {children}
@@ -84,12 +86,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="relative flex h-12 items-center justify-between bg-[#111111] px-4 text-sm">
-      <Link to="/catalogue" className="font-bold text-[#F5A623]">
-        PONCH'STORE
+    <nav className="relative flex h-14 items-center justify-between border-b border-ardoise bg-encre px-5 text-sm">
+      <Link to="/catalogue" className="font-display text-lg tracking-tight text-ambre">
+        Ponch'Store
       </Link>
 
-      <div className="absolute left-1/2 z-50 hidden -translate-x-1/2 items-center gap-6 md:flex">
+      <div className="absolute left-1/2 z-50 hidden -translate-x-1/2 items-center gap-8 md:flex">
         <LienNav vers="/catalogue">Catalogue</LienNav>
         {estStaff && (
           <MenuDeroulant libelle="Gestion">
@@ -100,7 +102,7 @@ export default function Navbar() {
             <LienMenu vers="/admin/creneaux">Créneaux</LienMenu>
             {estAdmin && (
               <>
-                <div className="my-1 border-t border-[#333333]" />
+                <div className="my-1.5 border-t border-ardoise" />
                 <LienMenu vers="/admin/produits">Produits</LienMenu>
                 <LienMenu vers="/admin/categories">Catégories</LienMenu>
                 <LienMenu vers="/admin/utilisateurs">Utilisateurs</LienMenu>
@@ -110,11 +112,11 @@ export default function Navbar() {
         )}
       </div>
 
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-6">
         <LienNav vers="/panier">
           Panier
           {nombreArticles > 0 && (
-            <span className="ml-1 rounded-full bg-[#F5A623] px-2 py-0.5 text-xs font-bold text-[#111111]">
+            <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center bg-ambre px-1 text-xs font-semibold text-encre">
               {nombreArticles}
             </span>
           )}
@@ -127,7 +129,7 @@ export default function Navbar() {
               <span className="flex items-center gap-2">
                 {utilisateur?.prenom}
                 {estStaff && (
-                  <span className="rounded bg-[#F5A623] px-1.5 py-0.5 text-[10px] font-bold text-[#111111]">
+                  <span className="surtitre border border-ambre px-1.5 py-0.5 text-ambre">
                     {utilisateur?.role}
                   </span>
                 )}
@@ -135,10 +137,10 @@ export default function Navbar() {
             }
           >
             <LienMenu vers="/compte">Mon compte</LienMenu>
-            <div className="my-1 border-t border-[#333333]" />
+            <div className="my-1.5 border-t border-ardoise" />
             <button
               onClick={handleDeconnexion}
-              className="block w-full px-4 py-2 text-left text-sm text-[#CC3333] hover:bg-[#111111]"
+              className="block w-full px-4 py-2 text-left text-sm text-cinabre transition-colors hover:bg-encre"
             >
               Déconnexion
             </button>
@@ -149,7 +151,7 @@ export default function Navbar() {
           onClick={() => setMenuMobileOuvert((o) => !o)}
           aria-label="Menu"
           aria-expanded={menuMobileOuvert}
-          className="text-white hover:text-[#F5A623] md:hidden"
+          className="text-white transition-colors hover:text-ambre md:hidden"
         >
           {menuMobileOuvert ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -158,14 +160,14 @@ export default function Navbar() {
       {menuMobileOuvert && (
         <div
           onClick={() => setMenuMobileOuvert(false)}
-          className="absolute left-0 right-0 top-full z-50 border-t border-[#333333] bg-[#1C1C1C] py-1 shadow-lg md:hidden"
+          className="absolute left-0 right-0 top-full z-50 border-b border-t border-ardoise bg-encre-clair py-1.5 md:hidden"
         >
           <LienMenu vers="/catalogue">Catalogue</LienMenu>
 
           {estStaff && (
             <>
-              <div className="my-1 border-t border-[#333333]" />
-              <p className="px-4 py-1 text-xs uppercase text-[#888888]">Gestion</p>
+              <div className="my-1.5 border-t border-ardoise" />
+              <p className="surtitre px-4 py-1.5 text-brume">Gestion</p>
               <LienMenu vers="/tableau-bord">Tableau de bord</LienMenu>
               <LienMenu vers="/preparation">Préparation</LienMenu>
               <LienMenu vers="/historique-commandes">Historique commandes</LienMenu>
@@ -181,14 +183,14 @@ export default function Navbar() {
             </>
           )}
 
-          <div className="my-1 border-t border-[#333333]" />
-          <p className="px-4 py-1 text-xs uppercase text-[#888888]">
+          <div className="my-1.5 border-t border-ardoise" />
+          <p className="surtitre px-4 py-1.5 text-brume">
             {utilisateur?.prenom} {estStaff && `· ${utilisateur?.role}`}
           </p>
           <LienMenu vers="/compte">Mon compte</LienMenu>
           <button
             onClick={handleDeconnexion}
-            className="block w-full px-4 py-2 text-left text-sm text-[#CC3333] hover:bg-[#111111]"
+            className="block w-full px-4 py-2 text-left text-sm text-cinabre transition-colors hover:bg-encre"
           >
             Déconnexion
           </button>

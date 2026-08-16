@@ -229,32 +229,34 @@ export default function GestionProduits() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-[#222222]">Gestion des produits</h1>
+
+        <p className="surtitre text-brume">Administration</p>
+        <div className="mb-10 mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h1 className="font-display text-4xl text-graphite md:text-5xl">Gestion des produits</h1>
           <Button onClick={basculerFormulaire}>
             {formulaireOuvert ? 'Fermer' : '+ Nouveau produit'}
           </Button>
         </div>
 
         {succes && (
-          <div className="fixed right-4 top-16 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg sm:right-6 sm:top-6">
+          <div className="fixed right-4 top-16 z-50 bg-menthe px-4 py-2 text-sm font-medium text-encre sm:right-6 sm:top-6">
             {succes}
           </div>
         )}
 
         {formulaireOuvert && (
-        <form onSubmit={soumettre} className="mb-8 max-w-3xl rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
-          <h2 className="mb-3 font-bold text-[#222222]">
+        <form onSubmit={soumettre} className="mb-10 max-w-3xl border border-trait bg-white p-6">
+          <h2 className="mb-5 font-display text-2xl text-graphite">
             {editionId ? `Modifier « ${form.nom} »` : 'Nouveau produit'}
           </h2>
 
-          <div className="relative mb-4 rounded bg-[#F9F9F9] p-3">
-            <label className="mb-1 block text-xs text-[#888888]">
+          <div className="relative mb-4 bg-papier p-3">
+            <label className="etiquette">
               Rechercher un produit (Open Food Facts) — remplit nom, marque, image, EAN
             </label>
             <input
@@ -262,36 +264,36 @@ export default function GestionProduits() {
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
               placeholder="ex : Grey Goose, Hennessy…"
-              className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+              className="champ"
             />
-            {rechercheMsg && <p className="mt-1 text-xs text-[#888888]">{rechercheMsg}</p>}
+            {rechercheMsg && <p className="mt-1 text-xs text-brume">{rechercheMsg}</p>}
 
             {resultats.length > 0 && (
-              <ul className="absolute z-10 mt-1 max-h-72 w-[calc(100%-1.5rem)] divide-y divide-[#E8E8E8] overflow-y-auto rounded border border-[#888888] bg-white shadow-lg">
+              <ul className="absolute z-10 mt-1 max-h-72 w-[calc(100%-1.5rem)] divide-y divide-trait overflow-y-auto border border-trait-fonce bg-white shadow-lg">
                 {resultats.map((r) => (
                   <li key={r.ean}>
                     <button
                       type="button"
                       onClick={() => choisirResultat(r)}
-                      className="flex w-full items-center gap-3 p-2 text-left hover:bg-[#F2F2F2]"
+                      className="flex w-full items-center gap-3 p-2 text-left hover:bg-papier-fonce"
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded bg-[#1C1C1C]">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden bg-encre-clair">
                         {r.imageUrl ? (
                           <img src={r.imageUrl} alt={r.nom} className="h-full object-contain" />
                         ) : (
-                          <span className="text-[8px] text-[#888888]">—</span>
+                          <span className="text-[8px] text-brume">—</span>
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-[#222222]">
+                        <p className="truncate text-sm font-medium text-graphite">
                           {r.nom}
                           {r.contenance && (
-                            <span className="ml-2 rounded bg-[#F5A623] px-1.5 py-0.5 text-xs text-[#111111]">
+                            <span className="ml-2 bg-ambre px-1.5 py-0.5 text-xs text-encre">
                               {r.contenance}
                             </span>
                           )}
                         </p>
-                        <p className="truncate text-xs text-[#888888]">
+                        <p className="truncate text-xs text-brume">
                           {r.marque || 'Marque inconnue'} · EAN {r.ean || '—'}
                         </p>
                       </div>
@@ -307,43 +309,43 @@ export default function GestionProduits() {
             <Champ label="Marque" valeur={form.marque} onChange={(v) => maj('marque', v)} />
             <Champ label="Format carton (ex: 6x70cl)" valeur={form.formatCarton} onChange={(v) => maj('formatCarton', v)} />
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">EAN (code-barres)</label>
+              <label className="etiquette">EAN (code-barres)</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={form.ean}
                   onChange={(e) => maj('ean', e.target.value)}
-                  className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                  className="champ"
                 />
                 <Button type="button" variant="outline" size="sm" onClick={importerEan}>
                   Récupérer
                 </Button>
               </div>
-              {importMsg && <p className="mt-1 text-xs text-[#888888]">{importMsg}</p>}
+              {importMsg && <p className="mt-1 text-xs text-brume">{importMsg}</p>}
             </div>
             <Champ label="Prix d'achat carton (€ HT)" valeur={form.prixAchatCarton} onChange={(v) => maj('prixAchatCarton', v)} />
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Stock (cartons)</label>
+              <label className="etiquette">Stock (cartons)</label>
               <input
                 type="text"
                 value={form.stockDisponible}
                 onChange={(e) => maj('stockDisponible', e.target.value)}
                 disabled={editionId !== null}
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm disabled:bg-[#F2F2F2] disabled:text-[#888888]"
+                className="champ disabled:bg-papier-fonce disabled:text-brume"
               />
               {editionId !== null && (
-                <p className="mt-1 text-xs text-[#888888]">
+                <p className="mt-1 text-xs text-brume">
                   Le stock se modifie via la page Stock (mouvements).
                 </p>
               )}
             </div>
             <Champ label="Cartons par palette" valeur={form.cartonsParPalette} onChange={(v) => maj('cartonsParPalette', v)} />
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Catégorie</label>
+              <label className="etiquette">Catégorie</label>
               <select
                 value={form.categorieId}
                 onChange={(e) => maj('categorieId', e.target.value)}
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                className="champ"
               >
                 <option value="">— choisir —</option>
                 {categories.map((c) => (
@@ -357,16 +359,16 @@ export default function GestionProduits() {
           </div>
 
           <div className="mt-3">
-            <label className="mb-1 block text-xs text-[#888888]">Description</label>
+            <label className="etiquette">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => maj('description', e.target.value)}
               rows="2"
-              className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+              className="champ"
             />
           </div>
 
-          {erreur && <p className="mt-3 text-sm text-[#CC3333]">{erreur}</p>}
+          {erreur && <p className="mt-3 text-sm text-cinabre">{erreur}</p>}
 
           <div className="mt-4 flex gap-3">
             <Button type="submit">{editionId ? 'Enregistrer' : 'Créer le produit'}</Button>
@@ -401,50 +403,50 @@ export default function GestionProduits() {
           ]}
         >
           {produitsAffiches.map((p) => (
-            <tr key={p.id} className="border-b border-[#E8E8E8]">
-              <td className="px-2 py-2 text-[#222222]">
-                {p.nom} <span className="text-[#888888]">· {p.marque}</span>
+            <tr key={p.id} className="border-b border-trait">
+              <td className="px-3 py-3 text-graphite">
+                {p.nom} <span className="text-brume">· {p.marque}</span>
               </td>
-              <td className="px-2 py-2 text-[#888888]">{p.categorie?.nom}</td>
-              <td className="px-2 py-2 text-right">{p.prixCarton} € HT</td>
-              <td className="px-2 py-2 text-right">
+              <td className="px-3 py-3 text-brume">{p.categorie?.nom}</td>
+              <td className="px-3 py-3 text-right">{p.prixCarton} € HT</td>
+              <td className="px-3 py-3 text-right">
                 {p.stockDisponible === 0 ? (
-                  <span className="font-bold text-[#CC3333]">0 · rupture</span>
+                  <span className="font-medium text-cinabre">0 · rupture</span>
                 ) : p.stockDisponible <= SEUIL_STOCK_FAIBLE ? (
-                  <span className="font-bold text-[#E67E22]">{p.stockDisponible} · faible</span>
+                  <span className="font-medium text-cuivre">{p.stockDisponible} · faible</span>
                 ) : (
                   <span>{p.stockDisponible}</span>
                 )}
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-3 py-3 text-center">
                 {p.actif ? (
-                  <span className="text-[#2ECC71]">oui</span>
+                  <span className="text-menthe">oui</span>
                 ) : (
-                  <span className="text-[#CC3333]">non</span>
+                  <span className="text-cinabre">non</span>
                 )}
               </td>
-              <td className="px-2 py-2 text-right">
-                <button onClick={() => editer(p)} className="text-[#F5A623] hover:underline">
+              <td className="px-3 py-3 text-right">
+                <button onClick={() => editer(p)} className="text-graphite underline decoration-trait-fonce underline-offset-4 transition-colors hover:decoration-encre">
                   Modifier
                 </button>
                 {p.actif ? (
                   <button
                     onClick={() => changerActif(p, false)}
-                    className="ml-3 text-[#CC3333] hover:underline"
+                    className="ml-3 text-cinabre hover:underline"
                   >
                     Désactiver
                   </button>
                 ) : (
                   <button
                     onClick={() => changerActif(p, true)}
-                    className="ml-3 text-[#2ECC71] hover:underline"
+                    className="ml-3 text-menthe hover:underline"
                   >
                     Réactiver
                   </button>
                 )}
                 <button
                   onClick={() => supprimer(p)}
-                  className="ml-3 text-[#CC3333] hover:underline"
+                  className="ml-3 text-cinabre hover:underline"
                 >
                   Supprimer
                 </button>
@@ -460,12 +462,12 @@ export default function GestionProduits() {
 function Champ({ label, valeur, onChange }) {
   return (
     <div>
-      <label className="mb-1 block text-xs text-[#888888]">{label}</label>
+      <label className="etiquette">{label}</label>
       <input
         type="text"
         value={valeur}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+        className="champ"
       />
     </div>
   )

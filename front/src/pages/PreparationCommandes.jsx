@@ -5,9 +5,9 @@ import BoutonRetour from '../components/BoutonRetour'
 import { Button } from '@/components/ui/button'
 
 const STATUT = {
-  EN_ATTENTE: { libelle: 'En attente', classe: 'bg-[#888888] text-white' },
-  EN_PREPARATION: { libelle: 'En préparation', classe: 'bg-[#F5A623] text-[#111111]' },
-  PRETE: { libelle: 'Prête', classe: 'bg-[#2ECC71] text-[#111111]' },
+  EN_ATTENTE: { libelle: 'En attente', classe: 'bg-brume text-white' },
+  EN_PREPARATION: { libelle: 'En préparation', classe: 'bg-ambre text-encre' },
+  PRETE: { libelle: 'Prête', classe: 'bg-menthe text-encre' },
 }
 
 const PROCHAINE_ETAPE = {
@@ -64,59 +64,63 @@ export default function PreparationCommandes() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-5xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Commandes à préparer</h1>
 
-        {chargement && <p className="text-[#888888]">Chargement…</p>}
+        <p className="surtitre text-brume">Exploitation</p>
+        <h1 className="mt-3 font-display text-4xl text-graphite md:text-5xl">
+          Commandes à préparer
+        </h1>
+
+        {chargement && <p className="mt-10 text-sm text-brume">Chargement…</p>}
         {!chargement && commandes.length === 0 && (
-          <p className="text-[#888888]">Aucune commande à préparer. 🎉</p>
+          <p className="mt-10 text-sm text-brume">Aucune commande à préparer.</p>
         )}
 
-        <div className="space-y-4">
+        <div className="mt-10 border-t border-encre">
           {commandes.map((c) => {
             const statut = STATUT[c.statut]
             const etape = PROCHAINE_ETAPE[c.statut]
             return (
-              <div key={c.id} className="rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
-                <div className="flex flex-wrap items-start justify-between gap-2">
+              <div key={c.id} className="border-b border-trait bg-white p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-bold text-[#222222]">
+                    <p className="font-display text-xl text-graphite">
                       Commande n°{c.id} · {c.utilisateur?.prenom} {c.utilisateur?.nom}
                     </p>
-                    <p className="text-xs text-[#888888]">
+                    <p className="mt-1 text-xs text-brume">
                       {c.utilisateur?.nomEtablissement || 'Établissement non renseigné'}
                     </p>
                     {c.creneau && (
-                      <p className="mt-1 text-xs text-[#888888]">
+                      <p className="mt-1 text-xs text-brume">
                         Retrait : {dateLisible(c.creneau.date)} · {heure(c.creneau.heureDebut)} –{' '}
                         {heure(c.creneau.heureFin)}
                       </p>
                     )}
                   </div>
-                  <span className={`rounded-full px-3 py-1 text-xs ${statut.classe}`}>
-                    {statut.libelle}
-                  </span>
+                  <span className={`surtitre px-2 py-1 ${statut.classe}`}>{statut.libelle}</span>
                 </div>
 
-                <ul className="mt-3 border-t border-[#E8E8E8] pt-3 text-sm text-[#222222]">
+                <ul className="mt-4 space-y-1 border-t border-trait pt-4 text-sm text-graphite">
                   {c.lignes.map((l) => (
                     <li key={l.produit.id} className="flex justify-between">
                       <span>{l.produit.nom}</span>
-                      <span className="text-[#888888]">× {l.quantite}</span>
+                      <span className="text-brume">× {l.quantite}</span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                  <span className="font-bold text-[#F5A623]">{c.montantTotal} € HT</span>
-                  <div className="flex items-center gap-3">
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                  <span className="font-display text-xl text-graphite">
+                    {c.montantTotal} <span className="text-sm text-brume">€ HT</span>
+                  </span>
+                  <div className="flex items-center gap-5">
                     <button
                       onClick={() => refuser(c.id)}
-                      className="text-sm text-[#CC3333] hover:underline"
+                      className="text-sm text-cinabre underline decoration-transparent underline-offset-4 transition-colors hover:decoration-cinabre"
                     >
                       Refuser
                     </button>

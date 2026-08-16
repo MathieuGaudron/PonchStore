@@ -6,6 +6,15 @@ import Navbar from '../components/Navbar'
 import ChampQuantite from '../components/ChampQuantite'
 import { Button } from '@/components/ui/button'
 
+function Ligne({ label, children }) {
+  return (
+    <div className="flex gap-4 border-b border-trait py-3">
+      <dt className="surtitre w-36 shrink-0 pt-0.5 text-brume sm:w-44">{label}</dt>
+      <dd className="text-graphite">{children}</dd>
+    </div>
+  )
+}
+
 export default function FicheProduit() {
   const { id } = useParams()
   const { ajouter } = usePanier()
@@ -46,87 +55,87 @@ export default function FicheProduit() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
-        <Link to="/catalogue" className="text-sm text-[#888888] hover:text-[#F5A623]">
-          ← Retour au catalogue
+      <main className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
+        <Link
+          to="/catalogue"
+          className="inline-flex items-baseline gap-2 text-sm text-brume transition-colors hover:text-encre"
+        >
+          <span aria-hidden="true">←</span>
+          Retour au catalogue
         </Link>
 
-        {chargement && <p className="mt-4 text-[#888888]">Chargement…</p>}
-        {erreur && <p className="mt-4 text-[#CC3333]">{erreur}</p>}
+        {chargement && <p className="mt-8 text-sm text-brume">Chargement…</p>}
+        {erreur && <p className="mt-8 text-sm text-cinabre">{erreur}</p>}
 
         {produit && (
-          <div className="mt-4 flex max-w-4xl flex-col gap-8 md:flex-row">
-            <div className="flex h-64 w-full shrink-0 items-center justify-center rounded-md bg-[#F2F2F2] p-4 sm:h-80 md:w-80">
-              {produit.imageUrl ? (
-                <img src={produit.imageUrl} alt={produit.nom} className="h-full w-full object-contain" />
-              ) : (
-                <span className="text-[#888888]">Pas d'image</span>
-              )}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-4">
-                <h1 className="text-2xl font-bold text-[#222222] sm:text-3xl">{produit.nom}</h1>
-                {produit.stockDisponible > 0 ? (
-                  <span className="whitespace-nowrap rounded-full bg-[#2ECC71] px-3 py-1 text-sm text-[#111111]">
-                    En stock
-                  </span>
+          <div className="mt-8 grid gap-10 md:grid-cols-12 md:gap-14">
+            <div className="md:col-span-5">
+              <div className="flex h-80 w-full items-center justify-center border border-trait bg-papier-fonce p-6 sm:h-96">
+                {produit.imageUrl ? (
+                  <img
+                    src={produit.imageUrl}
+                    alt={produit.nom}
+                    className="h-full w-full object-contain"
+                  />
                 ) : (
-                  <span className="whitespace-nowrap rounded-full bg-[#E67E22] px-3 py-1 text-sm text-white">
-                    Rupture
-                  </span>
+                  <span className="surtitre text-brume-clair">Sans visuel</span>
                 )}
               </div>
+            </div>
 
-              <p className="mt-1 text-[#888888]">{produit.marque}</p>
-              <p className="mt-1 text-sm text-[#888888]">{produit.categorie?.nom}</p>
-
-              <p className="mt-4 text-2xl font-bold text-[#F5A623]">
-                {produit.prixCarton} € HT / carton
+            <div className="min-w-0 md:col-span-7">
+              <p className="surtitre text-brume">
+                {produit.marque} · {produit.categorie?.nom}
               </p>
 
-              <dl className="mt-6 space-y-1 text-sm text-[#222222]">
-                <div className="flex gap-2">
-                  <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Format carton</dt>
-                  <dd>{produit.formatCarton}</dd>
-                </div>
-                <div className="flex gap-2">
-                  <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Stock disponible</dt>
-                  <dd>{produit.stockDisponible} carton(s)</dd>
-                </div>
+              <h1 className="mt-3 font-display text-4xl leading-tight text-graphite sm:text-5xl">
+                {produit.nom}
+              </h1>
+
+              <div className="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-b border-encre pb-6">
+                <p className="font-display text-3xl text-graphite">
+                  {produit.prixCarton} <span className="text-base text-brume">€ HT / carton</span>
+                </p>
+                <span className="flex items-center gap-1.5 text-sm text-brume">
+                  <span
+                    aria-hidden="true"
+                    className={`inline-block h-1.5 w-1.5 ${
+                      produit.stockDisponible > 0 ? 'bg-menthe' : 'bg-cuivre'
+                    }`}
+                  />
+                  {produit.stockDisponible > 0 ? 'En stock' : 'Rupture'}
+                </span>
+              </div>
+
+              <dl className="mt-2 text-sm">
+                <Ligne label="Format carton">{produit.formatCarton}</Ligne>
+                <Ligne label="Stock disponible">{produit.stockDisponible} carton(s)</Ligne>
                 {produit.cartonsParPalette && (
                   <>
-                    <div className="flex gap-2">
-                      <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Cartons par palette</dt>
-                      <dd>{produit.cartonsParPalette}</dd>
-                    </div>
-                    <div className="flex gap-2">
-                      <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Prix palette</dt>
-                      <dd>
-                        {produit.prixPalette} € HT
-                        <span className="text-[#888888]"> ({produit.cartonsParPalette} cartons)</span>
-                      </dd>
-                    </div>
-                    <div className="flex gap-2">
-                      <dt className="w-32 shrink-0 text-[#888888] sm:w-40">Remises volume</dt>
-                      <dd className="text-[#F5A623]">
-                        <span className="font-bold">−5%</span> dès 5 palettes ·{' '}
-                        <span className="font-bold">−10%</span> dès 10 palettes
-                      </dd>
-                    </div>
+                    <Ligne label="Cartons par palette">{produit.cartonsParPalette}</Ligne>
+                    <Ligne label="Prix palette">
+                      {produit.prixPalette} € HT
+                      <span className="text-brume"> ({produit.cartonsParPalette} cartons)</span>
+                    </Ligne>
+                    <Ligne label="Remises volume">
+                      <span className="font-medium">−5 %</span> dès 5 palettes ·{' '}
+                      <span className="font-medium">−10 %</span> dès 10 palettes
+                    </Ligne>
                   </>
                 )}
               </dl>
 
               {produit.description && (
-                <p className="mt-6 leading-relaxed text-[#222222]">{produit.description}</p>
+                <p className="mt-8 max-w-prose leading-relaxed text-graphite">
+                  {produit.description}
+                </p>
               )}
 
               {produit.stockDisponible > 0 && (
-                <div className="mt-8 flex flex-wrap items-center gap-3">
+                <div className="mt-10 flex flex-wrap items-center gap-4">
                   <ChampQuantite
                     valeur={quantite}
                     onChanger={(n) => {
@@ -134,9 +143,14 @@ export default function FicheProduit() {
                       setAjoute(false)
                     }}
                   />
-                  <Button onClick={handleAjouter}>Ajouter au panier</Button>
+                  <Button variant="accent" onClick={handleAjouter}>
+                    Ajouter au panier
+                  </Button>
                   {ajoute && (
-                    <Link to="/panier" className="text-sm text-[#2ECC71] hover:underline">
+                    <Link
+                      to="/panier"
+                      className="text-sm text-menthe underline decoration-transparent underline-offset-4 transition-colors hover:decoration-menthe"
+                    >
                       ✓ Ajouté — voir le panier
                     </Link>
                   )}

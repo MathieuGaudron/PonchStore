@@ -11,11 +11,11 @@ const FILTRES = [
 ]
 
 const STATUT = {
-  EN_ATTENTE: { libelle: 'En attente', classe: 'bg-[#F5A623] text-[#111111]' },
-  EN_PREPARATION: { libelle: 'En préparation', classe: 'bg-[#F5A623] text-[#111111]' },
-  PRETE: { libelle: 'Prête', classe: 'bg-[#2ECC71] text-[#111111]' },
-  RECUPEREE: { libelle: 'Récupérée', classe: 'bg-[#2ECC71] text-[#111111]' },
-  ANNULEE: { libelle: 'Annulée', classe: 'bg-[#CC3333] text-white' },
+  EN_ATTENTE: { libelle: 'En attente', classe: 'bg-ambre text-encre' },
+  EN_PREPARATION: { libelle: 'En préparation', classe: 'bg-ambre text-encre' },
+  PRETE: { libelle: 'Prête', classe: 'bg-menthe text-encre' },
+  RECUPEREE: { libelle: 'Récupérée', classe: 'bg-menthe text-encre' },
+  ANNULEE: { libelle: 'Annulée', classe: 'bg-cinabre text-white' },
 }
 
 const ANNULABLES = ['EN_ATTENTE', 'EN_PREPARATION']
@@ -59,7 +59,7 @@ export default function MesCommandes() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         {FILTRES.map((f) => (
           <Button
             key={f.cle}
@@ -72,42 +72,43 @@ export default function MesCommandes() {
         ))}
       </div>
 
-      {chargement && <p className="text-[#888888]">Chargement…</p>}
+      {chargement && <p className="text-sm text-brume">Chargement…</p>}
       {!chargement && commandes.length === 0 && (
-        <p className="text-[#888888]">Aucune commande.</p>
+        <p className="text-sm text-brume">Aucune commande.</p>
       )}
 
-      <div className="space-y-3">
+      {/* Liste continue séparée par des filets plutôt qu'une pile de cartes. */}
+      <div className="border-t border-encre">
         {commandes.map((c) => {
           const statut = STATUT[c.statut]
           return (
-            <div
-              key={c.id}
-              className="rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            <div key={c.id} className="border-b border-trait bg-white px-4 py-5">
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <div>
-                  <p className="font-bold text-[#222222]">Commande n°{c.id}</p>
-                  <p className="text-xs text-[#888888]">
+                  <p className="font-display text-xl text-graphite">Commande n°{c.id}</p>
+                  <p className="mt-1 text-xs text-brume">
                     {dateLisible(c.dateCommande)} · {c.lignes.length} article(s)
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className={`rounded-full px-3 py-1 text-xs ${statut.classe}`}>
-                    {statut.libelle}
+                  <span className={`surtitre px-2 py-1 ${statut.classe}`}>{statut.libelle}</span>
+                  <span className="font-display text-xl text-graphite">
+                    {c.montantTotal} <span className="text-sm text-brume">€ HT</span>
                   </span>
-                  <span className="font-bold text-[#F5A623]">{c.montantTotal} € HT</span>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-4 border-t border-[#E8E8E8] pt-3">
-                <Link to={`/commande/${c.id}`} className="text-sm text-[#F5A623] hover:underline">
+              <div className="mt-4 flex flex-wrap items-center gap-5">
+                <Link
+                  to={`/commande/${c.id}`}
+                  className="text-sm text-graphite underline decoration-trait-fonce underline-offset-4 transition-colors hover:decoration-encre"
+                >
                   Voir le détail →
                 </Link>
                 {ANNULABLES.includes(c.statut) && (
                   <button
                     onClick={() => annuler(c.id)}
-                    className="text-sm text-[#CC3333] hover:underline"
+                    className="text-sm text-cinabre underline decoration-transparent underline-offset-4 transition-colors hover:decoration-cinabre"
                   >
                     Annuler
                   </button>

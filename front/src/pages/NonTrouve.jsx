@@ -6,31 +6,36 @@ export default function NonTrouve() {
   const connecte = token !== null
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#111111] px-4 text-center">
-      <p className="text-6xl font-bold text-[#F5A623]">404</p>
+    <div className="flex min-h-screen flex-col justify-center bg-encre px-6 py-20 sm:px-12">
+      <div className="mx-auto w-full max-w-3xl">
+        <p className="surtitre text-brume">Erreur 404</p>
 
-      <h1 className="mt-4 text-2xl font-bold text-white">Cette page n'existe pas</h1>
+        <h1 className="titre-affiche mt-8 font-display text-6xl leading-[0.95] text-ambre-clair md:text-8xl">
+          Cette page n'existe pas
+        </h1>
 
-      <p className="mt-2 max-w-md text-sm text-[#888888]">
-        Le lien est peut-être erroné ou la page a été déplacée.
-      </p>
+        <p className="mt-10 max-w-md text-sm leading-relaxed text-brume">
+          Le lien est peut-être erroné, ou la page a été déplacée.
+        </p>
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          to={connecte ? '/catalogue' : '/'}
-          className="rounded bg-[#F5A623] px-5 py-2 font-bold text-[#111111]"
-        >
-          {connecte ? 'Retour au catalogue' : "Retour à l'accueil"}
-        </Link>
-
-        {!connecte && (
+        <div className="mt-8 flex flex-wrap items-baseline gap-8">
           <Link
-            to="/connexion"
-            className="rounded border border-[#F5A623] px-5 py-2 text-[#F5A623]"
+            to={connecte ? '/catalogue' : '/'}
+            className="inline-flex items-baseline gap-3 font-display text-xl text-ambre underline decoration-1 underline-offset-8 transition-colors hover:text-ambre-clair"
           >
-            Se connecter
+            {connecte ? 'Retour au catalogue' : "Retour à l'accueil"}
+            <span aria-hidden="true">→</span>
           </Link>
-        )}
+
+          {!connecte && (
+            <Link
+              to="/connexion"
+              className="text-sm text-brume underline decoration-ardoise underline-offset-4 transition-colors hover:text-white"
+            >
+              Se connecter
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   )

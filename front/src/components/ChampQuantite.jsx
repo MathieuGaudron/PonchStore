@@ -37,10 +37,11 @@ export default function ChampQuantite({ valeur, onChanger, onMin }) {
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="inline-flex items-center border border-trait-fonce bg-white">
       <button
         onClick={diminuer}
-        className="flex h-7 w-7 items-center justify-center rounded border border-[#888888] bg-white text-[#222222] hover:bg-[#F2F2F2]"
+        aria-label="Diminuer la quantité"
+        className="flex h-9 w-9 items-center justify-center text-graphite transition-colors hover:bg-papier-fonce"
       >
         −
       </button>
@@ -51,11 +52,12 @@ export default function ChampQuantite({ valeur, onChanger, onMin }) {
         onFocus={(e) => e.target.select()}
         onChange={(e) => changer(e.target.value)}
         onBlur={normaliser}
-        className="h-7 w-14 rounded border border-[#888888] bg-white text-center text-sm font-bold"
+        className="h-9 w-12 border-x border-trait-fonce bg-white text-center text-sm font-medium focus:outline-none"
       />
       <button
         onClick={augmenter}
-        className="flex h-7 w-7 items-center justify-center rounded border border-[#888888] bg-white text-[#222222] hover:bg-[#F2F2F2]"
+        aria-label="Augmenter la quantité"
+        className="flex h-9 w-9 items-center justify-center text-graphite transition-colors hover:bg-papier-fonce"
       >
         +
       </button>

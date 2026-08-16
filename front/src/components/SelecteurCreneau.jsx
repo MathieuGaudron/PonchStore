@@ -51,7 +51,7 @@ export default function SelecteurCreneau({ creneauChoisi, onChoisir }) {
             <Button
               key={c.id}
               size="sm"
-              variant={creneauChoisi?.id === c.id ? 'primary' : 'outline'}
+              variant={creneauChoisi?.id === c.id ? 'accent' : 'outline'}
               onClick={() => onChoisir(c)}
             >
               {heure(c.heureDebut)}
@@ -61,7 +61,7 @@ export default function SelecteurCreneau({ creneauChoisi, onChoisir }) {
               key={c.id}
               disabled
               title="Complet"
-              className="flex h-8 cursor-not-allowed items-center justify-center rounded border border-[#E8E8E8] text-xs text-[#BBBBBB] line-through"
+              className="flex h-9 cursor-not-allowed items-center justify-center border border-trait text-xs text-brume-clair line-through"
             >
               {heure(c.heureDebut)}
             </button>
@@ -74,7 +74,7 @@ export default function SelecteurCreneau({ creneauChoisi, onChoisir }) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-sm text-[#888888]">1. Choisis un jour</p>
+        <p className="surtitre mb-3 text-brume">I — Choisissez un jour</p>
         <Calendar
           mode="single"
           showOutsideDays={false}
@@ -86,27 +86,28 @@ export default function SelecteurCreneau({ creneauChoisi, onChoisir }) {
       </div>
 
       <div>
-        <p className="mb-2 text-sm text-[#888888]">2. Choisis une heure d'arrivée</p>
-        {!jourSelectionne && <p className="text-[#888888]">Sélectionne d'abord un jour.</p>}
+        <p className="surtitre mb-3 text-brume">II — Choisissez une heure d'arrivée</p>
+        {!jourSelectionne && <p className="text-sm text-brume">Sélectionnez d'abord un jour.</p>}
 
         {matin.length > 0 && (
-          <div className="mb-4">
-            <p className="mb-2 text-xs font-bold uppercase text-[#888888]">Matin · 9h–12h</p>
+          <div className="mb-5">
+            <p className="surtitre mb-3 text-brume">Matin · 9h–12h</p>
             {grilleSlots(matin)}
           </div>
         )}
 
         {apresMidi.length > 0 && (
           <div>
-            <p className="mb-2 text-xs font-bold uppercase text-[#888888]">Après-midi · 14h–18h</p>
+            <p className="surtitre mb-3 text-brume">Après-midi · 14h–18h</p>
             {grilleSlots(apresMidi)}
           </div>
         )}
 
         {creneauChoisi && (
-          <p className="mt-3 text-sm text-[#222222]">
-            Retrait à <span className="font-bold">{heure(creneauChoisi.heureDebut)}</span> (créneau de
-            20 min)
+          <p className="filet mt-5 pt-4 text-sm text-graphite">
+            Retrait à{' '}
+            <span className="font-display text-lg">{heure(creneauChoisi.heureDebut)}</span>{' '}
+            <span className="text-brume">(créneau de 20 min)</span>
           </p>
         )}
       </div>

@@ -6,9 +6,10 @@ export default function BoutonRetour() {
   return (
     <button
       onClick={() => navigate(-1)}
-      className="mb-4 text-sm text-[#888888] hover:text-[#F5A623]"
+      className="mb-6 inline-flex items-baseline gap-2 text-sm text-brume transition-colors hover:text-encre"
     >
-      ← Retour
+      <span aria-hidden="true">←</span>
+      Retour
     </button>
   )
 }

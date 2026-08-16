@@ -25,9 +25,9 @@ const ROLES = [
 ]
 
 const BADGES_ROLE = {
-  ADMIN: 'bg-[#F5A623] text-[#111111]',
-  STAFF: 'bg-[#F7C948] text-[#111111]',
-  CLIENT_PRO: 'bg-[#F2F2F2] text-[#222222]',
+  ADMIN: 'bg-ambre text-encre',
+  STAFF: 'bg-ambre-clair text-encre',
+  CLIENT_PRO: 'bg-papier-fonce text-graphite',
 }
 
 function formaterDate(valeur) {
@@ -113,7 +113,7 @@ export default function GestionUtilisateurs() {
   function champ(name, label, type = 'text', required = false) {
     return (
       <div>
-        <label className="mb-1 block text-xs text-[#888888]">
+        <label className="etiquette">
           {label}
           {required && ' *'}
         </label>
@@ -123,28 +123,30 @@ export default function GestionUtilisateurs() {
           value={form[name]}
           onChange={handleChange}
           required={required}
-          className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+          className="champ"
         />
-        {errors?.[name] && <span className="text-xs text-[#CC3333]">{errors[name]}</span>}
+        {errors?.[name] && <span className="text-xs text-cinabre">{errors[name]}</span>}
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-[#222222]">Gestion des utilisateurs</h1>
+
+        <p className="surtitre text-brume">Administration</p>
+        <div className="mb-10 mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h1 className="font-display text-4xl text-graphite md:text-5xl">Gestion des utilisateurs</h1>
           <Button onClick={() => setFormulaireOuvert((o) => !o)}>
             {formulaireOuvert ? 'Fermer' : '+ Nouvel utilisateur'}
           </Button>
         </div>
 
         {succes && (
-          <div className="fixed right-4 top-16 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg sm:right-6 sm:top-6">
+          <div className="fixed right-4 top-16 z-50 bg-menthe px-4 py-2 text-sm font-medium text-encre sm:right-6 sm:top-6">
             {succes}
           </div>
         )}
@@ -152,11 +154,11 @@ export default function GestionUtilisateurs() {
         {formulaireOuvert && (
         <form
           onSubmit={handleSubmit}
-          className="mb-8 max-w-3xl rounded bg-white p-6 shadow-[0_1px_4px_#E8E8E8]"
+          className="mb-10 max-w-3xl border border-trait bg-white p-6"
         >
-          <h2 className="mb-3 font-bold text-[#222222]">Nouvel utilisateur</h2>
+          <h2 className="mb-5 font-display text-2xl text-graphite">Nouvel utilisateur</h2>
 
-          {erreur && <p className="mb-3 text-sm text-[#CC3333]">{erreur}</p>}
+          {erreur && <p className="mb-3 text-sm text-cinabre">{erreur}</p>}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {champ('prenom', 'Prénom', 'text', true)}
@@ -164,12 +166,12 @@ export default function GestionUtilisateurs() {
             {champ('email', 'Email', 'email', true)}
             {champ('password', 'Mot de passe (8 car. min.)', 'password', true)}
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Rôle *</label>
+              <label className="etiquette">Rôle *</label>
               <select
                 name="role"
                 value={form.role}
                 onChange={handleChange}
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+                className="champ"
               >
                 {ROLES.map((role) => (
                   <option key={role.value} value={role.value}>
@@ -180,8 +182,8 @@ export default function GestionUtilisateurs() {
             </div>
           </div>
 
-          <h2 className="mb-3 mt-6 font-bold text-[#222222]">
-            Établissement <span className="text-xs font-normal text-[#888888]">(optionnel)</span>
+          <h2 className="mb-3 mt-6 font-display text-2xl text-graphite">
+            Établissement <span className="text-xs font-normal text-brume">(optionnel)</span>
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {champ('telephone', 'Téléphone')}
@@ -198,7 +200,7 @@ export default function GestionUtilisateurs() {
         </form>
         )}
 
-        <h2 className="mb-4 font-bold text-[#222222]">Comptes existants ({utilisateurs.length})</h2>
+        <h2 className="mb-4 font-display text-2xl text-graphite">Comptes existants ({utilisateurs.length})</h2>
 
         <Tableau
           colonnes={[
@@ -213,40 +215,40 @@ export default function GestionUtilisateurs() {
           ]}
         >
           {utilisateurs.map((u) => (
-            <tr key={u.id} className="border-b border-[#E8E8E8]">
-              <td className="px-2 py-2 text-[#222222]">
+            <tr key={u.id} className="border-b border-trait">
+              <td className="px-3 py-3 text-graphite">
                 {u.prenom} {u.nom}
-                {u.id === connecte?.id && <span className="ml-1 text-xs text-[#888888]">(vous)</span>}
+                {u.id === connecte?.id && <span className="ml-1 text-xs text-brume">(vous)</span>}
               </td>
-              <td className="px-2 py-2 text-[#888888]">{u.email}</td>
-              <td className="px-2 py-2 text-[#888888]">{u.telephone || '—'}</td>
-              <td className="px-2 py-2 text-[#888888]">{u.nomEtablissement || '—'}</td>
-              <td className="px-2 py-2 text-center">
-                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGES_ROLE[u.role] ?? ''}`}>
+              <td className="px-3 py-3 text-brume">{u.email}</td>
+              <td className="px-3 py-3 text-brume">{u.telephone || '—'}</td>
+              <td className="px-3 py-3 text-brume">{u.nomEtablissement || '—'}</td>
+              <td className="px-3 py-3 text-center">
+                <span className={`surtitre px-2 py-1 ${BADGES_ROLE[u.role] ?? ''}`}>
                   {u.role}
                 </span>
               </td>
-              <td className="px-2 py-2 text-[#888888]">{formaterDate(u.dateInscription)}</td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-3 py-3 text-brume">{formaterDate(u.dateInscription)}</td>
+              <td className="px-3 py-3 text-center">
                 {u.actif ? (
-                  <span className="text-[#2ECC71]">oui</span>
+                  <span className="text-menthe">oui</span>
                 ) : (
-                  <span className="font-bold text-[#CC3333]">non</span>
+                  <span className="font-medium text-cinabre">non</span>
                 )}
               </td>
-              <td className="px-2 py-2 text-right">
+              <td className="px-3 py-3 text-right">
                 {u.id !== connecte?.id &&
                   (u.actif ? (
                     <button
                       onClick={() => changerActif(u, false)}
-                      className="text-[#CC3333] hover:underline"
+                      className="text-cinabre hover:underline"
                     >
                       Désactiver
                     </button>
                   ) : (
                     <button
                       onClick={() => changerActif(u, true)}
-                      className="text-[#2ECC71] hover:underline"
+                      className="text-menthe hover:underline"
                     >
                       Réactiver
                     </button>

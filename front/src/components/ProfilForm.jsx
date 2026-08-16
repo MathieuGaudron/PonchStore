@@ -91,10 +91,10 @@ export default function ProfilForm() {
 
   if (!modeEdition) {
     return (
-      <div className="max-w-lg space-y-4">
-        {message && <p className="text-sm text-[#2ECC71]">{message}</p>}
+      <div className="max-w-lg space-y-8">
+        {message && <p className="text-sm text-menthe">{message}</p>}
 
-        <dl className="space-y-2 text-sm">
+        <dl className="border-t border-encre text-sm">
           <Ligne label="Prénom" valeur={reference.prenom} />
           <Ligne label="Nom" valeur={reference.nom} />
           <Ligne label="Email" valeur={reference.email} />
@@ -113,8 +113,8 @@ export default function ProfilForm() {
   const estClientPro = role === 'CLIENT_PRO'
 
   return (
-    <form onSubmit={enregistrer} className="max-w-lg space-y-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <form onSubmit={enregistrer} className="max-w-lg space-y-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Champ label="Prénom" valeur={form.prenom} onChange={(v) => maj('prenom', v)} obligatoire />
         <Champ label="Nom" valeur={form.nom} onChange={(v) => maj('nom', v)} obligatoire />
       </div>
@@ -134,7 +134,7 @@ export default function ProfilForm() {
       />
 
       <div>
-        <label className="mb-1 block text-xs text-[#888888]">
+        <label className="etiquette">
           Adresse de l'établissement{estClientPro && ' *'}
         </label>
         <textarea
@@ -142,7 +142,7 @@ export default function ProfilForm() {
           onChange={(e) => maj('adresseEtablissement', e.target.value)}
           rows="2"
           required={estClientPro}
-          className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+          className="champ"
         />
       </div>
 
@@ -153,7 +153,7 @@ export default function ProfilForm() {
         obligatoire={estClientPro}
       />
 
-      {erreur && <p className="text-sm text-[#CC3333]">{erreur}</p>}
+      {erreur && <p className="text-sm text-cinabre">{erreur}</p>}
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={envoi}>
@@ -169,9 +169,9 @@ export default function ProfilForm() {
 
 function Ligne({ label, valeur }) {
   return (
-    <div className="flex gap-2">
-      <dt className="w-40 text-[#888888]">{label}</dt>
-      <dd className="text-[#222222]">{valeur || '—'}</dd>
+    <div className="flex gap-4 border-b border-trait py-3">
+      <dt className="surtitre w-44 shrink-0 pt-0.5 text-brume">{label}</dt>
+      <dd className="text-graphite">{valeur || '—'}</dd>
     </div>
   )
 }
@@ -179,7 +179,7 @@ function Ligne({ label, valeur }) {
 function Champ({ label, valeur, onChange, type = 'text', obligatoire = false }) {
   return (
     <div>
-      <label className="mb-1 block text-xs text-[#888888]">
+      <label className="etiquette">
         {label}
         {obligatoire && ' *'}
       </label>
@@ -188,7 +188,7 @@ function Champ({ label, valeur, onChange, type = 'text', obligatoire = false }) 
         value={valeur}
         onChange={(e) => onChange(e.target.value)}
         required={obligatoire}
-        className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+        className="champ"
       />
     </div>
   )

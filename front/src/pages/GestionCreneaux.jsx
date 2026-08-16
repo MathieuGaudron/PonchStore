@@ -164,22 +164,24 @@ export default function GestionCreneaux() {
   function champ(label, contenu) {
     return (
       <div>
-        <label className="mb-1 block text-xs text-[#888888]">{label}</label>
+        <label className="etiquette">{label}</label>
         {contenu}
       </div>
     )
   }
 
-  const classeInput = 'w-full rounded border border-[#888888] bg-white px-2 py-1.5 text-sm'
+  const classeInput = 'champ'
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-[#222222]">Gestion des créneaux de retrait</h1>
+
+        <p className="surtitre text-brume">Exploitation</p>
+        <div className="mb-10 mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h1 className="font-display text-4xl text-graphite md:text-5xl">Gestion des créneaux de retrait</h1>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => ouvrirFormulaire('generation')}>
               {formulaire === 'generation' ? 'Fermer' : 'Générer des créneaux'}
@@ -191,7 +193,7 @@ export default function GestionCreneaux() {
         </div>
 
         {succes && (
-          <div className="fixed right-4 top-16 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg sm:right-6 sm:top-6">
+          <div className="fixed right-4 top-16 z-50 bg-menthe px-4 py-2 text-sm font-medium text-encre sm:right-6 sm:top-6">
             {succes}
           </div>
         )}
@@ -199,11 +201,11 @@ export default function GestionCreneaux() {
         {formulaire === 'creation' && (
           <form
             onSubmit={handleCreation}
-            className="mb-8 max-w-3xl rounded bg-white p-6 shadow-[0_1px_4px_#E8E8E8]"
+            className="mb-10 max-w-3xl border border-trait bg-white p-6"
           >
-            <h2 className="mb-3 font-bold text-[#222222]">Nouveau créneau</h2>
+            <h2 className="mb-5 font-display text-2xl text-graphite">Nouveau créneau</h2>
 
-            {erreur && <p className="mb-3 text-sm text-[#CC3333]">{erreur}</p>}
+            {erreur && <p className="mb-3 text-sm text-cinabre">{erreur}</p>}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
               {champ(
@@ -260,15 +262,15 @@ export default function GestionCreneaux() {
         {formulaire === 'generation' && (
           <form
             onSubmit={handleGeneration}
-            className="mb-8 max-w-3xl rounded bg-white p-6 shadow-[0_1px_4px_#E8E8E8]"
+            className="mb-10 max-w-3xl border border-trait bg-white p-6"
           >
-            <h2 className="mb-1 font-bold text-[#222222]">Générer des créneaux</h2>
-            <p className="mb-3 text-xs text-[#888888]">
+            <h2 className="mb-1 font-display text-2xl text-graphite">Générer des créneaux</h2>
+            <p className="mb-3 text-xs text-brume">
               Crée automatiquement tous les créneaux de la plage choisie. Les créneaux déjà existants
               sont ignorés.
             </p>
 
-            {erreur && <p className="mb-3 text-sm text-[#CC3333]">{erreur}</p>}
+            {erreur && <p className="mb-3 text-sm text-cinabre">{erreur}</p>}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {champ(
@@ -335,7 +337,7 @@ export default function GestionCreneaux() {
               )}
             </div>
 
-            <label className="mt-4 flex items-center gap-2 text-sm text-[#222222]">
+            <label className="mt-4 flex items-center gap-2 text-sm text-graphite">
               <input
                 type="checkbox"
                 checked={formGeneration.inclureWeekend}
@@ -355,13 +357,13 @@ export default function GestionCreneaux() {
         )}
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-bold text-[#222222]">
+          <h2 className="font-display text-2xl text-graphite">
             Créneaux à venir ({creneauxAffiches.length})
           </h2>
           <select
             value={jourFiltre}
             onChange={(e) => setJourFiltre(e.target.value)}
-            className="rounded border border-[#888888] bg-white px-2 py-1.5 text-sm"
+            className="champ w-auto"
           >
             <option value="">Toutes les dates</option>
             {jours.map((jour) => (
@@ -383,26 +385,26 @@ export default function GestionCreneaux() {
           ]}
         >
           {creneauxAffiches.map((c) => (
-            <tr key={c.id} className="border-b border-[#E8E8E8]">
-              <td className="px-2 py-2 text-[#222222]">{formaterDate(c.date)}</td>
-              <td className="px-2 py-2 text-[#222222]">
+            <tr key={c.id} className="border-b border-trait">
+              <td className="px-3 py-3 text-graphite">{formaterDate(c.date)}</td>
+              <td className="px-3 py-3 text-graphite">
                 {heure(c.heureDebut)} – {heure(c.heureFin)}
               </td>
-              <td className="px-2 py-2 text-center text-[#888888]">
+              <td className="px-3 py-3 text-center text-brume">
                 {c.nbReservations} / {c.capaciteMax}
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-3 py-3 text-center">
                 {c.disponible ? (
-                  <span className="rounded-full bg-[#2ECC71] px-2 py-0.5 text-xs font-bold text-[#111111]">
+                  <span className="surtitre bg-menthe px-2 py-1 text-encre">
                     Disponible
                   </span>
                 ) : (
-                  <span className="rounded-full bg-[#E67E22] px-2 py-0.5 text-xs font-bold text-white">
+                  <span className="surtitre bg-cuivre px-2 py-1 text-white">
                     Complet
                   </span>
                 )}
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-3 py-3 text-center">
                 {estAdmin ? (
                   <span className="inline-flex items-center gap-1">
                     <input
@@ -412,13 +414,13 @@ export default function GestionCreneaux() {
                       onChange={(e) =>
                         setCapacites((prev) => ({ ...prev, [c.id]: e.target.value }))
                       }
-                      className="w-16 rounded border border-[#E8E8E8] bg-white px-2 py-1 text-center text-sm"
+                      className="champ w-16 text-center"
                     />
                     {capacites[c.id] !== undefined &&
                       Number(capacites[c.id]) !== c.capaciteMax && (
                         <button
                           onClick={() => enregistrerCapacite(c)}
-                          className="font-bold text-[#F5A623] hover:underline"
+                          className="text-graphite underline decoration-trait-fonce underline-offset-4 transition-colors hover:decoration-encre"
                         >
                           OK
                         </button>
@@ -428,16 +430,16 @@ export default function GestionCreneaux() {
                   c.capaciteMax
                 )}
               </td>
-              <td className="px-2 py-2 text-right">
+              <td className="px-3 py-3 text-right">
                 {estAdmin ? (
                   <button
                     onClick={() => supprimer(c)}
-                    className="text-[#CC3333] hover:underline"
+                    className="text-cinabre hover:underline"
                   >
                     Supprimer
                   </button>
                 ) : (
-                  <span className="text-[#888888]">—</span>
+                  <span className="text-brume">—</span>
                 )}
               </td>
             </tr>
@@ -445,7 +447,7 @@ export default function GestionCreneaux() {
         </Tableau>
 
         {creneauxAffiches.length === 0 && (
-          <p className="mt-4 text-sm text-[#888888]">
+          <p className="mt-4 text-sm text-brume">
             Aucun créneau à venir — utilise « Générer des créneaux » pour ouvrir des plages de
             retrait.
           </p>

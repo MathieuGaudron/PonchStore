@@ -11,9 +11,9 @@ const TYPES_MOUVEMENT = [
 ]
 
 const BADGES_TYPE = {
-  ENTREE: { libelle: 'Entrée', classes: 'bg-[#2ECC71] text-[#111111]' },
-  SORTIE_AJUSTEMENT: { libelle: 'Sortie ajustement', classes: 'bg-[#E67E22] text-white' },
-  SORTIE_COMMANDE: { libelle: 'Sortie commande', classes: 'bg-[#1C1C1C] text-white' },
+  ENTREE: { libelle: 'Entrée', classes: 'bg-menthe text-encre' },
+  SORTIE_AJUSTEMENT: { libelle: 'Sortie ajustement', classes: 'bg-cuivre text-white' },
+  SORTIE_COMMANDE: { libelle: 'Sortie commande', classes: 'bg-encre-clair text-white' },
 }
 
 const FORM_VIDE = {
@@ -92,36 +92,38 @@ export default function GestionStock() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="min-h-screen bg-papier">
       <Navbar />
 
-      <main className="p-4 sm:p-8">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <BoutonRetour />
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-[#222222]">Gestion du stock</h1>
+
+        <p className="surtitre text-brume">Exploitation</p>
+        <div className="mb-10 mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h1 className="font-display text-4xl text-graphite md:text-5xl">Gestion du stock</h1>
           <Button onClick={() => setFormulaireOuvert((o) => !o)}>
             {formulaireOuvert ? 'Fermer' : '+ Nouveau mouvement'}
           </Button>
         </div>
 
         {succes && (
-          <div className="fixed right-4 top-16 z-50 rounded bg-[#2ECC71] px-4 py-2 text-sm font-bold text-[#111111] shadow-lg sm:right-6 sm:top-6">
+          <div className="fixed right-4 top-16 z-50 bg-menthe px-4 py-2 text-sm font-medium text-encre sm:right-6 sm:top-6">
             {succes}
           </div>
         )}
 
         {formulaireOuvert && (
-        <form onSubmit={soumettre} className="mb-8 max-w-3xl rounded bg-white p-4 shadow-[0_1px_4px_#E8E8E8]">
-          <h2 className="mb-3 font-bold text-[#222222]">Nouveau mouvement</h2>
+        <form onSubmit={soumettre} className="mb-10 max-w-3xl border border-trait bg-white p-6">
+          <h2 className="mb-5 font-display text-2xl text-graphite">Nouveau mouvement</h2>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Produit</label>
+              <label className="etiquette">Produit</label>
               <select
                 value={form.produitId}
                 onChange={(e) => maj('produitId', e.target.value)}
                 required
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                className="champ"
               >
                 <option value="">— choisir —</option>
                 {produits.map((p) => (
@@ -132,18 +134,18 @@ export default function GestionStock() {
                 ))}
               </select>
               {produitChoisi && (
-                <p className="mt-1 text-xs text-[#888888]">
-                  Stock actuel : <span className="font-bold text-[#222222]">{produitChoisi.stockDisponible}</span> carton(s)
+                <p className="mt-1 text-xs text-brume">
+                  Stock actuel : <span className="font-medium text-graphite">{produitChoisi.stockDisponible}</span> carton(s)
                 </p>
               )}
             </div>
 
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Type de mouvement</label>
+              <label className="etiquette">Type de mouvement</label>
               <select
                 value={form.type}
                 onChange={(e) => maj('type', e.target.value)}
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                className="champ"
               >
                 {TYPES_MOUVEMENT.map((t) => (
                   <option key={t.cle} value={t.cle}>
@@ -154,30 +156,30 @@ export default function GestionStock() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Quantité (cartons)</label>
+              <label className="etiquette">Quantité (cartons)</label>
               <input
                 type="number"
                 min="1"
                 value={form.quantite}
                 onChange={(e) => maj('quantite', e.target.value)}
                 required
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                className="champ"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs text-[#888888]">Commentaire (optionnel)</label>
+              <label className="etiquette">Commentaire (optionnel)</label>
               <input
                 type="text"
                 value={form.commentaire}
                 onChange={(e) => maj('commentaire', e.target.value)}
                 placeholder="ex : casse lors de la réception"
-                className="w-full rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+                className="champ"
               />
             </div>
           </div>
 
-          {erreur && <p className="mt-3 text-sm text-[#CC3333]">{erreur}</p>}
+          {erreur && <p className="mt-3 text-sm text-cinabre">{erreur}</p>}
 
           <div className="mt-4">
             <Button type="submit">Enregistrer le mouvement</Button>
@@ -186,11 +188,11 @@ export default function GestionStock() {
         )}
 
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          <h2 className="font-bold text-[#222222]">Historique des mouvements</h2>
+          <h2 className="font-display text-2xl text-graphite">Historique des mouvements</h2>
           <select
             value={filtreProduit}
             onChange={(e) => setFiltreProduit(e.target.value)}
-            className="rounded border border-[#888888] bg-white px-2 py-1 text-sm"
+            className="champ w-auto"
           >
             <option value="">Tous les produits</option>
             {produits.map((p) => (
@@ -212,37 +214,37 @@ export default function GestionStock() {
           ]}
         >
           {mouvements.map((m) => {
-            const badge = BADGES_TYPE[m.typeMouvement] ?? { libelle: m.typeMouvement, classes: 'bg-[#F2F2F2] text-[#222222]' }
+            const badge = BADGES_TYPE[m.typeMouvement] ?? { libelle: m.typeMouvement, classes: 'bg-papier-fonce text-graphite' }
             const estEntree = m.typeMouvement === 'ENTREE'
             return (
-              <tr key={m.id} className="border-b border-[#E8E8E8]">
-                <td className="px-2 py-2 text-[#888888]">{formaterDate(m.dateMouvement)}</td>
-                <td className="px-2 py-2 text-[#222222]">
+              <tr key={m.id} className="border-b border-trait">
+                <td className="px-3 py-3 text-brume">{formaterDate(m.dateMouvement)}</td>
+                <td className="px-3 py-3 text-graphite">
                   {m.produit?.nom}
-                  {m.produit?.marque && <span className="text-[#888888]"> · {m.produit.marque}</span>}
+                  {m.produit?.marque && <span className="text-brume"> · {m.produit.marque}</span>}
                 </td>
-                <td className="px-2 py-2">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${badge.classes}`}>
+                <td className="px-3 py-3">
+                  <span className={`surtitre px-2 py-1 ${badge.classes}`}>
                     {badge.libelle}
                   </span>
                   {m.commandeId && (
-                    <span className="ml-2 text-xs text-[#888888]">Commande #{m.commandeId}</span>
+                    <span className="ml-2 text-xs text-brume">Commande #{m.commandeId}</span>
                   )}
                 </td>
-                <td className={`px-2 py-2 text-right font-bold ${estEntree ? 'text-[#2ECC71]' : 'text-[#CC3333]'}`}>
+                <td className={`px-3 py-3 text-right font-medium ${estEntree ? 'text-menthe' : 'text-cinabre'}`}>
                   {estEntree ? '+' : '−'}
                   {m.quantite}
                 </td>
-                <td className="px-2 py-2 text-[#888888]">
+                <td className="px-3 py-3 text-brume">
                   {m.utilisateur ? `${m.utilisateur.prenom} ${m.utilisateur.nom}` : '—'}
                 </td>
-                <td className="px-2 py-2 text-[#888888]">{m.commentaire || '—'}</td>
+                <td className="px-3 py-3 text-brume">{m.commentaire || '—'}</td>
               </tr>
             )
           })}
           {mouvements.length === 0 && (
             <tr>
-              <td colSpan="6" className="py-4 text-center text-[#888888]">
+              <td colSpan="6" className="py-4 text-center text-brume">
                 Aucun mouvement de stock.
               </td>
             </tr>

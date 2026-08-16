@@ -1,11 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
+import LiensLegaux from './LiensLegaux'
 
-/*
- * Gabarit des pages légales : même en-tête et même pied que la page d'accueil,
- * avec une colonne de lecture étroite. Destiné à accueillir aussi les CGV et la
- * politique de confidentialité.
- */
 export default function CadreLegal({ surtitre, titre, miseAJour, children }) {
   const { token } = useAuth()
   const connecte = token !== null
@@ -47,14 +43,13 @@ export default function CadreLegal({ surtitre, titre, miseAJour, children }) {
       <footer className="bg-encre px-5 py-8">
         <div className="mx-auto flex max-w-3xl flex-col gap-3 text-xs text-brume sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Ponch'Store</span>
-          <span>L'abus d'alcool est dangereux pour la santé, à consommer avec modération.</span>
+          <LiensLegaux />
         </div>
       </footer>
     </div>
   )
 }
 
-/* Section d'un document légal : un titre en serif, un filet, du texte. */
 export function SectionLegale({ titre, children }) {
   return (
     <section className="border-b border-trait py-8">
@@ -64,10 +59,7 @@ export function SectionLegale({ titre, children }) {
   )
 }
 
-/*
- * Emplacement à renseigner. Volontairement visible : tant qu'il reste un
- * marqueur rouge sur la page, le document n'est pas publiable.
- */
+
 export function ARemplir({ children }) {
   return (
     <span className="border-b border-dashed border-cinabre font-medium text-cinabre">
@@ -76,7 +68,6 @@ export function ARemplir({ children }) {
   )
 }
 
-/* Ligne d'un bloc d'identification : intitulé à gauche, valeur à droite. */
 export function LigneLegale({ label, children }) {
   return (
     <div className="flex flex-col gap-1 border-b border-trait py-2.5 sm:flex-row sm:gap-4">

@@ -4,6 +4,8 @@ import { PanierProvider } from './context/PanierContext'
 import RoutePrivee from './components/RoutePrivee'
 import Accueil from './pages/Accueil'
 import MentionsLegales from './pages/MentionsLegales'
+import ConditionsGenerales from './pages/ConditionsGenerales'
+import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite'
 import NonTrouve from './pages/NonTrouve'
 import Connexion from './pages/Connexion'
 import MotDePasseOublie from './pages/MotDePasseOublie'
@@ -30,6 +32,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Accueil />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/conditions-generales" element={<ConditionsGenerales />} />
+            <Route
+              path="/politique-de-confidentialite"
+              element={<PolitiqueConfidentialite />}
+            />
             <Route path="/connexion" element={<Connexion />} />
             <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
             <Route path="/reinitialisation" element={<Reinitialisation />} />

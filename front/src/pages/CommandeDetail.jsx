@@ -88,6 +88,7 @@ export default function CommandeDetail() {
                     <th className="surtitre py-3">Produit</th>
                     <th className="surtitre py-3 text-center">Quantité</th>
                     <th className="surtitre py-3 text-right">Prix carton</th>
+                    <th className="surtitre py-3 text-right">Montant</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -96,6 +97,7 @@ export default function CommandeDetail() {
                       <td className="py-3 text-graphite">{l.produit.nom}</td>
                       <td className="py-3 text-center text-graphite">{l.quantite}</td>
                       <td className="py-3 text-right text-graphite">{l.prixUnitaire} € HT</td>
+                      <td className="py-3 text-right text-graphite">{l.montantLigne} € HT</td>
                     </tr>
                   ))}
                 </tbody>

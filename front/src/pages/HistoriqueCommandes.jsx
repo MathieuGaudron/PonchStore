@@ -189,7 +189,7 @@ export default function HistoriqueCommandes() {
                                 )}
                               </span>
                               <span className="text-brume">
-                                × {l.quantite} — {l.prixUnitaire} € HT
+                                × {l.quantite} à {l.prixUnitaire} € — {l.montantLigne} € HT
                               </span>
                             </li>
                           ))}

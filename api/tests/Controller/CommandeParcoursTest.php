@@ -148,12 +148,46 @@ class CommandeParcoursTest extends ApiTestCase
         $produit = $this->creerProduit(stock: 200);
         $creneau = $this->creerCreneau();
 
-        // 150 cartons = 5 palettes de 30 : marge 1,22 au lieu de 1,28.
+        // 150 cartons = 5 palettes de 30 : marge 1,216 au lieu de 1,28, soit les
+        // -5 % annoncés sur la fiche produit. 100 x 1,216 x 150 = 18 240 €.
         $this->requete('POST', '/api/panier', ['produitId' => $produit->getId(), 'quantite' => 150], $token);
         $this->requete('POST', '/api/commandes', ['creneauId' => $creneau->getId()], $token);
 
         self::assertSame(Response::HTTP_CREATED, $this->statut());
-        self::assertSame('18300.00', $this->reponse()['montantTotal']);
+        self::assertSame('18240.00', $this->reponse()['montantTotal']);
+
+        // La ligne doit porter le prix remisé, pas le prix catalogue de 128 € :
+        // sinon la remise n'existe que dans le total et disparaît du détail.
+        $ligne = $this->reponse()['lignes'][0];
+        self::assertSame('121.60', $ligne['prixUnitaire']);
+        self::assertSame('18240.00', $ligne['montantLigne']);
+    }
+
+    public function testLeDetailDeCommandeRedonneExactementLeTotal(): void
+    {
+        $token = $this->tokenPour(RoleEnum::CLIENT_PRO);
+        $creneau = $this->creerCreneau();
+
+        // 149 cartons sont plafonnés au prix de 150 : le prix au carton facturé
+        // tombe alors sur un arrondi (122,42 €) qui ne redonne pas le montant de
+        // la ligne. C'est le cas qui impose de stocker le montant, pas de le
+        // recalculer à l'affichage.
+        $categorie = $this->creerCategorie();
+        $produit = $this->creerProduit(stock: 400, categorie: $categorie);
+        $autre = $this->creerProduit(stock: 400, categorie: $categorie);
+        $this->requete('POST', '/api/panier', ['produitId' => $produit->getId(), 'quantite' => 149], $token);
+        $this->requete('POST', '/api/panier', ['produitId' => $autre->getId(), 'quantite' => 40], $token);
+        $this->requete('POST', '/api/commandes', ['creneauId' => $creneau->getId()], $token);
+
+        self::assertSame(Response::HTTP_CREATED, $this->statut());
+        $reponse = $this->reponse();
+
+        $somme = 0.0;
+        foreach ($reponse['lignes'] as $ligne) {
+            $somme += (float) $ligne['montantLigne'];
+        }
+
+        self::assertSame((float) $reponse['montantTotal'], round($somme, 2));
     }
 
     private function rafraichir(Produit $produit): Produit

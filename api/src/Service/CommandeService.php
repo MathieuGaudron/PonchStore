@@ -66,13 +66,19 @@ class CommandeService
                     throw new \DomainException('Stock insuffisant pour ' . $produit->getNom() . '.');
                 }
 
+                // La commande fige le prix remisé, pas le prix catalogue : sinon le
+                // récapitulatif afficherait un prix au carton qui ne redonne pas le
+                // total facturé, et la remise disparaîtrait de l'historique.
+                $montantLigne = $this->panierService->montantLigne($produit, $quantite);
+
                 $ligne = new LigneCommande();
                 $ligne->setProduit($produit);
                 $ligne->setQuantite($quantite);
-                $ligne->setPrixUnitaire(number_format($produit->getPrixCarton(), 2, '.', ''));
+                $ligne->setPrixUnitaire(number_format($this->panierService->prixCartonFacture($produit, $quantite), 2, '.', ''));
+                $ligne->setMontantLigne(number_format($montantLigne, 2, '.', ''));
                 $commande->addLigne($ligne);
 
-                $montantTotal += $this->panierService->montantLigne($produit, $quantite);
+                $montantTotal += $montantLigne;
 
                 $produit->setStockDisponible($produit->getStockDisponible() - $quantite);
 

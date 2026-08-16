@@ -6,9 +6,16 @@ use App\Entity\Produit;
 
 class PanierService
 {
-    public const MARGE_5_A_9_PALETTES = 1.22;
-    public const MARGE_10_PALETTES_OU_PLUS = 1.18;
+    /*
+     * Les marges des paliers sont calées sur la remise annoncée au client :
+     * 1,28 x 0,95 pour -5 %, 1,28 x 0,90 pour -10 %. Toute modification de
+     * TAUX_MARGE_BASE impose de les recalculer, sans quoi la fiche produit
+     * annoncerait de nouveau une remise que le prix ne tient pas.
+     */
+    public const MARGE_5_A_9_PALETTES = 1.216;
+    public const MARGE_10_PALETTES_OU_PLUS = 1.152;
 
+    /* 15 % de marge nette minimum : le palier à 10 palettes n'en est qu'à 0,2 point. */
     public const MARGE_PLANCHER = 1.15;
 
     public const SEUIL_PALIER_INFERIEUR = 5;

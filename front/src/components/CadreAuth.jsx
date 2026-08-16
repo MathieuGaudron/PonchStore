@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import LiensLegaux from './LiensLegaux'
 
 /*
  * Écran d'authentification en deux volets : un panneau de marque sombre à
@@ -37,12 +37,9 @@ export default function CadreAuth({ surtitre, titre, children }) {
 
           <div className="mt-10">{children}</div>
 
-          <Link
-            to="/mentions-legales"
-            className="mt-12 inline-block text-xs text-brume underline decoration-trait-fonce underline-offset-4 transition-colors hover:text-encre"
-          >
-            Mentions légales
-          </Link>
+          <div className="mt-12 text-xs text-brume">
+            <LiensLegaux variante="claire" />
+          </div>
         </div>
       </main>
     </div>

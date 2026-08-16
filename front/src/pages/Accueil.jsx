@@ -137,6 +137,12 @@ export default function Accueil() {
       <footer className="bg-encre px-5 py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 text-xs text-brume sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Ponch'Store</span>
+          <Link
+            to="/mentions-legales"
+            className="underline decoration-ardoise underline-offset-4 transition-colors hover:text-white"
+          >
+            Mentions légales
+          </Link>
           <span>L'abus d'alcool est dangereux pour la santé, à consommer avec modération.</span>
         </div>
       </footer>

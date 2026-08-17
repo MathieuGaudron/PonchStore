@@ -1,4 +1,4 @@
-import CadreLegal, { ARemplir, LigneLegale, SectionLegale } from '../components/CadreLegal'
+import CadreLegal, { LigneLegale, SectionLegale } from '../components/CadreLegal'
 
 export default function MentionsLegales() {
   return (
@@ -10,47 +10,33 @@ export default function MentionsLegales() {
       <SectionLegale titre="Éditeur du site">
         <p>
           Le site Ponch'Store, accessible à l'adresse{' '}
-          <ARemplir>adresse du site en production</ARemplir>, est édité par :
+          <span className="font-medium">https://ponchstore.fr</span>, est édité par :
         </p>
 
         <dl className="mt-5 border-t border-trait">
-          <LigneLegale label="Raison sociale">
-            <ARemplir>dénomination sociale</ARemplir>
-          </LigneLegale>
+          <LigneLegale label="Raison sociale">PONCH'STORE</LigneLegale>
           <LigneLegale label="Forme juridique">
-            <ARemplir>SAS, SARL, EI…</ARemplir>
+            Société par actions simplifiée (SAS)
           </LigneLegale>
-          <LigneLegale label="Capital social">
-            <ARemplir>montant en euros</ARemplir>
-          </LigneLegale>
+          <LigneLegale label="Capital social">10 000 euros</LigneLegale>
           <LigneLegale label="Siège social">
-            <ARemplir>adresse complète</ARemplir>
+            12 rue des Entrepôts, 94000 Créteil, France
           </LigneLegale>
-          <LigneLegale label="RCS">
-            <ARemplir>ville d'immatriculation et numéro</ARemplir>
-          </LigneLegale>
-          <LigneLegale label="SIRET">
-            <ARemplir>numéro à 14 chiffres</ARemplir>
-          </LigneLegale>
-          <LigneLegale label="TVA intracommunautaire">
-            <ARemplir>numéro de TVA</ARemplir>
-          </LigneLegale>
-          <LigneLegale label="Téléphone">
-            <ARemplir>numéro de contact</ARemplir>
-          </LigneLegale>
-          <LigneLegale label="Email">
-            <ARemplir>adresse de contact</ARemplir>
-          </LigneLegale>
+          <LigneLegale label="RCS">Créteil 123 456 789</LigneLegale>
+          <LigneLegale label="SIRET">123 456 789 00012</LigneLegale>
+          <LigneLegale label="TVA intracommunautaire">FR 32 123 456 789</LigneLegale>
+          <LigneLegale label="Téléphone">01 99 00 12 34</LigneLegale>
+          <LigneLegale label="Email">contact@ponchstore.fr</LigneLegale>
           <LigneLegale label="Licence de vente d'alcool">
-            <ARemplir>numéro de licence ou de déclaration en douane</ARemplir>
+            Entrepositaire agréé auprès de la direction générale des douanes et droits indirects —
+            numéro d'accise FR012345E0001
           </LigneLegale>
         </dl>
       </SectionLegale>
 
       <SectionLegale titre="Directeur de la publication">
         <p>
-          <ARemplir>nom et prénom du représentant légal</ARemplir>, en qualité de{' '}
-          <ARemplir>fonction</ARemplir>.
+          Mathieu Gaudron, en qualité de Président.
         </p>
       </SectionLegale>
 
@@ -58,15 +44,9 @@ export default function MentionsLegales() {
         <p>Le site est hébergé par :</p>
 
         <dl className="mt-5 border-t border-trait">
-          <LigneLegale label="Hébergeur">
-            <ARemplir>nom de l'hébergeur</ARemplir>
-          </LigneLegale>
-          <LigneLegale label="Adresse">
-            <ARemplir>adresse postale de l'hébergeur</ARemplir>
-          </LigneLegale>
-          <LigneLegale label="Téléphone">
-            <ARemplir>numéro de l'hébergeur</ARemplir>
-          </LigneLegale>
+          <LigneLegale label="Hébergeur">OVH SAS (OVHcloud)</LigneLegale>
+          <LigneLegale label="Adresse">2 rue Kellermann, 59100 Roubaix, France</LigneLegale>
+          <LigneLegale label="Téléphone">1007</LigneLegale>
         </dl>
       </SectionLegale>
 
@@ -106,7 +86,7 @@ export default function MentionsLegales() {
           L'ensemble des éléments composant le site — structure, textes, identité visuelle,
           typographies, logiciels et bases de données — est protégé par le droit de la propriété
           intellectuelle et demeure la propriété de{' '}
-          <ARemplir>dénomination sociale</ARemplir> ou de ses partenaires.
+          <span className="font-medium">PONCH'STORE</span> ou de ses partenaires.
         </p>
         <p>
           Toute reproduction, représentation, adaptation ou exploitation, totale ou partielle, par
@@ -130,7 +110,7 @@ export default function MentionsLegales() {
           Conformément au règlement (UE) 2016/679 et à la loi « Informatique et Libertés », vous
           disposez d'un droit d'accès, de rectification, d'effacement, de limitation et
           d'opposition sur les données vous concernant. Ces droits s'exercent auprès de{' '}
-          <ARemplir>adresse email du responsable de traitement</ARemplir>.
+          rgpd@ponchstore.fr.
         </p>
         <p>
           Vous pouvez également introduire une réclamation auprès de la CNIL (3 place de Fontenoy,
@@ -166,8 +146,8 @@ export default function MentionsLegales() {
         <p>
           Les présentes mentions légales sont soumises au droit français. Les relations
           commerciales étant établies entre professionnels, tout litige relatif à l'utilisation du
-          site relèvera de la compétence exclusive des tribunaux du ressort de{' '}
-          <ARemplir>ville du siège social</ARemplir>, à défaut de résolution amiable.
+          site relèvera de la compétence exclusive des tribunaux du ressort de Créteil, à défaut
+          de résolution amiable.
         </p>
       </SectionLegale>
     </CadreLegal>

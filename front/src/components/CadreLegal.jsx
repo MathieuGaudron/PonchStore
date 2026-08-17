@@ -29,6 +29,15 @@ export default function CadreLegal({ surtitre, titre, miseAJour, children }) {
           <p className="mt-6 text-xs text-brume">Dernière mise à jour : {miseAJour}</p>
         )}
 
+        <p className="mt-8 border border-dashed border-cinabre px-4 py-3 text-xs leading-relaxed text-cinabre">
+          <span className="font-medium">Projet pédagogique.</span> Ponch'Store est une société
+          fictive créée dans le cadre d'un projet de certification. Les informations
+          d'identification figurant sur cette page — dénomination, adresse, SIRET, RCS, TVA,
+          numéro d'accise, téléphone et adresses email — sont fictives et ne désignent aucune
+          entreprise réelle. Elles devront être remplacées par les informations authentiques
+          avant toute mise en service.
+        </p>
+
         <div className="mt-12 border-t border-encre">{children}</div>
 
         <Link
@@ -59,14 +68,6 @@ export function SectionLegale({ titre, children }) {
   )
 }
 
-
-export function ARemplir({ children }) {
-  return (
-    <span className="border-b border-dashed border-cinabre font-medium text-cinabre">
-      [à compléter : {children}]
-    </span>
-  )
-}
 
 export function LigneLegale({ label, children }) {
   return (

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import CadreLegal, { ARemplir, SectionLegale } from '../components/CadreLegal'
+import CadreLegal, { SectionLegale } from '../components/CadreLegal'
 
 export default function ConditionsGenerales() {
   return (
@@ -11,8 +11,10 @@ export default function ConditionsGenerales() {
       <SectionLegale titre="1. Objet et champ d'application">
         <p>
           Les présentes conditions générales de vente régissent les ventes conclues sur la
-          plateforme Ponch'Store entre <ARemplir>dénomination sociale</ARemplir>, ci-après « le
-          Vendeur », et ses clients professionnels, ci-après « le Client ».
+          plateforme Ponch'Store entre <span className="font-medium">PONCH'STORE</span>, société
+          par actions simplifiée au capital de 10 000 euros, dont le siège est situé 12 rue des
+          Entrepôts, 94000 Créteil, immatriculée au RCS de Créteil sous le numéro 123 456 789,
+          ci-après « le Vendeur », et ses clients professionnels, ci-après « le Client ».
         </p>
         <p>
           La plateforme est <strong className="font-medium">réservée aux professionnels</strong> :
@@ -117,16 +119,18 @@ export default function ConditionsGenerales() {
       <SectionLegale titre="6. Créneau de retrait">
         <p>
           Le retrait s'effectue sur le créneau réservé par le Client, à l'adresse{' '}
-          <ARemplir>adresse du point de retrait</ARemplir>. Les créneaux disponibles sont ouverts
-          par le Vendeur et leur capacité est limitée.
+          <span className="font-medium">12 rue des Entrepôts, 94000 Créteil</span>. Les créneaux
+          disponibles sont ouverts par le Vendeur et leur capacité est limitée.
         </p>
         <p>
           Le Client se présente muni d'un justificatif d'identité et, le cas échéant, d'un mandat
           si le retrait est effectué par un tiers.
         </p>
         <p>
-          En cas de retard ou d'absence au créneau réservé :{' '}
-          <ARemplir>délai de garde de la commande, conditions de report, frais éventuels</ARemplir>.
+          En cas de retard ou d'absence au créneau réservé, la commande est conservée pendant
+          3 jours ouvrés à compter de la date du créneau. Le Client peut demander au Vendeur son
+          report sur un créneau ultérieur, sans frais. Passé ce délai, le Vendeur se réserve le
+          droit d'annuler la commande et de remettre les quantités concernées en stock.
         </p>
       </SectionLegale>
 
@@ -138,9 +142,10 @@ export default function ConditionsGenerales() {
           Le règlement s'effectue intégralement sur place, au moment du retrait de la commande.
         </p>
         <p>
-          Moyens de paiement acceptés :{' '}
-          <ARemplir>espèces, carte bancaire, chèque, virement…</ARemplir>. Conditions de paiement
-          différé éventuellement consenties : <ARemplir>délais et plafonds accordés</ARemplir>.
+          Moyens de paiement acceptés : carte bancaire, virement et chèque d'entreprise. Les
+          règlements en espèces sont acceptés dans la limite de 1 000 euros, conformément à
+          l'article L. 112-6 du code monétaire et financier. Aucun paiement différé n'est consenti :
+          le règlement intervient intégralement au retrait de la commande.
         </p>
         <p>
           Conformément à l'article L. 441-10 du code de commerce, tout retard de paiement entraîne
@@ -181,8 +186,7 @@ export default function ConditionsGenerales() {
       <SectionLegale titre="10. Réclamations et produits non conformes">
         <p>
           Toute réclamation portant sur un produit manquant, abîmé ou non conforme doit être
-          adressée à <ARemplir>adresse email du service client</ARemplir> dans un délai de{' '}
-          <ARemplir>délai en jours</ARemplir> à compter du retrait.
+          adressée à sav@ponchstore.fr dans un délai de 3 jours ouvrés à compter du retrait.
         </p>
         <p>
           Les produits doivent être conservés dans leur emballage d'origine et tenus à disposition
@@ -240,7 +244,7 @@ export default function ConditionsGenerales() {
         <p>
           Les présentes conditions sont soumises au droit français. Les relations étant établies
           entre professionnels, tout litige relève de la compétence exclusive des tribunaux du
-          ressort de <ARemplir>ville du siège social</ARemplir>, à défaut de résolution amiable.
+          ressort de Créteil, à défaut de résolution amiable.
         </p>
       </SectionLegale>
     </CadreLegal>

@@ -1,4 +1,4 @@
-import CadreLegal, { ARemplir, LigneLegale, SectionLegale } from '../components/CadreLegal'
+import CadreLegal, { LigneLegale, SectionLegale } from '../components/CadreLegal'
 
 export default function PolitiqueConfidentialite() {
   return (
@@ -10,12 +10,11 @@ export default function PolitiqueConfidentialite() {
       <SectionLegale titre="Responsable du traitement">
         <p>
           Les données collectées sur la plateforme Ponch'Store sont traitées par{' '}
-          <ARemplir>dénomination sociale</ARemplir>, dont le siège est situé{' '}
-          <ARemplir>adresse du siège social</ARemplir>.
+          <span className="font-medium">PONCH'STORE</span>, dont le siège est situé 12 rue des
+          Entrepôts, 94000 Créteil.
         </p>
         <p>
-          Pour toute question relative à vos données, écrivez à{' '}
-          <ARemplir>adresse email du responsable de traitement</ARemplir>.
+          Pour toute question relative à vos données, écrivez à rgpd@ponchstore.fr.
         </p>
       </SectionLegale>
 
@@ -80,17 +79,17 @@ export default function PolitiqueConfidentialite() {
           comptes.
         </p>
         <p>
-          Elles peuvent être communiquées à{' '}
-          <ARemplir>hébergeur, expert-comptable, prestataires éventuels</ARemplir>, agissant en
-          qualité de sous-traitants et tenus aux mêmes obligations de confidentialité. Aucune
-          donnée n'est transférée hors de l'Union européenne.
+          Elles peuvent être communiquées à OVH SAS (hébergement du site et de la base de
+          données) ainsi qu'au cabinet comptable du Vendeur, agissant en qualité de sous-traitants
+          et tenus aux mêmes obligations de confidentialité. Aucune donnée n'est transférée hors
+          de l'Union européenne.
         </p>
       </SectionLegale>
 
       <SectionLegale titre="Durée de conservation">
         <dl className="border-t border-trait">
           <LigneLegale label="Compte client">
-            <ARemplir>durée — usuellement 3 ans après le dernier contact</ARemplir>
+            3 ans à compter du dernier contact
           </LigneLegale>
           <LigneLegale label="Commandes et factures">
             10 ans, conformément aux obligations comptables (article L. 123-22 du code de
@@ -135,8 +134,8 @@ export default function PolitiqueConfidentialite() {
           corriger vos informations à tout moment.
         </p>
         <p>
-          Pour les autres demandes — effacement, portabilité, opposition — écrivez à{' '}
-          <ARemplir>adresse email du responsable de traitement</ARemplir>. Une réponse vous sera
+          Pour les autres demandes — effacement, portabilité, opposition — écrivez à
+          rgpd@ponchstore.fr. Une réponse vous sera
           apportée dans un délai d'un mois. L'effacement s'entend sous réserve des données que le
           Vendeur est légalement tenu de conserver, notamment les pièces comptables.
         </p>

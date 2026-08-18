@@ -33,7 +33,7 @@ export default function TableauBord() {
           <div className="mt-10 grid grid-cols-1 gap-px border border-trait bg-trait sm:grid-cols-2 lg:grid-cols-4">
             <Carte
               valeur={stats.commandesAPreparer}
-              libelle="Commandes à préparer"
+              libelle="Commandes en cours"
               accent="bg-ambre"
               lien="/preparation"
             />

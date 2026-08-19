@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { apiFetch } from '../services/api'
 import Navbar from '../components/Navbar'
 import BoutonRetour from '../components/BoutonRetour'
 import Tableau from '../components/Tableau'
 import { Button } from '@/components/ui/button'
+import { correspondAuFiltre, FILTRES_STOCK, SEUIL_STOCK_FAIBLE } from '../lib/stock'
 
 const TYPES_MOUVEMENT = [
   { cle: 'ENTREE', libelle: 'Entrée (réception fournisseur)' },
@@ -40,6 +42,24 @@ export default function GestionStock() {
   const [succes, setSucces] = useState(null)
   const [version, setVersion] = useState(0)
   const [formulaireOuvert, setFormulaireOuvert] = useState(false)
+  const [params, setParams] = useSearchParams()
+
+  /*
+   * Le filtre vit dans l'URL : les cartes « rupture » et « stock faible » du
+   * tableau de bord pointent directement sur /stock?stock=rupture, et le lien
+   * reste partageable entre préparateurs.
+   */
+  const filtreStock = params.get('stock') ?? 'tous'
+
+  function changerFiltre(cle) {
+    const suivants = new URLSearchParams(params)
+    if (cle === 'tous') {
+      suivants.delete('stock')
+    } else {
+      suivants.set('stock', cle)
+    }
+    setParams(suivants, { replace: true })
+  }
 
   useEffect(() => {
     apiFetch('/api/stock/produits')
@@ -67,6 +87,14 @@ export default function GestionStock() {
   }
 
   const produitChoisi = produits.find((p) => String(p.id) === form.produitId)
+
+  /*
+   * Les produits désactivés sont hors catalogue : les recompter ici ferait
+   * diverger la liste des compteurs du tableau de bord, qui les excluent.
+   */
+  const produitsAffiches = produits
+    .filter((p) => p.actif !== false)
+    .filter((p) => correspondAuFiltre(p, filtreStock))
 
   async function soumettre(e) {
     e.preventDefault()
@@ -187,7 +215,62 @@ export default function GestionStock() {
         </form>
         )}
 
-        <div className="mb-4 flex flex-wrap items-center gap-3">
+        <h2 className="mb-4 font-display text-2xl text-graphite">État du stock</h2>
+
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          {FILTRES_STOCK.map((f) => (
+            <Button
+              key={f.cle}
+              size="sm"
+              variant={filtreStock === f.cle ? 'primary' : 'outline'}
+              onClick={() => changerFiltre(f.cle)}
+            >
+              {f.libelle}
+            </Button>
+          ))}
+          <span className="text-sm text-brume sm:ml-2">
+            <strong className="font-medium text-graphite">{produitsAffiches.length}</strong>{' '}
+            produit(s)
+          </span>
+        </div>
+
+        <Tableau
+          colonnes={[
+            { titre: 'Produit' },
+            { titre: 'Catégorie' },
+            { titre: 'Format' },
+            { titre: 'Stock', alignement: 'droite' },
+          ]}
+        >
+          {produitsAffiches.map((p) => (
+            <tr key={p.id} className="border-b border-trait">
+              <td className="px-3 py-3 text-graphite">
+                {p.nom}
+                {p.marque && <span className="text-brume"> · {p.marque}</span>}
+              </td>
+              <td className="px-3 py-3 text-brume">{p.categorie?.nom}</td>
+              <td className="px-3 py-3 text-brume">{p.formatCarton}</td>
+              <td className="px-3 py-3 text-right">
+                {p.stockDisponible === 0 ? (
+                  <span className="font-medium text-cinabre">0 · rupture</span>
+                ) : p.stockDisponible <= SEUIL_STOCK_FAIBLE ? (
+                  <span className="font-medium text-cuivre">{p.stockDisponible} · faible</span>
+                ) : (
+                  <span>{p.stockDisponible}</span>
+                )}
+              </td>
+            </tr>
+          ))}
+          {produitsAffiches.length === 0 && (
+            <tr>
+              <td colSpan="4" className="py-4 text-center text-brume">
+                Aucun produit dans cette catégorie de stock.
+              </td>
+            </tr>
+          )}
+        </Tableau>
+
+        <div className="mb-4 mt-12 flex flex-wrap items-center gap-3">
           <h2 className="font-display text-2xl text-graphite">Historique des mouvements</h2>
           <select
             value={filtreProduit}

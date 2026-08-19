@@ -5,14 +5,7 @@ import Navbar from '../components/Navbar'
 import BoutonRetour from '../components/BoutonRetour'
 import Tableau from '../components/Tableau'
 import { Button } from '@/components/ui/button'
-
-const FILTRES_STOCK = [
-  { cle: 'tous', libelle: 'Tous' },
-  { cle: 'rupture', libelle: 'Rupture' },
-  { cle: 'faible', libelle: 'Stock faible' },
-]
-
-const SEUIL_STOCK_FAIBLE = 10
+import { correspondAuFiltre, FILTRES_STOCK, SEUIL_STOCK_FAIBLE } from '../lib/stock'
 
 const FORM_VIDE = {
   nom: '',
@@ -67,11 +60,7 @@ export default function GestionProduits() {
     return () => clearTimeout(minuteur)
   }, [recherche])
 
-  const produitsAffiches = produits.filter((p) => {
-    if (filtreStock === 'rupture') return p.stockDisponible === 0
-    if (filtreStock === 'faible') return p.stockDisponible > 0 && p.stockDisponible <= SEUIL_STOCK_FAIBLE
-    return true
-  })
+  const produitsAffiches = produits.filter((p) => correspondAuFiltre(p, filtreStock))
 
   useEffect(() => {
     apiFetch('/api/categories')

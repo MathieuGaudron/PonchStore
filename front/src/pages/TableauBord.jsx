@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../services/api'
-import { useAuth } from '../context/auth-context'
 import Navbar from '../components/Navbar'
 import BoutonRetour from '../components/BoutonRetour'
 
 export default function TableauBord() {
-  const { utilisateur } = useAuth()
   const [stats, setStats] = useState(null)
-
-  const estAdmin = utilisateur?.role === 'ADMIN'
 
   useEffect(() => {
     apiFetch('/api/tableau-bord')
@@ -49,14 +45,14 @@ export default function TableauBord() {
               valeur={stats.produitsEnRupture}
               libelle="Produits en rupture"
               accent="bg-cinabre"
-              lien={estAdmin ? '/admin/produits?stock=rupture' : null}
+              lien="/stock?stock=rupture"
             />
 
             <Carte
               valeur={stats.produitsStockFaible}
               libelle={`Stock faible (≤ ${stats.seuilStockFaible})`}
               accent="bg-cuivre"
-              lien={estAdmin ? '/admin/produits?stock=faible' : null}
+              lien="/stock?stock=faible"
             />
           </div>
         )}
@@ -68,25 +64,15 @@ export default function TableauBord() {
 /*
  * Le chiffre reste en gris d'encre pour la lisibilité ; c'est un bandeau de
  * couleur en tête de cellule qui distingue les indicateurs entre eux.
+ * Les quatre indicateurs mènent à la page qui les détaille : le préparateur
+ * doit pouvoir passer du compteur à la liste sans droits d'administration.
  */
 function Carte({ valeur, libelle, accent, lien }) {
-  const contenu = (
-    <>
+  return (
+    <Link to={lien} className="block bg-white p-6 pb-8 transition-colors hover:bg-papier">
       <span className={`block h-1 w-10 ${accent}`} />
       <p className="mt-6 font-display text-6xl leading-none text-graphite">{valeur}</p>
       <p className="surtitre mt-5 text-brume">{libelle}</p>
-    </>
+    </Link>
   )
-
-  const classe = 'block bg-white p-6 pb-8'
-
-  if (lien) {
-    return (
-      <Link to={lien} className={`${classe} transition-colors hover:bg-papier`}>
-        {contenu}
-      </Link>
-    )
-  }
-
-  return <div className={classe}>{contenu}</div>
 }

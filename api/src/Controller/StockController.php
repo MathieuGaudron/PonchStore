@@ -26,12 +26,17 @@ class StockController extends AbstractController
     ) {
     }
 
+    /*
+     * Le drapeau `actif` est exposé ici (et nulle part ailleurs pour le staff) :
+     * l'état du stock ne doit compter que les produits encore au catalogue,
+     * comme le font les compteurs du tableau de bord.
+     */
     #[Route('/produits', name: 'api_stock_produits', methods: ['GET'])]
     public function produits(): JsonResponse
     {
         $produits = $this->produitRepository->findBy([], ['nom' => 'ASC']);
 
-        return $this->json($produits, JsonResponse::HTTP_OK, [], ['groups' => ['produit:list']]);
+        return $this->json($produits, JsonResponse::HTTP_OK, [], ['groups' => ['produit:list', 'produit:stock']]);
     }
 
     #[Route('/mouvements', name: 'api_stock_mouvements_liste', methods: ['GET'])]

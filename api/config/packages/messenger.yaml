@@ -5,14 +5,20 @@ framework:
         transports:
             sync: 'sync://'
 
+            # auto_setup=false : sans ça, le transport Doctrine crée lui-même la
+            # table messenger_messages dès qu'un consommateur démarre. Sur une base
+            # neuve, les conteneurs scheduler et mailer gagnent la course contre les
+            # migrations, et la migration qui crée cette table échoue avec
+            # « table already exists » — ce qui casse tout déploiement initial.
+            # C'est la migration qui doit posséder le schéma, pas le transport.
             async:
-                dsn: 'doctrine://default?queue_name=async'
+                dsn: 'doctrine://default?queue_name=async&auto_setup=false'
                 retry_strategy:
                     max_retries: 3
                     delay: 5000
                     multiplier: 3
 
-            failed: 'doctrine://default?queue_name=failed'
+            failed: 'doctrine://default?queue_name=failed&auto_setup=false'
 
         routing:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async

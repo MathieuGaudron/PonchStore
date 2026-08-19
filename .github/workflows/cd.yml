@@ -16,7 +16,6 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_OWNER: ${{ github.repository_owner }}
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
@@ -25,9 +24,21 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
+    outputs:
+      proprietaire: ${{ steps.proprietaire.outputs.nom }}
+
     steps:
       - name: Récupération du code
         uses: actions/checkout@v4
+
+      # Docker impose des noms de dépôt entièrement en minuscules, alors qu'un
+      # propriétaire GitHub peut contenir des majuscules (MathieuGaudron). Sans
+      # cette normalisation, la publication échoue sur "repository name must be
+      # lowercase". Le résultat est exposé en sortie de job pour que le
+      # déploiement vise exactement les mêmes images.
+      - name: Normalisation du propriétaire en minuscules
+        id: proprietaire
+        run: echo "nom=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
       - name: Vérification de l'URL de l'API
         env:
@@ -50,7 +61,7 @@ jobs:
           context: ./api
           file: ./api/Dockerfile.prod
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/ponchstore-api:${{ env.IMAGE_TAG }}
+          tags: ${{ env.REGISTRY }}/${{ steps.proprietaire.outputs.nom }}/ponchstore-api:${{ env.IMAGE_TAG }}
           cache-from: type=gha,scope=api-prod
           cache-to: type=gha,mode=max,scope=api-prod
 
@@ -62,7 +73,7 @@ jobs:
           push: true
           build-args: |
             VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/ponchstore-front:${{ env.IMAGE_TAG }}
+          tags: ${{ env.REGISTRY }}/${{ steps.proprietaire.outputs.nom }}/ponchstore-front:${{ env.IMAGE_TAG }}
           cache-from: type=gha,scope=front-prod
           cache-to: type=gha,mode=max,scope=front-prod
 
@@ -80,7 +91,7 @@ jobs:
           VPS_APP_PATH: ${{ secrets.VPS_APP_PATH }}
           GHCR_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
           GHCR_USER: ${{ secrets.GHCR_USER }}
-          GHCR_OWNER: ${{ env.IMAGE_OWNER }}
+          GHCR_OWNER: ${{ needs.publish.outputs.proprietaire }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         with:
           host: ${{ secrets.VPS_HOST }}

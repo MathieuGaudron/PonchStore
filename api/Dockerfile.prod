@@ -1,0 +1,49 @@
+FROM composer:2 AS vendor
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
+COPY . .
+RUN composer dump-autoload --classmap-authoritative --no-dev
+
+FROM php:8.2-apache
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libicu-dev libonig-dev \
+    && docker-php-ext-install pdo_mysql intl opcache \
+    && a2enmod rewrite headers \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www/api
+COPY --from=vendor /app /var/www/api
+COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
+
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
+# Réglages PHP de production. Sans fichier ini, l'image php:8.2-apache laisse
+# display_errors actif : la moindre erreur renvoie la trace complète au client.
+# variables_order est fixé explicitement car Symfony lit les variables
+# d'environnement dans $_ENV, que le "E" alimente.
+RUN { \
+        echo 'display_errors = Off'; \
+        echo 'log_errors = On'; \
+        echo 'error_log = /proc/self/fd/2'; \
+        echo 'expose_php = Off'; \
+        echo 'variables_order = "EGPCS"'; \
+        echo 'opcache.validate_timestamps = 0'; \
+        echo 'opcache.memory_consumption = 128'; \
+        echo 'opcache.max_accelerated_files = 20000'; \
+    } > /usr/local/etc/php/conf.d/prod.ini
+
+# symfony/runtime charge .env à chaque démarrage et lève une exception fatale si
+# le fichier n'existe pas — or il est gitignoré, donc absent de l'image. On le
+# crée vide : toute la configuration vient de l'environnement Docker (.env.prod).
+# Vide et non recopié de .env.example, pour qu'une variable oubliée échoue
+# bruyamment au lieu d'être masquée par une valeur de développement.
+RUN : > .env
+
+RUN mkdir -p var/cache var/log var/share \
+    && chown -R www-data:www-data var
+
+EXPOSE 80

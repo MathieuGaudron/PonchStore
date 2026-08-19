@@ -119,5 +119,16 @@ jobs:
       - name: Préparation des variables d'environnement
         run: cp .env.example .env
 
-      - name: Build des images
+      - name: Build des images de développement
         run: docker compose build
+
+      # Les images de production ne sont construites par le workflow CD qu'une
+      # fois la branche fusionnée dans main : sans ce contrôle, un Dockerfile.prod
+      # cassé ne se découvrirait qu'au moment du déploiement. Ici on construit
+      # sans publier, uniquement pour vérifier que ça compile.
+      - name: Build des images de production (sans publication)
+        run: |
+          docker build -f api/Dockerfile.prod -t ponchstore-api:verification ./api
+          docker build -f front/Dockerfile.prod \
+            --build-arg VITE_API_BASE_URL=https://exemple.invalid \
+            -t ponchstore-front:verification ./front

@@ -1,0 +1,11 @@
+# Le build Vite réinstalle les dépendances : inutile d'envoyer node_modules
+# (des centaines de Mo) ni les artefacts locaux dans le contexte de build.
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+.git/
+Dockerfile
+Dockerfile.prod
+.dockerignore

@@ -10,6 +10,10 @@ CLAUDE.md
 .env
 .env.local
 .env.*.local
+# Configuration de production : ne vit que sur le VPS. .env.deploy est généré
+# par le workflow CD à chaque déploiement.
+.env.prod
+.env.deploy
 
 # Notes perso (gitignored — non versionnées)
 *.local.md

@@ -156,6 +156,22 @@ script d'initialisation ne se rejouera pas — accorder les droits une fois à l
 docker exec -i ponchstore-db mysql -uroot -proot < docker/db/init/10-base-de-test.sql
 ```
 
+## Déploiement continu
+
+Le workflow `.github/workflows/cd.yml` publie les images de production dans GitHub
+Container Registry puis les déploie sur un VPS via SSH. Il s'exécute sur `main` ou
+manuellement depuis GitHub Actions, avec l'environnement GitHub `production`.
+
+Le VPS doit contenir un clone du dépôt, Docker Compose et un fichier `.env.prod` non
+versionné dans le répertoire de déploiement. Ce fichier contient les variables de
+production (`APP_SECRET`, `JWT_SECRET`, `DATABASE_URL`, `MAILER_DSN`, `CORS_ALLOW_ORIGIN`,
+`FRONT_URL`, `APP_HOST`, `API_HOST` et les identifiants MySQL). Caddy fournit HTTPS et
+redirige `APP_HOST` vers le front et `API_HOST` vers l'API.
+
+Secrets GitHub requis : `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_APP_PATH`,
+`GHCR_USER` et `GHCR_READ_TOKEN`. Variable GitHub requise : `VITE_API_BASE_URL`.
+Le token de lecture GHCR doit être limité à `read:packages`.
+
 ## Architecture
 
 Projet monorepo organisé en deux applications indépendantes :
@@ -163,7 +179,7 @@ Projet monorepo organisé en deux applications indépendantes :
 ```
 ponchstore/
 ├── api/               # Backend Symfony 7 (API REST JSON + JWT)
-├── front/             # Frontend React 18 + Vite
+├── front/             # Frontend React 19 + Vite
 ├── docker-compose.yml # Orchestration des services
 └── README.md
 ```

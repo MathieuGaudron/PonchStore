@@ -10,7 +10,7 @@ export default function MentionsLegales() {
       <SectionLegale titre="Éditeur du site">
         <p>
           Le site Ponch'Store, accessible à l'adresse{' '}
-          <span className="font-medium">https://ponchstore.fr</span>, est édité par :
+          <span className="font-medium">https://ponchstore.shop</span>, est édité par :
         </p>
 
         <dl className="mt-5 border-t border-trait">
@@ -26,7 +26,7 @@ export default function MentionsLegales() {
           <LigneLegale label="SIRET">123 456 789 00012</LigneLegale>
           <LigneLegale label="TVA intracommunautaire">FR 32 123 456 789</LigneLegale>
           <LigneLegale label="Téléphone">01 99 00 12 34</LigneLegale>
-          <LigneLegale label="Email">contact@ponchstore.fr</LigneLegale>
+          <LigneLegale label="Email">contact@ponchstore.shop</LigneLegale>
           <LigneLegale label="Licence de vente d'alcool">
             Entrepositaire agréé auprès de la direction générale des douanes et droits indirects —
             numéro d'accise FR012345E0001
@@ -110,7 +110,7 @@ export default function MentionsLegales() {
           Conformément au règlement (UE) 2016/679 et à la loi « Informatique et Libertés », vous
           disposez d'un droit d'accès, de rectification, d'effacement, de limitation et
           d'opposition sur les données vous concernant. Ces droits s'exercent auprès de{' '}
-          rgpd@ponchstore.fr.
+          rgpd@ponchstore.shop.
         </p>
         <p>
           Vous pouvez également introduire une réclamation auprès de la CNIL (3 place de Fontenoy,

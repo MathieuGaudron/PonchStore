@@ -9,7 +9,7 @@ use Symfony\Component\Mime\Email;
 
 class CommandeMailService
 {
-    private const EXPEDITEUR = 'no-reply@ponchstore.fr';
+    private const EXPEDITEUR = 'no-reply@ponchstore.shop';
 
     private const JOURS = [
         1 => 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche',

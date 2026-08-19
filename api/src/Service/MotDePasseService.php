@@ -36,7 +36,7 @@ class MotDePasseService
         $lien = $this->urlFront . '/reinitialisation?token=' . $token;
 
         $message = (new Email())
-            ->from('no-reply@ponchstore.fr')
+            ->from('no-reply@ponchstore.shop')
             ->to($utilisateur->getEmail())
             ->subject("PONCH'STORE — Réinitialisation de votre mot de passe")
             ->text(

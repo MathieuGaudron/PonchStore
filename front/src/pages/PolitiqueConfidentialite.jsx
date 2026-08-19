@@ -14,7 +14,7 @@ export default function PolitiqueConfidentialite() {
           Entrepôts, 94000 Créteil.
         </p>
         <p>
-          Pour toute question relative à vos données, écrivez à rgpd@ponchstore.fr.
+          Pour toute question relative à vos données, écrivez à rgpd@ponchstore.shop.
         </p>
       </SectionLegale>
 
@@ -135,7 +135,7 @@ export default function PolitiqueConfidentialite() {
         </p>
         <p>
           Pour les autres demandes — effacement, portabilité, opposition — écrivez à
-          rgpd@ponchstore.fr. Une réponse vous sera
+          rgpd@ponchstore.shop. Une réponse vous sera
           apportée dans un délai d'un mois. L'effacement s'entend sous réserve des données que le
           Vendeur est légalement tenu de conserver, notamment les pièces comptables.
         </p>

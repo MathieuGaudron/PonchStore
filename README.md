@@ -59,7 +59,7 @@ le catalogue produits se construit ensuite via le back-office (import EAN Open F
 
 | Rôle | Email | Mot de passe |
 |---|---|---|
-| ADMIN | admin@ponchstore.fr | Test1234! |
+| ADMIN | admin@ponchstore.shop | Test1234! |
 | CLIENT_PRO | jean@lecomptoir.fr | Test1234! |
 
 ## Créneaux de retrait

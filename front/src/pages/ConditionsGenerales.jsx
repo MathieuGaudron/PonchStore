@@ -186,7 +186,7 @@ export default function ConditionsGenerales() {
       <SectionLegale titre="10. Réclamations et produits non conformes">
         <p>
           Toute réclamation portant sur un produit manquant, abîmé ou non conforme doit être
-          adressée à sav@ponchstore.fr dans un délai de 3 jours ouvrés à compter du retrait.
+          adressée à sav@ponchstore.shop dans un délai de 3 jours ouvrés à compter du retrait.
         </p>
         <p>
           Les produits doivent être conservés dans leur emballage d'origine et tenus à disposition

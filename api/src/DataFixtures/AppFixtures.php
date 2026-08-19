@@ -43,7 +43,7 @@ class AppFixtures extends Fixture
         $admin = new Utilisateur();
         $admin->setNom('Ponch');
         $admin->setPrenom('Admin');
-        $admin->setEmail('admin@ponchstore.fr');
+        $admin->setEmail('admin@ponchstore.shop');
         $admin->setRole(RoleEnum::ADMIN);
         $admin->setTelephone('0140000000');
         $admin->setMotDePasse($this->passwordHasher->hashPassword($admin, 'Test1234!'));

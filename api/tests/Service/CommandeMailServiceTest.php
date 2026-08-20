@@ -15,6 +15,7 @@ use Symfony\Component\Mime\Email;
 class CommandeMailServiceTest extends TestCase
 {
     private const URL_FRONT = 'http://localhost:3000';
+    private const EXPEDITEUR = 'expediteur-de-test@ponchstore.shop';
 
     public function testLeMailAnnonceLeJourEtLHeureDuCreneau(): void
     {
@@ -50,12 +51,20 @@ class CommandeMailServiceTest extends TestCase
         self::assertStringContainsString(self::URL_FRONT . '/commande/12', $corps);
     }
 
+    public function testLEmailPartDeLAdresseConfiguree(): void
+    {
+        $email = $this->envoyer($this->commande());
+
+        self::assertCount(1, $email->getFrom());
+        self::assertSame(self::EXPEDITEUR, $email->getFrom()[0]->getAddress());
+    }
+
     public function testAucunEnvoiSansCreneauNiClient(): void
     {
         $mailer = $this->createMock(MailerInterface::class);
         $mailer->expects(self::never())->method('send');
 
-        $service = new CommandeMailService($mailer, self::URL_FRONT);
+        $service = new CommandeMailService($mailer, self::URL_FRONT, self::EXPEDITEUR);
         $service->confirmerReservation(new Commande());
         $service->rappelerRetrait(new Commande());
     }
@@ -76,7 +85,7 @@ class CommandeMailServiceTest extends TestCase
                 $capture = $message;
             });
 
-        $action(new CommandeMailService($mailer, self::URL_FRONT));
+        $action(new CommandeMailService($mailer, self::URL_FRONT, self::EXPEDITEUR));
 
         self::assertInstanceOf(Email::class, $capture);
 

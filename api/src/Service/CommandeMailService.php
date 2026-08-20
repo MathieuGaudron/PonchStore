@@ -9,8 +9,6 @@ use Symfony\Component\Mime\Email;
 
 class CommandeMailService
 {
-    private const EXPEDITEUR = 'no-reply@ponchstore.shop';
-
     private const JOURS = [
         1 => 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche',
     ];
@@ -23,6 +21,7 @@ class CommandeMailService
     public function __construct(
         private readonly MailerInterface $mailer,
         private readonly string $urlFront,
+        private readonly string $expediteur,
     ) {
     }
 
@@ -36,7 +35,7 @@ class CommandeMailService
         }
 
         $message = (new Email())
-            ->from(self::EXPEDITEUR)
+            ->from($this->expediteur)
             ->to($utilisateur->getEmail())
             ->subject("PONCH'STORE — Commande n°{$commande->getId()} confirmée")
             ->text($this->corps($commande, $creneau));
@@ -54,7 +53,7 @@ class CommandeMailService
         }
 
         $message = (new Email())
-            ->from(self::EXPEDITEUR)
+            ->from($this->expediteur)
             ->to($utilisateur->getEmail())
             ->subject("PONCH'STORE — Retrait demain de votre commande n°{$commande->getId()}")
             ->text($this->corpsRappel($commande, $creneau));

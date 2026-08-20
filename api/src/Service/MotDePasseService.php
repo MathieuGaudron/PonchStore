@@ -18,6 +18,7 @@ class MotDePasseService
         private readonly MailerInterface $mailer,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly string $urlFront,
+        private readonly string $expediteur,
     ) {
     }
 
@@ -36,7 +37,7 @@ class MotDePasseService
         $lien = $this->urlFront . '/reinitialisation?token=' . $token;
 
         $message = (new Email())
-            ->from('no-reply@ponchstore.shop')
+            ->from($this->expediteur)
             ->to($utilisateur->getEmail())
             ->subject("PONCH'STORE — Réinitialisation de votre mot de passe")
             ->text(

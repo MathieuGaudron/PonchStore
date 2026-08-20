@@ -172,6 +172,88 @@ Secrets GitHub requis : `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_APP_PATH`,
 `GHCR_USER` et `GHCR_READ_TOKEN`. Variable GitHub requise : `VITE_API_BASE_URL`.
 Le token de lecture GHCR doit être limité à `read:packages`.
 
+## Envoi d'e-mails en production
+
+Les e-mails (confirmation de commande, rappel de créneau, réinitialisation de mot de
+passe) sont mis en file par Messenger et expédiés par le service `mailer`. Deux variables
+de `.env.prod` les pilotent :
+
+| Variable | Rôle |
+|---|---|
+| `MAILER_DSN` | serveur SMTP et identifiants |
+| `MAILER_EXPEDITEUR` | adresse affichée comme expéditeur (repli : `no-reply@ponchstore.shop`) |
+
+**Fournisseur retenu : Brevo** (offre gratuite, 300 messages par jour).
+
+### 1. Authentifier le domaine
+
+Créer un compte Brevo, puis déclarer le domaine `ponchstore.shop`. Brevo affiche des
+enregistrements DNS (SPF, DKIM, et un code de vérification) à ajouter dans la zone DNS
+du domaine, chez OVH.
+
+Cette étape n'est pas une formalité : sans elle, rien ne prouve aux serveurs
+destinataires que Ponch'Store est autorisé à écrire au nom de ce domaine, et les
+messages partent en indésirables — ou sont rejetés.
+
+### 2. Renseigner `.env.prod` sur le VPS
+
+La clé SMTP fournie par Brevo n'est pas le mot de passe du compte : c'est un secret
+distinct, révocable.
+
+```dotenv
+MAILER_DSN=smtp://IDENTIFIANT:CLE_SMTP@smtp-relay.brevo.com:587
+MAILER_EXPEDITEUR=no-reply@ponchstore.shop
+```
+
+Si la clé contient `@`, `:` ou `/`, les encoder (`%40`, `%3A`, `%2F`) : ces caractères
+découpent l'URL du DSN et l'authentification échouerait sans message clair.
+
+### 3. Recréer les conteneurs, puis vérifier
+
+`.env.prod` est lu au démarrage : un simple `restart` ne suffit pas, il faut recréer les
+conteneurs. Le service `mailer` en particulier, puisque c'est lui qui envoie réellement.
+
+```bash
+cd "$VPS_APP_PATH"
+docker compose --env-file .env.prod --env-file .env.deploy -f docker-compose.prod.yml \
+  up -d --force-recreate api mailer scheduler
+
+docker compose --env-file .env.prod --env-file .env.deploy -f docker-compose.prod.yml \
+  exec -T --user www-data api php bin/console mailer:test ton.adresse@exemple.fr
+```
+
+Attention à la lecture du résultat : **tous les envois passent par la file Messenger**,
+`mailer:test` compris. La commande rend donc la main tout de suite, même si
+l'authentification SMTP échoue — c'est le conteneur `mailer` qui expédie réellement,
+quelques secondes plus tard. Les erreurs apparaissent dans ses journaux, pas dans la
+sortie de la commande :
+
+```bash
+docker compose --env-file .env.prod --env-file .env.deploy -f docker-compose.prod.yml \
+  logs --tail 30 mailer
+```
+
+Pour vérifier les identifiants seuls, sans dépendre du reste de la chaîne, on peut tester
+l'authentification directement depuis le VPS :
+
+```bash
+cd "$VPS_APP_PATH"
+python3 - <<'EOF'
+import urllib.parse, smtplib
+dsn = next(l.split('=', 1)[1].strip() for l in open('.env.prod') if l.startswith('MAILER_DSN='))
+u = urllib.parse.urlparse(dsn)
+s = smtplib.SMTP(u.hostname, u.port, timeout=20)
+s.starttls()
+s.login(urllib.parse.unquote(u.username), urllib.parse.unquote(u.password))
+print('authentification acceptée')
+s.quit()
+EOF
+```
+
+Ce test lit le DSN dans `.env.prod` — le secret n'est donc jamais retapé sur la ligne de
+commande, où il resterait dans l'historique du shell. Il vérifie aussi que le port 587
+n'est pas bloqué en sortie, ce que certains hébergeurs font par défaut.
+
 ## Sauvegardes
 
 En production, les données ne vivent qu'à un seul endroit : le volume Docker `db_data`

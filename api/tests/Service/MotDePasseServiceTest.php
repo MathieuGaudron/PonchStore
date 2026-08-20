@@ -13,6 +13,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class MotDePasseServiceTest extends TestCase
 {
+    private const EXPEDITEUR = 'expediteur-de-test@ponchstore.shop';
+
     private EntityManagerInterface $em;
     private UtilisateurRepository $utilisateurRepository;
     private MailerInterface $mailer;
@@ -31,6 +33,7 @@ class MotDePasseServiceTest extends TestCase
             $this->mailer,
             $this->passwordHasher,
             'http://localhost:3000',
+            self::EXPEDITEUR,
         );
     }
 

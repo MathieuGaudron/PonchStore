@@ -172,6 +172,91 @@ Secrets GitHub requis : `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_APP_PATH`,
 `GHCR_USER` et `GHCR_READ_TOKEN`. Variable GitHub requise : `VITE_API_BASE_URL`.
 Le token de lecture GHCR doit être limité à `read:packages`.
 
+## Sauvegardes
+
+En production, les données ne vivent qu'à un seul endroit : le volume Docker `db_data`
+du VPS. Le code est sur GitHub et se reconstruit, les commandes et les comptes clients
+non. `scripts/sauvegarde-db.sh` en produit un export quotidien avec `mysqldump`, sous
+forme d'un fichier SQL compressé et horodaté.
+
+Le script prend un instantané cohérent sans verrouiller les tables (`--single-transaction`),
+donc le site reste disponible pendant la sauvegarde. L'archive n'est nommée définitivement
+qu'après relecture par `gzip -t` : une coupure laisse un fichier `.partiel`, jamais une
+sauvegarde tronquée qui aurait l'air valide. Les archives de plus de 14 jours sont
+supprimées, mais seulement si la sauvegarde du jour a réussi.
+
+### Installation sur le VPS
+
+Le script est déployé avec le dépôt. Il se lance depuis le répertoire de déploiement,
+sans argument :
+
+```bash
+cd "$VPS_APP_PATH" && ./scripts/sauvegarde-db.sh
+```
+
+Une fois ce premier essai concluant, planifier une exécution quotidienne à 3 h avec
+`crontab -e` :
+
+```cron
+0 3 * * * /chemin/vers/ponchstore/scripts/sauvegarde-db.sh >> /home/UTILISATEUR/sauvegarde-ponchstore.log 2>&1
+```
+
+L'utilisateur du cron doit appartenir au groupe `docker`. Deux variables permettent
+d'ajuster le comportement : `REPERTOIRE_SAUVEGARDES` (défaut `$HOME/sauvegardes-ponchstore`)
+et `RETENTION_JOURS` (défaut 14).
+
+### Vérifier une sauvegarde
+
+Une sauvegarde jamais restaurée n'est pas une sauvegarde. Le contrôle se fait dans un
+conteneur MySQL jetable, sans aucun lien avec la production :
+
+```bash
+docker run --rm -d --name essai-restauration -e MYSQL_ROOT_PASSWORD=essai mysql:8.0
+
+# Attendre la fin de l'initialisation en tentant une vraie connexion. Un simple
+# "mysqladmin ping" répondrait trop tôt : pendant l'initialisation, le serveur
+# temporaire accepte déjà le socket alors que le mot de passe root n'est pas encore
+# posé, et la restauration échouerait sur un « Access denied ».
+until docker exec -e MYSQL_PWD=essai essai-restauration mysql -uroot -e 'SELECT 1' \
+  >/dev/null 2>&1; do sleep 2; done
+
+gunzip -c ~/sauvegardes-ponchstore/ponchstore-AAAA-MM-JJ-HHMMSS.sql.gz \
+  | docker exec -i -e MYSQL_PWD=essai essai-restauration mysql -uroot
+
+docker exec -e MYSQL_PWD=essai essai-restauration mysql -uroot \
+  -e "SELECT COUNT(*) FROM ponchstore.commande;"
+
+docker rm -f essai-restauration
+```
+
+Le dump contient son propre `CREATE DATABASE`, il se restaure donc sur un serveur vierge
+sans préparation.
+
+### Restaurer la production
+
+À ne faire qu'en cas de perte réelle : la restauration écrase les tables existantes, et
+tout ce qui a été enregistré depuis la sauvegarde est perdu.
+
+```bash
+cd "$VPS_APP_PATH"
+
+compose() {
+  docker compose --env-file .env.prod --env-file .env.deploy -f docker-compose.prod.yml "$@"
+}
+
+# Personne ne doit écrire pendant la restauration.
+compose stop api scheduler mailer
+
+gunzip -c ~/sauvegardes-ponchstore/ponchstore-AAAA-MM-JJ-HHMMSS.sql.gz \
+  | compose exec -T db sh -c 'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysql --user=root'
+
+compose start api scheduler mailer
+compose exec -T --user www-data api php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+La dernière commande rattrape le cas d'une sauvegarde antérieure à une migration : le
+schéma restauré est alors remis à niveau.
+
 ## Architecture
 
 Projet monorepo organisé en deux applications indépendantes :
@@ -180,6 +265,7 @@ Projet monorepo organisé en deux applications indépendantes :
 ponchstore/
 ├── api/               # Backend Symfony 7 (API REST JSON + JWT)
 ├── front/             # Frontend React 19 + Vite
+├── scripts/           # Exploitation du VPS (sauvegarde de la base)
 ├── docker-compose.yml # Orchestration des services
 └── README.md
 ```

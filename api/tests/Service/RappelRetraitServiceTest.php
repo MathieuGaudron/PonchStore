@@ -7,6 +7,7 @@ use App\Repository\CommandeRepository;
 use App\Service\CommandeMailService;
 use App\Service\RappelRetraitService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\NullLogger;
 use PHPUnit\Framework\TestCase;
 
 class RappelRetraitServiceTest extends TestCase
@@ -71,6 +72,7 @@ class RappelRetraitServiceTest extends TestCase
             $repository,
             $mailService,
             $em ?? $this->createMock(EntityManagerInterface::class),
+            new NullLogger(),
         );
     }
 }

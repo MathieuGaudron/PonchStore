@@ -339,6 +339,44 @@ compose exec -T --user www-data api php bin/console doctrine:migrations:migrate 
 La dernière commande rattrape le cas d'une sauvegarde antérieure à une migration : le
 schéma restauré est alors remis à niveau.
 
+## Journalisation
+
+Les logs applicatifs (Monolog) partent sur la **sortie d'erreur du conteneur**, jamais
+dans un fichier. Un fichier vivrait dans la couche écrivable du conteneur et
+disparaîtrait au déploiement suivant, qui recrée les conteneurs depuis l'image. Ils se
+lisent donc avec la commande utilisée pour tout le reste :
+
+```bash
+docker compose logs -f api                       # développement
+docker compose -f docker-compose.prod.yml logs -f api      # production
+docker compose -f docker-compose.prod.yml logs --tail 50 mailer    # envois Messenger
+```
+
+En production, `fingers_crossed` n'écrit **rien** tant que tout va bien. Dès qu'une
+erreur survient, il déverse les 50 messages précédents de la même requête — requêtes SQL,
+étapes métier — puis l'erreur elle-même. On ne lit donc pas seulement *ce qui a cassé*,
+mais *ce qui l'a précédé*. Les 404 et 405 sont exclus du déclenchement : un client qui se
+trompe d'URL n'est pas une panne.
+
+Le format est du **JSON, une ligne par événement**. Une trace d'exception s'étale sinon
+sur des dizaines de lignes qu'aucun agrégateur ne saurait rattacher entre elles.
+
+En développement, deux sorties coexistent : l'historique complet dans
+`api/var/log/dev.log` (ignoré par Git, lisible depuis l'hôte grâce au volume monté) pour
+les recherches après coup, et les erreurs seules dans `docker compose logs api`, pour
+garder le même réflexe qu'en production.
+
+| Niveau | Employé pour |
+|---|---|
+| `critical` | Exception non rattrapée : toute réponse 5xx. Posé par Symfony |
+| `error` | Le code a rattrapé, mais quelque chose a échoué : e-mail de confirmation non parti, rappel de retrait en échec |
+| `warning` | Dépendance externe indisponible (Open Food Facts). Incident normal, pas un bug |
+| `notice` | Cas métier attendu qu'on veut malgré tout pouvoir distinguer d'une vraie panne (suppression d'un produit refusée par la base) |
+
+Les `catch` qui absorbent volontairement une erreur — pour ne pas annuler une commande
+valide à cause d'un e-mail, par exemple — la tracent tous. Une erreur absorbée
+silencieusement est une erreur qu'on ne saura jamais expliquer.
+
 ## Architecture
 
 Projet monorepo organisé en deux applications indépendantes :

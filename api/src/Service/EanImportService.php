@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class EanImportService
@@ -10,8 +11,10 @@ class EanImportService
     private const URL_RECHERCHE = 'https://world.openfoodfacts.org/cgi/search.pl';
     private const USER_AGENT = 'PonchStore/1.0 (projet etudiant IPSSI)';
 
-    public function __construct(private readonly HttpClientInterface $httpClient)
-    {
+    public function __construct(
+        private readonly HttpClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     public function rechercher(string $terme): array
@@ -69,7 +72,12 @@ class EanImportService
             }
 
             return $response->toArray(false);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $this->logger->warning('Recherche Open Food Facts indisponible.', [
+                'terme' => $terme,
+                'exception' => $e,
+            ]);
+
             return null;
         }
     }
@@ -88,7 +96,12 @@ class EanImportService
             }
 
             $data = $response->toArray(false);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $this->logger->warning('Import Open Food Facts indisponible.', [
+                'ean' => $ean,
+                'exception' => $e,
+            ]);
+
             return null;
         }
 

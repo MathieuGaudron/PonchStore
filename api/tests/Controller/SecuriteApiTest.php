@@ -17,6 +17,7 @@ class SecuriteApiTest extends ApiTestCase
             'liste des utilisateurs' => ['GET', '/api/utilisateurs', RoleEnum::ADMIN],
             'création d\'un utilisateur' => ['POST', '/api/utilisateurs', RoleEnum::ADMIN],
             'activation d\'un utilisateur' => ['PATCH', '/api/utilisateurs/999999/actif', RoleEnum::ADMIN],
+            'modification d\'un utilisateur' => ['PUT', '/api/utilisateurs/999999', RoleEnum::ADMIN],
             'liste back-office des produits' => ['GET', '/api/produits', RoleEnum::ADMIN],
             'création d\'un produit' => ['POST', '/api/produits', RoleEnum::ADMIN],
             'suppression d\'un produit' => ['DELETE', '/api/produits/999999', RoleEnum::ADMIN],

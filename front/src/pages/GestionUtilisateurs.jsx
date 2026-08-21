@@ -36,7 +36,7 @@ function formaterDate(valeur) {
 }
 
 export default function GestionUtilisateurs() {
-  const { utilisateur: connecte, creerUtilisateur } = useAuth()
+  const { utilisateur: connecte, creerUtilisateur, seDeconnecter } = useAuth()
 
   const [utilisateurs, setUtilisateurs] = useState([])
   const [form, setForm] = useState(FORM_VIDE)
@@ -46,6 +46,7 @@ export default function GestionUtilisateurs() {
   const [loading, setLoading] = useState(false)
   const [version, setVersion] = useState(0)
   const [formulaireOuvert, setFormulaireOuvert] = useState(false)
+  const [enEdition, setEnEdition] = useState(null)
 
   useEffect(() => {
     let ignore = false
@@ -69,23 +70,98 @@ export default function GestionUtilisateurs() {
     setTimeout(() => setSucces(null), 3000)
   }
 
+  function fermerFormulaire() {
+    setFormulaireOuvert(false)
+    setEnEdition(null)
+    setForm(FORM_VIDE)
+    setErreur(null)
+    setErrors(null)
+  }
+
+  function ouvrirCreation() {
+    setEnEdition(null)
+    setForm(FORM_VIDE)
+    setErreur(null)
+    setErrors(null)
+    setFormulaireOuvert(true)
+  }
+
+  function ouvrirEdition(u) {
+    setEnEdition(u)
+    setForm({
+      nom: u.nom ?? '',
+      prenom: u.prenom ?? '',
+      email: u.email ?? '',
+      password: '',
+      role: u.role ?? 'CLIENT_PRO',
+      telephone: u.telephone ?? '',
+      nomEtablissement: u.nomEtablissement ?? '',
+      adresseEtablissement: u.adresseEtablissement ?? '',
+      siret: u.siret ?? '',
+    })
+    setErreur(null)
+    setErrors(null)
+    setFormulaireOuvert(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
     setErreur(null)
     setErrors(null)
+
+    const soiMeme = enEdition && enEdition.id === connecte?.id
+    const emailChange = soiMeme && form.email !== enEdition.email
+
+    if (
+      emailChange &&
+      !window.confirm(
+        'Vous modifiez votre propre adresse e-mail. Votre session sera fermée et vous devrez vous reconnecter avec la nouvelle adresse. Continuer ?',
+      )
+    ) {
+      return
+    }
+
     setLoading(true)
 
     try {
-      const cree = await creerUtilisateur(form)
-      setForm(FORM_VIDE)
-      setFormulaireOuvert(false)
-      setVersion((v) => v + 1)
-      afficherSucces(`Compte créé pour ${cree.prenom} ${cree.nom} (${cree.role}) ✓`)
+      if (enEdition) {
+        const modifie = await apiFetch(`/api/utilisateurs/${enEdition.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            nom: form.nom,
+            prenom: form.prenom,
+            email: form.email,
+            role: form.role,
+            telephone: form.telephone,
+            nomEtablissement: form.nomEtablissement,
+            adresseEtablissement: form.adresseEtablissement,
+            siret: form.siret,
+          }),
+        })
+        fermerFormulaire()
+        setVersion((v) => v + 1)
+
+        if (emailChange) {
+          window.alert('Adresse modifiée. Reconnectez-vous avec votre nouvelle adresse.')
+          seDeconnecter()
+          return
+        }
+
+        afficherSucces(`Compte de ${modifie.prenom} ${modifie.nom} modifié ✓`)
+      } else {
+        const cree = await creerUtilisateur(form)
+        fermerFormulaire()
+        setVersion((v) => v + 1)
+        afficherSucces(`Compte créé pour ${cree.prenom} ${cree.nom} (${cree.role}) ✓`)
+      }
     } catch (err) {
       if (err.status === 422 && err.data?.errors) {
         setErrors(err.data.errors)
       } else if (err.status === 409) {
         setErreur('Cet email est déjà utilisé.')
+      } else if (err.status === 422) {
+        setErreur(err.data?.message || err.message)
       } else {
         setErreur(err.message)
       }
@@ -140,7 +216,7 @@ export default function GestionUtilisateurs() {
         <p className="surtitre text-brume">Administration</p>
         <div className="mb-10 mt-3 flex flex-wrap items-end justify-between gap-4">
           <h1 className="font-display text-4xl text-graphite md:text-5xl">Gestion des utilisateurs</h1>
-          <Button onClick={() => setFormulaireOuvert((o) => !o)}>
+          <Button onClick={() => (formulaireOuvert ? fermerFormulaire() : ouvrirCreation())}>
             {formulaireOuvert ? 'Fermer' : '+ Nouvel utilisateur'}
           </Button>
         </div>
@@ -156,7 +232,9 @@ export default function GestionUtilisateurs() {
           onSubmit={handleSubmit}
           className="mb-10 max-w-3xl border border-trait bg-white p-6"
         >
-          <h2 className="mb-5 font-display text-2xl text-graphite">Nouvel utilisateur</h2>
+          <h2 className="mb-5 font-display text-2xl text-graphite">
+            {enEdition ? `Modifier ${enEdition.prenom} ${enEdition.nom}` : 'Nouvel utilisateur'}
+          </h2>
 
           {erreur && <p className="mb-3 text-sm text-cinabre">{erreur}</p>}
 
@@ -164,14 +242,15 @@ export default function GestionUtilisateurs() {
             {champ('prenom', 'Prénom', 'text', true)}
             {champ('nom', 'Nom', 'text', true)}
             {champ('email', 'Email', 'email', true)}
-            {champ('password', 'Mot de passe (8 car. min.)', 'password', true)}
+            {!enEdition && champ('password', 'Mot de passe (8 car. min.)', 'password', true)}
             <div>
               <label className="etiquette">Rôle *</label>
               <select
                 name="role"
                 value={form.role}
                 onChange={handleChange}
-                className="champ"
+                disabled={enEdition?.id === connecte?.id}
+                className="champ disabled:cursor-not-allowed disabled:text-brume"
               >
                 {ROLES.map((role) => (
                   <option key={role.value} value={role.value}>
@@ -179,8 +258,20 @@ export default function GestionUtilisateurs() {
                   </option>
                 ))}
               </select>
+              {enEdition?.id === connecte?.id && (
+                <span className="text-xs text-brume">
+                  Vous ne pouvez pas modifier votre propre rôle.
+                </span>
+              )}
             </div>
           </div>
+
+          {enEdition && (
+            <p className="mt-4 text-xs text-brume">
+              Le mot de passe n'est pas modifiable ici : l'utilisateur le change lui-même
+              depuis « Mot de passe oublié ».
+            </p>
+          )}
 
           <h2 className="mb-3 mt-6 font-display text-2xl text-graphite">
             Établissement <span className="text-xs font-normal text-brume">(optionnel)</span>
@@ -194,8 +285,21 @@ export default function GestionUtilisateurs() {
 
           <div className="mt-6">
             <Button type="submit" disabled={loading}>
-              {loading ? 'Création…' : "Créer l'utilisateur"}
+              {loading
+                ? 'Enregistrement…'
+                : enEdition
+                  ? 'Enregistrer les modifications'
+                  : "Créer l'utilisateur"}
             </Button>
+            {enEdition && (
+              <button
+                type="button"
+                onClick={fermerFormulaire}
+                className="ml-4 text-brume hover:underline"
+              >
+                Annuler
+              </button>
+            )}
           </div>
         </form>
         )}
@@ -237,22 +341,32 @@ export default function GestionUtilisateurs() {
                 )}
               </td>
               <td className="px-3 py-3 text-right">
-                {u.id !== connecte?.id &&
-                  (u.actif ? (
-                    <button
-                      onClick={() => changerActif(u, false)}
-                      className="text-cinabre hover:underline"
-                    >
-                      Désactiver
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => changerActif(u, true)}
-                      className="text-menthe hover:underline"
-                    >
-                      Réactiver
-                    </button>
-                  ))}
+                <button
+                  onClick={() => ouvrirEdition(u)}
+                  className="text-graphite hover:underline"
+                >
+                  Modifier
+                </button>
+                {u.id !== connecte?.id && (
+                  <>
+                    <span className="mx-2 text-trait">|</span>
+                    {u.actif ? (
+                      <button
+                        onClick={() => changerActif(u, false)}
+                        className="text-cinabre hover:underline"
+                      >
+                        Désactiver
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => changerActif(u, true)}
+                        className="text-menthe hover:underline"
+                      >
+                        Réactiver
+                      </button>
+                    )}
+                  </>
+                )}
               </td>
             </tr>
           ))}

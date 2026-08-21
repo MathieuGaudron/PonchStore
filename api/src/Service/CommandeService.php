@@ -12,6 +12,7 @@ use App\Repository\CommandeRepository;
 use App\Repository\CreneauRetraitRepository;
 use App\Repository\PanierArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class CommandeService
 {
@@ -22,6 +23,7 @@ class CommandeService
         private readonly CreneauRetraitRepository $creneauRepository,
         private readonly CommandeRepository $commandeRepository,
         private readonly CommandeMailService $commandeMailService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -104,7 +106,11 @@ class CommandeService
 
         try {
             $this->commandeMailService->confirmerReservation($commande);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $this->logger->error('Commande créée mais e-mail de confirmation non envoyé.', [
+                'commande' => $commande->getId(),
+                'exception' => $e,
+            ]);
         }
 
         return $commande;

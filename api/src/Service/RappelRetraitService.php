@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\CommandeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class RappelRetraitService
 {
@@ -11,6 +12,7 @@ class RappelRetraitService
         private readonly CommandeRepository $commandeRepository,
         private readonly CommandeMailService $commandeMailService,
         private readonly EntityManagerInterface $em,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -27,7 +29,11 @@ class RappelRetraitService
                 $this->commandeMailService->rappelerRetrait($commande);
                 $commande->setRappelEnvoyeAt(new \DateTimeImmutable());
                 ++$envoyes;
-            } catch (\Throwable) {
+            } catch (\Throwable $e) {
+                $this->logger->error("Échec de l'envoi du rappel de retrait.", [
+                    'commande' => $commande->getId(),
+                    'exception' => $e,
+                ]);
                 ++$echecs;
             }
         }

@@ -16,6 +16,7 @@ use App\Service\CommandeService;
 use App\Service\PanierService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 class CommandeServiceTest extends TestCase
 {
@@ -39,6 +40,7 @@ class CommandeServiceTest extends TestCase
             $this->creneauRepository,
             $this->commandeRepository,
             $this->createMock(CommandeMailService::class),
+            new NullLogger(),
         );
         $this->utilisateur = new Utilisateur();
     }

@@ -11,6 +11,7 @@ use App\Repository\ProduitRepository;
 use App\Service\EanImportService;
 use App\Service\StockService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ class ProduitController extends AbstractController
         private readonly CategorieRepository $categorieRepository,
         private readonly ValidatorInterface $validator,
         private readonly EntityManagerInterface $em,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -145,7 +147,12 @@ class ProduitController extends AbstractController
             }
             $this->em->remove($produit);
             $this->em->flush();
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $this->logger->notice('Suppression de produit refusée par la base.', [
+                'produit' => $id,
+                'exception' => $e,
+            ]);
+
             return $this->json(
                 ['message' => 'Ce produit est lié à des commandes : désactivez-le plutôt que de le supprimer.'],
                 JsonResponse::HTTP_CONFLICT,

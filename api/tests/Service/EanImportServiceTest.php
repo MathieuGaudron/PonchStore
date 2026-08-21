@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 
 use App\Service\EanImportService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
@@ -21,7 +22,7 @@ class EanImportServiceTest extends TestCase
             ],
         ]));
 
-        $service = new EanImportService(new MockHttpClient($reponse));
+        $service = new EanImportService(new MockHttpClient($reponse), new NullLogger());
 
         $resultat = $service->importer('3033610013009');
 
@@ -42,7 +43,7 @@ class EanImportServiceTest extends TestCase
             ],
         ]));
 
-        $service = new EanImportService(new MockHttpClient($reponse));
+        $service = new EanImportService(new MockHttpClient($reponse), new NullLogger());
 
         $this->assertNull($service->importer('1234567890123'));
     }
@@ -51,7 +52,7 @@ class EanImportServiceTest extends TestCase
     {
         $reponse = new MockResponse(json_encode(['status' => 0]));
 
-        $service = new EanImportService(new MockHttpClient($reponse));
+        $service = new EanImportService(new MockHttpClient($reponse), new NullLogger());
 
         $this->assertNull($service->importer('0000000000000'));
     }
@@ -60,7 +61,7 @@ class EanImportServiceTest extends TestCase
     {
         $reponse = new MockResponse('', ['http_code' => 503]);
 
-        $service = new EanImportService(new MockHttpClient($reponse));
+        $service = new EanImportService(new MockHttpClient($reponse), new NullLogger());
 
         $this->assertNull($service->importer('3033610013009'));
     }
@@ -71,7 +72,7 @@ class EanImportServiceTest extends TestCase
             throw new \RuntimeException('Connexion impossible');
         });
 
-        $service = new EanImportService($client);
+        $service = new EanImportService($client, new NullLogger());
 
         $this->assertNull($service->importer('3033610013009'));
     }
@@ -85,7 +86,7 @@ class EanImportServiceTest extends TestCase
             ],
         ]));
 
-        $service = new EanImportService(new MockHttpClient($reponse));
+        $service = new EanImportService(new MockHttpClient($reponse), new NullLogger());
 
         $resultats = $service->rechercher('vodka');
 
@@ -103,7 +104,7 @@ class EanImportServiceTest extends TestCase
             new MockResponse(json_encode(['products' => [['product_name' => 'Rhum Diplomatico']]])),
         ]);
 
-        $service = new EanImportService($client);
+        $service = new EanImportService($client, new NullLogger());
 
         $resultats = $service->rechercher('rhum');
 
@@ -118,7 +119,7 @@ class EanImportServiceTest extends TestCase
             new MockResponse('', ['http_code' => 503]),
         ]);
 
-        $service = new EanImportService($client);
+        $service = new EanImportService($client, new NullLogger());
 
         $this->assertSame([], $service->rechercher('rhum'));
     }

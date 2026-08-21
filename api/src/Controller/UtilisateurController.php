@@ -61,6 +61,76 @@ class UtilisateurController extends AbstractController
         return $this->json($utilisateur, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
     }
 
+    #[Route('/{id}', name: 'api_utilisateurs_modifier', methods: ['PUT'], requirements: ['id' => '\d+'])]
+    public function modifier(
+        int $id,
+        Request $request,
+        #[CurrentUser] Utilisateur $connecte,
+        ValidatorInterface $validator,
+        UtilisateurRepository $utilisateurRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $utilisateur = $utilisateurRepository->find($id);
+        if ($utilisateur === null) {
+            return $this->json(['message' => 'Utilisateur introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            return $this->json(['message' => 'Corps de requête JSON invalide.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $constraints = new Assert\Collection(
+            fields: [
+                'nom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
+                'prenom' => [new Assert\NotBlank(), new Assert\Length(max: 100)],
+                'email' => [new Assert\NotBlank(), new Assert\Email(), new Assert\Length(max: 180)],
+                'role' => new Assert\Optional([new Assert\Choice(choices: array_column(RoleEnum::cases(), 'value'))]),
+                'telephone' => new Assert\Optional([new Assert\Length(max: 20)]),
+                'nomEtablissement' => new Assert\Optional([new Assert\Length(max: 150)]),
+                'adresseEtablissement' => new Assert\Optional(),
+                'siret' => new Assert\Optional([new Assert\Regex(pattern: '/^\d{14}$/', message: 'Le SIRET doit contenir exactement 14 chiffres.')]),
+            ],
+        );
+
+        $errors = $validator->validate($data, $constraints);
+        if (count($errors) > 0) {
+            $messages = [];
+            foreach ($errors as $error) {
+                $messages[trim($error->getPropertyPath(), '[]')] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $messages], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $existant = $utilisateurRepository->findOneBy(['email' => $data['email']]);
+        if ($existant !== null && $existant->getId() !== $utilisateur->getId()) {
+            return $this->json(['message' => 'Cet email est déjà utilisé.'], JsonResponse::HTTP_CONFLICT);
+        }
+
+        $role = RoleEnum::from($data['role'] ?? $utilisateur->getRole()->value);
+
+        if ($utilisateur->getId() === $connecte->getId() && $role !== $utilisateur->getRole()) {
+            return $this->json(
+                ['message' => 'Impossible de modifier votre propre rôle.'],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        }
+
+        $utilisateur->setNom($data['nom']);
+        $utilisateur->setPrenom($data['prenom']);
+        $utilisateur->setEmail($data['email']);
+        $utilisateur->setRole($role);
+        $utilisateur->setTelephone($data['telephone'] ?? null);
+        $utilisateur->setNomEtablissement($data['nomEtablissement'] ?? null);
+        $utilisateur->setAdresseEtablissement($data['adresseEtablissement'] ?? null);
+        $utilisateur->setSiret($data['siret'] ?? null);
+
+        $em->flush();
+
+        return $this->json($utilisateur, JsonResponse::HTTP_OK, [], ['groups' => self::GROUPES]);
+    }
+
     #[Route('', name: 'api_utilisateurs_create', methods: ['POST'])]
     public function create(
         Request $request,

@@ -61,6 +61,110 @@ class CommandeMailService
         $this->mailer->send($message);
     }
 
+    public function annoncerCommandePrete(Commande $commande): void
+    {
+        $utilisateur = $commande->getUtilisateur();
+        $creneau = $commande->getCreneau();
+
+        if ($utilisateur === null || $creneau === null) {
+            return;
+        }
+
+        $message = (new Email())
+            ->from($this->expediteur)
+            ->to($utilisateur->getEmail())
+            ->subject("PONCH'STORE — Commande n°{$commande->getId()} prête à retirer")
+            ->text($this->corpsPrete($commande, $creneau));
+
+        $this->mailer->send($message);
+    }
+
+    public function confirmerRetrait(Commande $commande): void
+    {
+        $utilisateur = $commande->getUtilisateur();
+        $creneau = $commande->getCreneau();
+
+        if ($utilisateur === null || $creneau === null) {
+            return;
+        }
+
+        $message = (new Email())
+            ->from($this->expediteur)
+            ->to($utilisateur->getEmail())
+            ->subject("PONCH'STORE — Récapitulatif de retrait, commande n°{$commande->getId()}")
+            ->text($this->corpsRetrait($commande, $creneau));
+
+        $this->mailer->send($message);
+    }
+
+    public function annoncerAnnulation(Commande $commande): void
+    {
+        $utilisateur = $commande->getUtilisateur();
+        $creneau = $commande->getCreneau();
+
+        if ($utilisateur === null || $creneau === null) {
+            return;
+        }
+
+        $message = (new Email())
+            ->from($this->expediteur)
+            ->to($utilisateur->getEmail())
+            ->subject("PONCH'STORE — Commande n°{$commande->getId()} annulée")
+            ->text($this->corpsAnnulation($commande, $creneau));
+
+        $this->mailer->send($message);
+    }
+
+    private function corpsPrete(Commande $commande, CreneauRetrait $creneau): string
+    {
+        return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
+            . "Votre commande n°{$commande->getId()} est prête et vous attend.\n\n"
+            . 'Retrait le ' . $this->jour($creneau->getDate())
+            . ', entre ' . $this->heure($creneau->getHeureDebut())
+            . ' et ' . $this->heure($creneau->getHeureFin()) . ".\n\n"
+            . 'Montant à régler : ' . number_format($commande->getMontantTtc(), 2, ',', ' ') . " € TTC\n"
+            . '(' . number_format((float) $commande->getMontantTotal(), 2, ',', ' ') . " € HT)\n\n"
+            . "Le détail de votre commande est consultable ici :\n"
+            . $this->urlFront . '/commande/' . $commande->getId() . "\n\n"
+            . "À très vite,\n"
+            . "L'équipe PONCH'STORE";
+    }
+
+    /*
+     * Ce message vaut justificatif de retrait : le client est un professionnel,
+     * il lui faut le détail des lignes et la ventilation HT / TVA / TTC pour sa
+     * comptabilité. C'est ce qui le distingue d'une simple notification.
+     */
+    private function corpsRetrait(Commande $commande, CreneauRetrait $creneau): string
+    {
+        return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
+            . "Votre commande n°{$commande->getId()} a bien été retirée le "
+            . $this->jour($creneau->getDate()) . ".\n"
+            . "Ce message vous sert de récapitulatif.\n\n"
+            . "Votre commande :\n"
+            . $this->recapitulatif($commande) . "\n"
+            . $this->totaux($commande) . "\n"
+            . "Le détail de votre commande reste consultable ici :\n"
+            . $this->urlFront . '/commande/' . $commande->getId() . "\n\n"
+            . "Merci de votre confiance,\n"
+            . "L'équipe PONCH'STORE";
+    }
+
+    private function corpsAnnulation(Commande $commande, CreneauRetrait $creneau): string
+    {
+        return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
+            . "Votre commande n°{$commande->getId()} a été annulée.\n\n"
+            . 'Le créneau de retrait du ' . $this->jour($creneau->getDate())
+            . ' (' . $this->heure($creneau->getHeureDebut())
+            . ' - ' . $this->heure($creneau->getHeureFin()) . ") a été libéré,\n"
+            . "et les produits réservés sont de nouveau disponibles à la vente.\n\n"
+            . 'Montant annulé : ' . number_format($commande->getMontantTtc(), 2, ',', ' ') . " € TTC\n\n"
+            . "Vous pouvez passer une nouvelle commande à tout moment :\n"
+            . $this->urlFront . "/catalogue\n\n"
+            . "À bientôt,\n"
+            . "L'équipe PONCH'STORE";
+    }
+
     private function corpsRappel(Commande $commande, CreneauRetrait $creneau): string
     {
         return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
@@ -80,6 +184,24 @@ class CommandeMailService
 
     private function corps(Commande $commande, CreneauRetrait $creneau): string
     {
+        return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
+            . "Nous avons bien reçu votre commande n°{$commande->getId()}.\n\n"
+            . 'Retrait prévu le ' . $this->jour($creneau->getDate())
+            . ', entre ' . $this->heure($creneau->getHeureDebut())
+            . ' et ' . $this->heure($creneau->getHeureFin()) . ".\n\n"
+            . "Votre commande :\n"
+            . $this->recapitulatif($commande) . "\n"
+            . $this->totaux($commande) . "\n"
+            . "Le détail de votre commande est consultable ici :\n"
+            . $this->urlFront . '/commande/' . $commande->getId() . "\n\n"
+            . "Si vous ne pouvez pas vous présenter à ce créneau, annulez votre commande\n"
+            . "depuis votre espace client pour libérer la place.\n\n"
+            . "À bientôt,\n"
+            . "L'équipe PONCH'STORE";
+    }
+
+    private function recapitulatif(Commande $commande): string
+    {
         $recapitulatif = '';
         foreach ($commande->getLignes() as $ligne) {
             $produit = $ligne->getProduit();
@@ -95,27 +217,19 @@ class CommandeMailService
             );
         }
 
+        return $recapitulatif;
+    }
+
+    private function totaux(Commande $commande): string
+    {
         $ht = number_format((float) $commande->getMontantTotal(), 2, ',', ' ');
         $tva = number_format($commande->getMontantTva(), 2, ',', ' ');
         $ttc = number_format($commande->getMontantTtc(), 2, ',', ' ');
         $tauxTva = (int) round(PanierService::TAUX_TVA * 100);
 
-        return "Bonjour {$commande->getUtilisateur()->getPrenom()},\n\n"
-            . "Nous avons bien reçu votre commande n°{$commande->getId()}.\n\n"
-            . 'Retrait prévu le ' . $this->jour($creneau->getDate())
-            . ', entre ' . $this->heure($creneau->getHeureDebut())
-            . ' et ' . $this->heure($creneau->getHeureFin()) . ".\n\n"
-            . "Votre commande :\n"
-            . $recapitulatif . "\n"
-            . "Montant total HT : {$ht} €\n"
+        return "Montant total HT : {$ht} €\n"
             . "TVA {$tauxTva} % : {$tva} €\n"
-            . "Total TTC : {$ttc} €\n\n"
-            . "Le détail de votre commande est consultable ici :\n"
-            . $this->urlFront . '/commande/' . $commande->getId() . "\n\n"
-            . "Si vous ne pouvez pas vous présenter à ce créneau, annulez votre commande\n"
-            . "depuis votre espace client pour libérer la place.\n\n"
-            . "À bientôt,\n"
-            . "L'équipe PONCH'STORE";
+            . "Total TTC : {$ttc} €\n";
     }
 
     private function jour(\DateTimeImmutable $date): string

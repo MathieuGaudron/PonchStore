@@ -51,6 +51,46 @@ class CommandeMailServiceTest extends TestCase
         self::assertStringContainsString(self::URL_FRONT . '/commande/12', $corps);
     }
 
+    public function testLeMailDeCommandePreteAnnonceLeCreneauEtLeMontant(): void
+    {
+        $email = $this->capturer(fn (CommandeMailService $s) => $s->annoncerCommandePrete($this->commande()));
+        $corps = $email->getTextBody();
+
+        self::assertStringContainsString('prête à retirer', $email->getSubject());
+        self::assertStringContainsString('n°12', $email->getSubject());
+        self::assertStringContainsString('est prête et vous attend', $corps);
+        self::assertStringContainsString('samedi 22 août 2026', $corps);
+        self::assertStringContainsString('entre 09h00 et 09h20', $corps);
+        self::assertStringContainsString('174,60 € TTC', $corps);
+        self::assertStringContainsString(self::URL_FRONT . '/commande/12', $corps);
+    }
+
+    public function testLeMailDeRetraitTientLieuDeRecapitulatifComptable(): void
+    {
+        $email = $this->capturer(fn (CommandeMailService $s) => $s->confirmerRetrait($this->commande()));
+        $corps = $email->getTextBody();
+
+        self::assertStringContainsString('Récapitulatif de retrait', $email->getSubject());
+        self::assertStringContainsString('a bien été retirée le samedi 22 août 2026', $corps);
+        self::assertStringContainsString('3 × Ricard 1L (6 x 1L)', $corps);
+        self::assertStringContainsString('Montant total HT : 145,50 €', $corps);
+        self::assertStringContainsString('TVA 20 % : 29,10 €', $corps);
+        self::assertStringContainsString('Total TTC : 174,60 €', $corps);
+    }
+
+    public function testLeMailDAnnulationSignaleLeCreneauLibere(): void
+    {
+        $email = $this->capturer(fn (CommandeMailService $s) => $s->annoncerAnnulation($this->commande()));
+        $corps = $email->getTextBody();
+
+        self::assertStringContainsString('annulée', $email->getSubject());
+        self::assertStringContainsString('n°12', $email->getSubject());
+        self::assertStringContainsString('samedi 22 août 2026', $corps);
+        self::assertStringContainsString('a été libéré', $corps);
+        self::assertStringContainsString('174,60 € TTC', $corps);
+        self::assertStringContainsString(self::URL_FRONT . '/catalogue', $corps);
+    }
+
     public function testLEmailPartDeLAdresseConfiguree(): void
     {
         $email = $this->envoyer($this->commande());
@@ -67,6 +107,9 @@ class CommandeMailServiceTest extends TestCase
         $service = new CommandeMailService($mailer, self::URL_FRONT, self::EXPEDITEUR);
         $service->confirmerReservation(new Commande());
         $service->rappelerRetrait(new Commande());
+        $service->annoncerCommandePrete(new Commande());
+        $service->confirmerRetrait(new Commande());
+        $service->annoncerAnnulation(new Commande());
     }
 
     private function envoyer(Commande $commande): Email

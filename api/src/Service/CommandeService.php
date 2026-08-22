@@ -132,6 +132,8 @@ class CommandeService
         $commande->setStatut($nouveauStatut);
         $this->em->flush();
 
+        $this->notifier($commande, $nouveauStatut);
+
         return $commande;
     }
 
@@ -162,11 +164,37 @@ class CommandeService
 
             $this->em->flush();
             $this->em->commit();
-
-            return $commande;
         } catch (\Throwable $e) {
             $this->em->rollback();
             throw $e;
+        }
+
+        $this->notifier($commande, StatutCommandeEnum::ANNULEE);
+
+        return $commande;
+    }
+
+    /*
+     * Notification envoyée une fois la transaction refermée, et dont l'échec ne
+     * remonte pas : le statut est déjà changé en base, faire échouer la requête
+     * pour une panne du fournisseur d'e-mails laisserait l'admin croire que le
+     * clic n'a pas pris. Le log est ce qui permet de rattraper l'envoi.
+     */
+    private function notifier(Commande $commande, StatutCommandeEnum $statut): void
+    {
+        try {
+            match ($statut) {
+                StatutCommandeEnum::PRETE => $this->commandeMailService->annoncerCommandePrete($commande),
+                StatutCommandeEnum::RECUPEREE => $this->commandeMailService->confirmerRetrait($commande),
+                StatutCommandeEnum::ANNULEE => $this->commandeMailService->annoncerAnnulation($commande),
+                default => null,
+            };
+        } catch (\Throwable $e) {
+            $this->logger->error('Statut de commande modifié mais e-mail de notification non envoyé.', [
+                'commande' => $commande->getId(),
+                'statut' => $statut->value,
+                'exception' => $e,
+            ]);
         }
     }
 }
